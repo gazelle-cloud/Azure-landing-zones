@@ -1,0 +1,29 @@
+
+name: lz - online-myApp-test
+
+on:
+  push:
+    paths:
+      - 'landingzones/online-prod/online-myApp-test.json'
+
+  workflow_dispatch:
+
+  pull_request_target:
+    types:
+      - closed
+    paths:
+      - 'landingzones/online-prod/online-myApp-test.json'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  landingzone:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    uses: ./.github/workflows/template-landingzones.yml
+    with:
+      managementGroup: 'online'
+      managementGroupHierarchy: 'prod'
+      parameterFile: ./landingzones/online-prod/online-myApp-test.json
+    secrets: inherit

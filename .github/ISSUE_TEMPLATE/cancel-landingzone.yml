@@ -1,0 +1,16 @@
+name: cancel landingzone
+description: cancel a landingzone
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the form below to cancel a landingzone.
+
+  - type: input
+    id: subscriptionId
+    attributes:
+      label: subscription Id
+      description: 
+      placeholder: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    validations:
+      required: true

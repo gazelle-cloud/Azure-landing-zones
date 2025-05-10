@@ -1,0 +1,11 @@
+{
+  "appName": "myApp",
+  "environment": "test",
+  "billingScope": "platform",
+  "managementGroupName": "online",
+  "budget": "10",
+  "CIDR": "23",
+  "subscriptionId": "",
+  "githubRepoName": "landingzones",
+  "engineerEmail": "mantas@outlook.dk"
+}

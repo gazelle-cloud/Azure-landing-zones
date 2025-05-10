@@ -1,0 +1,110 @@
+name: platform - flow - destroy Azure platform
+
+on:
+  workflow_dispatch:
+    inputs:
+      managementGroupHierarchy:
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  destroy:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: ${{ inputs.managementGroupHierarchy }}
+    env:
+      topLevelManagementGroup: ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}
+      managementSubscriptionId: ${{ vars.PLALTFORM_SUBSCRIPTION_ID }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Azure login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+        tenant-id: ${{ vars.AZURE_TENANT_ID }}
+        allow-no-subscriptions: true
+        enable-AzPSSession: true
+    
+    - name: get github token
+      id: github-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+        private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+        owner: ${{ github.repository_owner }}
+
+    - name: reset hierarchy settings
+      uses: azure/powershell@v2
+      if: ${{ inputs.managementGroupHierarchy == 'prod' }}
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          $params = @{
+            GroupName = '${{ vars.AZURE_TENANT_ID }}'
+            DefaultManagementGroup = '/providers/Microsoft.Management/managementGroups/${{ vars.AZURE_TENANT_ID}}'
+            Authorization = $false
+          }
+          write-output $params
+          new-azManagementGroupHierarchySetting @params
+
+    - name: delete landing zone deployment stacks
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          $params = @{
+            environment = '${{ inputs.managementGroupHierarchy }}'
+          }
+          write-output $params
+          ./.github/utils/remove-landingzoneDeploymentStacks.ps1 @params
+
+    - name: move subscriptions
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          $params = @{
+            topLevelManagementGroupName = '${{ env.topLevelManagementGroup }}'
+          }
+          write-output $params
+          ./.github/utils/move-subscriptions.ps1 @params
+
+    - name: delete management group level deployment stacks
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          $params = @{
+            topLevelManagementGroupName = '${{ env.topLevelManagementGroup }}'
+          }
+          write-output $params
+          ./.github/utils/remove-managementGroupDeploymentStacks.ps1 @params
+
+    - name: cleanup deployment history
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          $params = @{
+            managementSubscriptionId  = '${{ env.managementSubscriptionId }}'
+            topLevelManagementGroupName = '${{ env.topLevelManagementGroup }}'
+          }
+          write-output $params
+          ./.github/utils/remove-deploymentHistory.ps1 @params
+
+    - name: delete GitHub environment
+      env:
+        GH_TOKEN: ${{ steps.github-token.outputs.token }}
+      run: |
+          echo "delete deployment environment"
+          gh api --method DELETE -H "Accept: application/vnd.github+json" \
+          repos/${{ github.repository }}/environments/${{ inputs.managementGroupHierarchy }}

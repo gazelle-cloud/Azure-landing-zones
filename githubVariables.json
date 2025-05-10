@@ -1,0 +1,34 @@
+{
+    "organizationVariables": {
+        "AZURE_DEFAULT_LOCATION": "francecentral"
+    },
+    "repositoryVariables": {
+        "APP_GITHUB_AZUREPLATFORM_ID": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "RUNNER_IMAGE_VERSION": "xxxxxxxxxxxxxx",
+        "AZURE_CLI_VERSION": "xxxxx",
+        "AZURE_TENANT_ID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "BILLING_ACCOUNT_NAME": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx_xxxx-xx-xx",
+        "BILLING_PROFILE_NAME": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "BILLINGSCOPE_PLATFORM": "/providers/Microsoft.Billing/billingAccounts/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx_xxxx-xx-xx/billingProfiles/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/invoiceSections/xxxxxxxx",
+        "AZURE_PLATFORM_ADMIN_GROUP_ID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "AZURE_PLATFORM_ENGINEER_EMAIL": "xxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "environmentVariables": {
+        "AZURE_PLATFORM_CLIENT_ID": {
+            "test": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            "prod": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        },
+        "AZURE_PLATFORM_PRINCIPAL_ID": {
+            "test": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            "prod": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        },
+        "PLALTFORM_SUBSCRIPTION_ID": {
+            "test": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            "prod": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        },
+        "TOP_LEVEL_MANAGEMENT_GROUP_NAME": {
+            "test": "gazelle-test",
+            "prod": "gazelle-prod"
+        }
+    }
+}

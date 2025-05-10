@@ -1,0 +1,82 @@
+name: template - request new landingzone
+
+on:
+  issues: 
+    types: closed
+
+jobs:
+  initLandingzone:
+    if: contains(github.event.issue.labels.*.name, 'newLandingzone')
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+      
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.github-token.outputs.token }}      
+
+
+      - name: get issue inputs
+        id: inputs
+        uses: edumserrano/github-issue-forms-parser@v1
+        with:
+          template-filepath: '.github/ISSUE_TEMPLATE/request-new-landingzone.yml'
+          issue-form-body: '${{ github.event.issue.body }}'
+
+      - name: Output parsed issue
+        id: json
+        shell: pwsh
+        run: |
+          $issue = '${{ steps.inputs.outputs.parsed-issue }}' | ConvertFrom-Json
+          $issueAsJsonIndented = ConvertTo-Json $issue
+
+          Write-Output $issueAsJsonIndented
+
+          $managementGroup = $issue.managementGroupName.split('-')[0]
+          $mgmtHierarchy = $issue.managementGroupName.split('-')[1]
+
+          $lzName = "{0}-{1}-{2}" -f $managementGroup, $issue.appName, $issue.environment
+          set-content -path "./landingzones/$issue.managementGroupName/$lzName.json" -value $issueAsJsonIndented
+          
+          write-output "landingzoneName=$lzName" >> $env:GITHUB_ENV
+          write-output "managementGroupHierarchy=$mgmtHierarchy" >> $env:GITHUB_ENV
+        
+      - name: init workflow file
+        run: |
+          cp .github/workflows/template-lz-template.yml .github/workflows/lz-${{ env.landingzoneName }}.yml
+
+      - name: replace - landingzoneName
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "{{replace-lz-landingzoneName}}"
+          replace: "${{ env.landingzoneName }}"
+          exclude: "**/template-*"
+          
+      - name: replace - managementGroupName
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "{{replace-lz-managementGroupName}}"
+          replace: "${{ env.managementGroupName }}"
+          exclude: "**/template-*"
+
+      - name: replace - managementGroupHierarchy
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "{{replace-lz-managementGroupHierarchy}}"
+          replace: "${{ env.managementGroupHierarchy }}"
+          exclude: "**/template-*"
+
+      - name: push param file
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "init landingzone: ${{ env.landingzoneName }}"
+          git push
+      

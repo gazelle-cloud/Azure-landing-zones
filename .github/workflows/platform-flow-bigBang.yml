@@ -1,0 +1,62 @@
+name: platform - flow - BigBang
+
+on:
+  workflow_dispatch:
+    inputs:
+      managementGroupHierarchy:
+        description: 'Management Group Hierarchy'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - 'test'
+          - 'prod'
+
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+
+jobs:
+  tenantLevel:
+    uses: ./.github/workflows/template-tenantLevel.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+    secrets: inherit
+    
+  monitor:
+    needs: 
+      - tenantLevel
+    uses: ./.github/workflows/template-monitor.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+    secrets: inherit
+    
+  identity:
+    needs: tenantLevel
+    uses: ./.github/workflows/template-identity.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+    secrets: inherit
+        
+  policy:
+    needs: 
+      - monitor
+    uses: ./.github/workflows/template-policy.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+    secrets: inherit
+
+  automation-docker:
+    needs: monitor
+    uses: ./.github/workflows/template-automation-docker.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+    secrets: inherit
+
+  automation:
+    needs: automation-docker
+    uses: ./.github/workflows/template-automation.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+    secrets: inherit

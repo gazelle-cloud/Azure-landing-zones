@@ -1,0 +1,11 @@
+{
+  "appName": "MSDN",
+  "environment": "test",
+  "billingScope": "platform",
+  "managementGroupName": "online-test",
+  "budget": "50",
+  "CIDR": "22",
+  "subscriptionId": "84e64f94-714d-4c07-9f03-f07af8380b36",
+  "githubRepoName": "MSDN",
+  "engineerEmail": "mantas@outlook.dk"
+}

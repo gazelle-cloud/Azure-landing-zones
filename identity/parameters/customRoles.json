@@ -1,0 +1,17 @@
+{
+    "landing-zone-owner": {
+        "roleName": "Landing Zone Owner",
+        "actions": [
+            "*"
+        ]
+    },
+    "landing-zone-admin": {
+        "roleName": "Landing Zone Admin",
+        "actions": [
+            "*/read",
+            "Microsoft.App/jobs/*/action",
+            "Microsoft.Insights/actiongroups/*/action",
+            "microsoft.policyinsights/remediations/write"
+        ]
+    }
+}

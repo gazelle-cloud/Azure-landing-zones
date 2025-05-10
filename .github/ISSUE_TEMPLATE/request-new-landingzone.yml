@@ -1,0 +1,95 @@
+name: New Landing Zone Request
+description: Fill in the required details to request a new landing zone
+title: "New Landing Zone Request"
+body:
+  - type: input
+    id: appName
+    attributes:
+      label: Application Name
+      description: Must be a single word, up to 10 characters in length. Used to generate the landing zone name by concatenating ManagementGroupName-ApplicationName-Environment.
+      placeholder: myApp
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Application Environment
+      description: Defines the stage or purpose of the landing zone
+      multiple: false
+      options: 
+        - test
+        - prod
+      default: 0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: billingScope
+    attributes:
+      label: Billing Scope
+      multiple: false
+      description: Specifies the Invoice Section associated with the landing zone budget
+      options: 
+        - platform
+      default: 0
+    validations:
+      required: false
+
+  - type: dropdown
+    id: managementGroupName
+    attributes:
+      label: Management Group Name
+      multiple: false
+      description: Determines access and security baseline standards.
+      options: 
+        - online-test
+        - online-prod
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: budget
+    attributes:
+      label: Budget
+      description: Defines the budget in DKK. Alerts are sent when predictions approach 100%
+      placeholder: "100"
+    validations:
+      required: true
+
+  - type: input
+    id: CIDR
+    attributes:
+      label: Virtual network address space
+      description: Create landing zone process will find the next available address space based on the CIDR provided. The default value gives 256 addresses.
+      placeholder: "24"
+    validations:
+      required: true
+
+  - type: input
+    id: subscriptionId
+    attributes:
+      label: Bring-Your-Own-Subscription
+      description: If empty, a new subscription will be created. Provide a Subscription Id to convert an existing subscription to a landing zone. 
+      placeholder: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    validations:
+      required: false
+
+  - type: input
+    id: githubRepoName
+    attributes:
+      label: Application GitHub Repository Name
+      description: Stores environment variables for Infrastructure-as-Code templates and GitHub Actions
+      placeholder: MSDN
+    validations:
+      required: true
+
+  - type: input
+    id: engineerEmail
+    attributes:
+      label: Engineer Email
+      description: Used for reporting security incidents, cost alerts, and critical updates.
+      placeholder: foo@gazelle.cloud
+    validations:
+      required: true

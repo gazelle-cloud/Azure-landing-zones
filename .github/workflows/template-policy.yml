@@ -1,0 +1,200 @@
+name: template - policy
+
+
+on:
+  workflow_call:
+    inputs:
+        managementGroupHierarchy:
+          required: true
+          type: string
+
+env:
+  ManagementGroupId: ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}
+  Location: ${{ vars.AZURE_DEFAULT_LOCATION }}
+  DenySettingsMode: 'None'
+  ActionOnUnmanage: 'deleteAll'
+  GitHubOrganizationName: ${{ github.repository_owner }}
+  GitHubRepositoryName: ${{ github.event.repository.name }}
+  environment: ${{ inputs.managementGroupHierarchy }}
+  DenySettingsApplyToChildScopes: 'false'
+jobs:
+    identity:
+        runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+        environment: ${{ inputs.managementGroupHierarchy }}
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+            private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+            owner: ${{ github.repository_owner }}  
+
+        - name: Azure login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: true
+
+        - name: identity
+          uses: azure/powershell@v2
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          with:
+            azPSVersion: 'latest'
+            inlineScript: |
+                . ./.github/utils/new-deployment.ps1
+
+                $params = @{
+                  Name                    = 'policy-identity'
+                  templateFile            = './policy/bicep/identity.bicep'
+                  subscriptionId          = '${{ vars.PLALTFORM_SUBSCRIPTION_ID }}'
+                  environment             = '${{ inputs.managementGroupHierarchy }}'
+                }
+                New-platformDeployment @params
+
+    definitions:
+        runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+        environment: ${{ inputs.managementGroupHierarchy }}
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+            private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+            owner: ${{ github.repository_owner }}   
+
+        - name: Azure login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: true
+
+        - name: custom definitions
+          uses: azure/powershell@v2
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          with:
+            azPSVersion: 'latest'
+            inlineScript: |
+                . ./.github/utils/new-deployment.ps1
+
+                $params = @{
+                  Name          = 'policy-customDefinitions'
+                  templateFile  = './policy/parameters/customDefinitions/main.bicep'
+                }
+                New-platformDeployment @params
+
+        - name: setDefinitions - diagnostic settings
+          uses: azure/powershell@v2
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          with:
+            azPSVersion: 'latest'
+            inlineScript: |
+                . ./.github/utils/new-deployment.ps1
+
+                $params = @{
+                  Name           = 'policy-diagnosticSettings'
+                  templateFile   = './policy/bicep/configDiagnosticSettings.bicep'
+                }
+                New-platformDeployment @params
+
+    assignment-online:
+        runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+        needs: 
+          - definitions
+          - identity
+        environment: ${{ inputs.managementGroupHierarchy }}
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Azure login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: true
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+            private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+            owner: ${{ github.repository_owner }}
+
+        - name: set definitions and assignments
+          uses: azure/powershell@v2
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          with:
+            azPSVersion: 'latest'
+            inlineScript: |
+              . ./.github/utils/new-deployment.ps1
+
+              $params = @{
+                Name            = 'policy-assignments-online'
+                templateFile    = './policy/bicep/online.bicep'
+                environment     = '${{ inputs.managementGroupHierarchy }}'
+              }
+              New-platformDeployment @params
+
+    assignment-platform:
+        runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+        needs: 
+          - definitions
+          - identity
+        environment: ${{ inputs.managementGroupHierarchy }}
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Azure login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: true
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+            private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+            owner: ${{ github.repository_owner }}
+
+        - name: set definitions and assignments
+          uses: azure/powershell@v2
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          with:
+            azPSVersion: 'latest'
+            inlineScript: |
+              . ./.github/utils/new-deployment.ps1
+
+              $params = @{
+                Name                                = 'policy-assignments-platform'
+                templateFile                        = './policy/bicep/platform.bicep'
+                environment                         = '${{ inputs.managementGroupHierarchy }}'
+                policyIdentityResourceId            = '${{ vars.POLICY_IDENTITY_RESOURCE_ID }}'
+                diagnosticSettingsPolicyResourceId  = '${{ vars.POLICY_CONFIG_DIAGNOSTICSETTINGS_RESOURCE_ID }}'
+                logAnalyticsResourceId              = '${{ vars.LOG_ANALYTICS_RESOURCE_ID }}'
+                platformEngineerEmail               = '${{ vars.AZURE_PLATFORM_ENGINEER_EMAIL }}'
+              }
+              New-platformDeployment @params

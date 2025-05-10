@@ -1,0 +1,108 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>Microsoft.PowerShell.Commands.PSRepositoryItemInfo</T>
+      <T>System.Management.Automation.PSCustomObject</T>
+      <T>System.Object</T>
+    </TN>
+    <MS>
+      <S N="Name">ipmgmt</S>
+      <S N="Version">0.1.18</S>
+      <S N="Type">Module</S>
+      <S N="Description">Powershell module to perform IP Range calculations</S>
+      <S N="Author">Andrey Vernigora</S>
+      <S N="CompanyName">Andrey.Vernigora</S>
+      <S N="Copyright">(c) Andrey Vernigora. All rights reserved.</S>
+      <DT N="PublishedDate">2022-06-14T07:21:08+02:00</DT>
+      <Nil N="InstalledDate" />
+      <Nil N="UpdatedDate" />
+      <Nil N="LicenseUri" />
+      <Nil N="ProjectUri" />
+      <Nil N="IconUri" />
+      <Obj N="Tags" RefId="1">
+        <TN RefId="1">
+          <T>System.Object[]</T>
+          <T>System.Array</T>
+          <T>System.Object</T>
+        </TN>
+        <LST>
+          <S>PSModule</S>
+        </LST>
+      </Obj>
+      <Obj N="Includes" RefId="2">
+        <TN RefId="2">
+          <T>System.Collections.Hashtable</T>
+          <T>System.Object</T>
+        </TN>
+        <DCT>
+          <En>
+            <S N="Key">RoleCapability</S>
+            <Obj N="Value" RefId="3">
+              <TNRef RefId="1" />
+              <LST />
+            </Obj>
+          </En>
+          <En>
+            <S N="Key">DscResource</S>
+            <Ref N="Value" RefId="3" />
+          </En>
+          <En>
+            <S N="Key">Command</S>
+            <Ref N="Value" RefId="3" />
+          </En>
+          <En>
+            <S N="Key">Function</S>
+            <Ref N="Value" RefId="3" />
+          </En>
+          <En>
+            <S N="Key">Cmdlet</S>
+            <Ref N="Value" RefId="3" />
+          </En>
+          <En>
+            <S N="Key">Workflow</S>
+            <Ref N="Value" RefId="3" />
+          </En>
+        </DCT>
+      </Obj>
+      <Nil N="PowerShellGetFormatVersion" />
+      <Nil N="ReleaseNotes" />
+      <Obj N="Dependencies" RefId="4">
+        <TNRef RefId="1" />
+        <LST />
+      </Obj>
+      <S N="RepositorySourceLocation">https://www.powershellgallery.com/api/v2</S>
+      <S N="Repository">PSGallery</S>
+      <S N="PackageManagementProvider">NuGet</S>
+      <Obj N="AdditionalMetadata" RefId="5">
+        <TN RefId="3">
+          <T>System.Management.Automation.PSCustomObject</T>
+          <T>System.Object</T>
+        </TN>
+        <MS>
+          <S N="copyright">(c) Andrey Vernigora. All rights reserved.</S>
+          <S N="description">Powershell module to perform IP Range calculations</S>
+          <S N="requireLicenseAcceptance">False</S>
+          <S N="isLatestVersion">True</S>
+          <S N="isAbsoluteLatestVersion">True</S>
+          <S N="versionDownloadCount">375</S>
+          <S N="downloadCount">870</S>
+          <S N="packageSize">23437</S>
+          <S N="published">14/06/2022 07.21.08 +02:00</S>
+          <S N="created">14/06/2022 07.21.08 +02:00</S>
+          <S N="lastUpdated">01/02/2025 07.00.00 +01:00</S>
+          <S N="tags">PSModule</S>
+          <S N="developmentDependency">False</S>
+          <S N="updated">2025-02-01T07:00:00Z</S>
+          <S N="NormalizedVersion">0.1.18</S>
+          <S N="Authors">Andrey Vernigora</S>
+          <S N="IsPrerelease">false</S>
+          <S N="ItemType">Module</S>
+          <S N="FileList">ipmgmt.nuspec|bin\System.Net.IPNetwork.dll|ipmgmt.psd1|docs\Get-IPRanges.md|ipmgmt.psm1|docs\Get-VLSMBreakdown.md|networktools.ps1|test\ipmgmt.Tests.ps1|README.md|en-US\ipmgmt-help.xml</S>
+          <S N="GUID">77fd7e63-fda8-493e-bdcf-3668ae711a79</S>
+          <S N="CompanyName">NONE</S>
+        </MS>
+      </Obj>
+      <S N="InstalledLocation">C:\git\pwsh\ipmgmt\0.1.18</S>
+    </MS>
+  </Obj>
+</Objs>

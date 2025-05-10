@@ -1,0 +1,48 @@
+name: template - automation
+
+on:
+  workflow_call:
+    inputs:
+        managementGroupHierarchy:
+            required: true
+            type: string
+
+env:
+  ManagementGroupId: ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}
+  Location: ${{ vars.AZURE_DEFAULT_LOCATION }}
+  DenySettingsMode: 'None'
+  ActionOnUnmanage: 'deleteAll'
+  GitHubOrganizationName: ${{ github.repository_owner }}
+  GitHubRepositoryName: ${{ github.event.repository.name }}
+  environment: ${{ inputs.managementGroupHierarchy }}
+  DenySettingsApplyToChildScopes: 'false'
+jobs:
+    PowerShellScripts:
+      runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+      environment: ${{ inputs.managementGroupHierarchy }}
+      steps:
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+  
+      - name: Checkout repository
+        uses: actions/checkout@v4
+              
+      - name: login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+  
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/automation:${{ inputs.managementGroupHierarchy }} -f automation/Dockerfile .
+  
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/automation:${{ inputs.managementGroupHierarchy }}

@@ -1,0 +1,29 @@
+
+name: lz - online-MSDN-test
+
+on:
+  push:
+    paths:
+      - 'landingzones/online-test/online-MSDN-test.json'
+
+  workflow_dispatch:
+
+  pull_request_target:
+    types:
+      - closed
+    paths:
+      - 'landingzones/online-test/online-MSDN-test.json'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  landingzone:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    uses: ./.github/workflows/template-landingzones.yml
+    with:
+      managementGroup: 'online'
+      managementGroupHierarchy: 'test'
+      parameterFile: ./landingzones/online-test/online-MSDN-test.json
+    secrets: inherit

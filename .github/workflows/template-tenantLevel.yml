@@ -1,0 +1,110 @@
+name: template - tenant level
+
+on:
+  workflow_call:
+    inputs:
+        managementGroupHierarchy:
+            required: true
+            type: string
+
+env:
+  topLevelManagementGroupId: /providers/Microsoft.Management/managementGroups/${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}
+  ManagementGroupId: ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}
+  Location: ${{ vars.AZURE_DEFAULT_LOCATION }}
+  DenySettingsMode: 'None'
+  ActionOnUnmanage: 'deleteAll'
+  GitHubOrganizationName: ${{ github.repository_owner }}
+  GitHubRepositoryName: ${{ github.event.repository.name }}
+  environment: ${{ inputs.managementGroupHierarchy }}
+  DenySettingsApplyToChildScopes: 'false'
+jobs:
+    ManagementGroups:
+        runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+        environment: ${{ inputs.managementGroupHierarchy }}
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Azure login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: true
+
+        - name: management group hierarchy
+          uses: azure/powershell@v2
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          with:
+            azPSVersion: 'latest'
+            inlineScript: |
+              . ./.github/utils/new-deployment.ps1
+              $params = @{
+                Name                        = 'tenantLevel-managementGroups'
+                templateFile                = './tenant-level/bicep/managementGroups.bicep'
+                topLevelManagementGroupName = '${{ env.topLevelManagementGroupId }}'
+                environment                 = '${{ inputs.managementGroupHierarchy }}'
+              }
+              New-PlatformDeployment @params
+
+        - name: basic subscription settings
+          uses: azure/cli@v2
+          with:
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              az account subscription rename --id ${{ vars.PLALTFORM_SUBSCRIPTION_ID }} \
+                --name platform-${{ inputs.managementGroupHierarchy }}
+
+              az account management-group subscription add \
+                --name platform-${{ inputs.managementGroupHierarchy}} \
+                --subscription  ${{ vars.PLALTFORM_SUBSCRIPTION_ID }}
+    
+    ProdConfig:
+        if: ${{ inputs.managementGroupHierarchy == 'prod' }}
+        runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+        environment: prod
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+            private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+            owner: ${{ github.repository_owner }}
+
+        - name: Azure login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID}}
+            allow-no-subscriptions: true
+            enable-AzPSSession: true
+
+        - name: disable Nework Watcher
+          uses: azure/cli@v2
+          with:
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+                az network watcher configure --locations ${{ vars.AZURE_DEFAULT_LOCATION }} --enabled 'false'
+
+        - name: invoice sections
+          uses: azure/powershell@v2
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          with:
+            azPSVersion: 'latest'
+            inlineScript: |
+              . ./.github/utils/new-deployment.ps1
+              $params = @{
+                Name                        = 'tenantLevel-invoiceSections'
+                templateFile                = './tenant-level/bicep/billing.bicep'
+                TemplateParameterFile       = './tenant-level/parameters/billing.bicepparam'
+                billingAccountName          = '${{ vars.BILLING_ACCOUNT_NAME }}'
+                billingProfileName          = '${{ vars.BILLING_PROFILE_NAME }}'
+              }
+              New-PlatformDeployment @params

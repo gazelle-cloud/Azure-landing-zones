@@ -1,0 +1,182 @@
+name: template - landing zone
+
+on:
+  workflow_call:
+    inputs:
+        managementGroup:
+          required: true
+          type: string
+        managementGroupHierarchy:
+            default: prod
+            type: string
+        location:
+            default: ${{ vars.AZURE_DEFAULT_LOCATION }}
+            type: string
+        mainBicep:
+            default: ./landingzones/bicep/main.bicep
+            type: string
+        parameterFile:
+            required: true
+            type: string
+    
+
+jobs:
+    create-landingzone:
+        runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+        environment: ${{ inputs.managementGroupHierarchy }}
+        steps:
+        - name: Checkout local
+          uses: actions/checkout@v4
+
+        - name: get github token
+          id: github-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+            private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+            owner: ${{ github.repository_owner }}
+
+        - name: Azure login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+            tenant-id: ${{ vars.AZURE_TENANT_ID }}
+            allow-no-subscriptions: true
+            enable-AzPSSession: true
+
+        - name: fetch JSON values
+          uses: azure/cli@v2
+          with:
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+                lzparams=$(jq -r 'to_entries[] | "\(.key)=\(.value)"' ${{ inputs.parameterFile }})
+                IFS=$'\n'
+                for item in $lzparams
+                do
+                  echo $item
+                  echo "$item" >> $GITHUB_ENV
+                done  
+                
+        - name: rename subscription
+          if: ${{ env.subscriptionId != null }}
+          uses: azure/cli@v2
+          with:
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              az account subscription rename --id ${{ env.subscriptionId}} \
+                --name ${{ inputs.managementGroup }}-${{ env.appName }}-${{ env.environment}}
+        
+        - name: create subscription
+          if: ${{ env.subscriptionId == null }}
+          env:
+            invoiceSection: "billingScope_${{ env.billingScope }}"
+          uses: azure/cli@v2
+          with:
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              newSubscription=$(az account alias create --workload 'Production' \
+                --name ${{ inputs.managementGroup }}-${{ env.appName }}-${{ env.environment}} \
+                --display-name ${{ inputs.managementGroup }}-${{ env.appName }}-${{ env.environment}} \
+                --billing-scope ${{ vars[env.invoiceSection] }})
+              echo "Subscription Alias: $newSubscription"
+              subscriptionId=$(echo $newSubscription | jq -r '.properties.subscriptionId')
+              echo "subscriptionId=$subscriptionId" >> $GITHUB_ENV
+
+        - name: move subscription
+          id: moveSubscription
+          continue-on-error: true
+          uses: azure/cli@v2
+          with:
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              az account management-group subscription add \
+                --name ${{ inputs.managementGroup }}-${{ inputs.managementGroupHierarchy}} \
+                --subscription ${{ env.subscriptionId}}
+
+        - name: move subscription (retry)
+          if: steps.moveSubscription.outcome == 'failure'
+          uses: azure/cli@v2
+          with:
+            azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+            inlineScript: |
+              sleep 30s
+              az account management-group subscription add \
+                --name ${{ inputs.managementGroup }}-${{ inputs.managementGroupHierarchy}} \
+                --subscription ${{ env.subscriptionId}}
+
+        - name: network address space
+          uses: azure/powershell@v2
+          with:
+            azPSVersion: "latest"
+            inlineScript: |
+              $params = @{
+                CIDR = '${{ env.CIDR }}'
+              }
+              write-output $params
+
+              Select-AzSubscription -Subscription ${{ env.subscriptionId}}
+              $vnet = Get-AzVirtualNetwork
+              if ($null -ne $vnet ) {
+                $AddressSpace = $vnet.AddressSpace.AddressPrefixes[0]
+                write-output "vnet already exists, address space: $AddressSpace"
+                echo "AddressSpace=$AddressSpace" >> $env:GITHUB_ENV
+              } else {
+                write-output "vnet does not exist, finding a new address space"
+                import-module -name ./.github/utils/ipmgmt -verbose
+                $AddressSpace = ./.github/utils/get-networkAddressSpace.ps1 @params
+                echo "address space: $AddressSpace"
+                echo "AddressSpace=$AddressSpace" >> $env:GITHUB_ENV
+              }
+
+        - name: create GitHub environment
+          uses: azure/powershell@v2
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          with:
+            azPSVersion: "latest"
+            inlineScript: |
+              echo "create environment"
+              gh api --method PUT -H "Accept: application/vnd.github+json" `
+              repos/${{ github.repository_owner  }}/${{ env.githubRepoName }}/environments/${{ env.environment }}
+              
+        - name: create landingzone
+          uses: azure/powershell@v2
+          env:
+            GH_TOKEN: ${{ steps.github-token.outputs.token }}
+            ManagementGroupId: ${{ inputs.managementGroup }}-${{ inputs.managementGroupHierarchy}}
+            Location: ${{ vars.AZURE_DEFAULT_LOCATION}}
+            DenySettingsMode: 'DenyWriteAndDelete'
+            ActionOnUnmanage: 'deleteAll'
+            environment: ${{ env.environment }}
+            DenySettingsApplyToChildScopes: 'true'
+            GitHubOrganizationName: ${{ github.repository_owner }}
+            GitHubRepositoryName: ${{ env.githubRepoName }}
+          with:
+            azPSVersion: 'latest'
+            inlineScript: |
+              . ./.github/utils/new-deployment.ps1
+
+              $landingzoneParameters = Get-Content '${{ inputs.parameterFile }}' | ConvertFrom-Json -AsHashtable
+              $landingzoneParameters
+
+              $lzparams = @{
+                  Name                                = 'lz-${{ env.appName }}-${{ env.environment}}'
+                  parameters                          = $landingzoneParameters
+                  templateFile                        = '${{ inputs.mainBicep }}'
+                  addressPrefix                       = '${{ env.AddressSpace }}'
+                  diagnosticSettingsPolicyResourceId  = '${{ vars.POLICY_CONFIG_DIAGNOSTICSETTINGS_RESOURCE_ID }}'
+                  DeploymentSubscriptionId            = '${{ env.subscriptionId }}'
+                  DenySettingsExcludedAction          = @(
+                      'Microsoft.ManagedIdentity/userAssignedIdentities/*/assign/action'
+                      'Microsoft.Network/virtualNetworks/subnets/*'
+                      'Microsoft.Network/networkSecurityGroups/*'
+                      'microsoft.policyinsights/remediations/write'
+                      'Microsoft.OperationalInsights/workspaces/sharedKeys/action'
+                  )
+                  DenySettingsExcludedPrincipal      = @(
+                      '${{ vars.AZURE_PLATFORM_ADMIN_GROUP_ID }}'
+                      '${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }}'
+                  )
+              }
+              select-azsubscription -subscription ${{ env.subscriptionId }}
+              New-platformDeployment @lzparams

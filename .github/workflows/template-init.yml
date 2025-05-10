@@ -1,0 +1,88 @@
+name: template - init
+
+on:
+  workflow_call:
+    inputs:
+        managementGroupHierarchy:
+            required: true
+            type: string
+
+jobs:
+  setGitHubEnvironmentVariables:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.managementGroupHierarchy }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: get github token
+      id: github-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+        private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+        owner: ${{ github.repository_owner }}
+
+    - name: create environment variables file
+      env:
+        GH_TOKEN: ${{ steps.github-token.outputs.token }}
+      run: |
+        echo "create environment"
+        gh api --method PUT -H "Accept: application/vnd.github+json" \
+        repos/${{ github.repository }}/environments/${{ inputs.managementGroupHierarchy }}
+        
+    - name: set environment variables
+      env:
+        GH_TOKEN: ${{ steps.github-token.outputs.token }}
+      shell: pwsh
+      run: |
+          . ./.github/utils/set-githubVariables.ps1 -JsonFilePath "./githubVariables.json" -Environment ${{ inputs.managementGroupHierarchy }} -organizationName ${{ github.repository_owner }}
+
+          echo "environment variables raw file"
+          $jsonContent = Get-Content ./githubVariables.json
+          $jsonContent
+
+  FetchAzureRoleDefinitions:
+    runs-on: ubuntu-latest
+    needs: 
+      - setGitHubEnvironmentVariables
+    environment: ${{ inputs.managementGroupHierarchy }}
+    steps:
+    - name: get github token
+      id: github-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+        private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}   
+
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ steps.github-token.outputs.token }}
+
+    - name: Azure login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+        tenant-id: ${{ vars.AZURE_TENANT_ID}}
+        allow-no-subscriptions: true
+        enable-AzPSSession: true
+
+    - name: fetch role definitions
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          ./.github/utils/get-AzureRoleDefinitions.ps1
+
+    - name: push role definitions
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        if [ -n "$(git status --porcelain)" ]; then
+          git add .
+          git commit -m "update Azure role definitions"
+          git push
+        else
+          echo "No changes to commit"
+        fi
+    

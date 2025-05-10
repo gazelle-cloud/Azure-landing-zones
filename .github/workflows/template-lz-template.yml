@@ -1,0 +1,29 @@
+
+name: lz - {{replace-lz-landingzoneName}}
+
+on:
+  push:
+    paths:
+      - 'landingzones/{{replace-lz-managementGroupName}}/{{replace-lz-landingzoneName}}.json'
+
+  workflow_dispatch:
+
+  pull_request_target:
+    types:
+      - closed
+    paths:
+      - 'landingzones/{{replace-lz-managementGroupName}}/{{replace-lz-landingzoneName}}.json'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  landingzone:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    uses: ./.github/workflows/template-landingzones.yml
+    with:
+      managementGroup: '{{replace-lz-managementGroup}}'
+      managementGroupHierarchy: '{{replace-lz-managementGroupHierarchy}}'
+      parameterFile: ./landingzones/{{replace-lz-managementGroupName}}/{{replace-lz-landingzoneName}}.json
+    secrets: inherit

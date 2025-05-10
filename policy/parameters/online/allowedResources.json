@@ -1,0 +1,13 @@
+[
+    "Microsoft.Insights/actionGroups",
+    "Microsoft.Insights/activityLogAlerts",
+    "Microsoft.ManagedIdentity/userAssignedIdentities",
+    "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials",
+    "Microsoft.Network/virtualNetworks",
+    "Microsoft.Network/networkSecurityGroups",
+    "Microsoft.OperationalInsights/workspaces",
+    "Microsoft.Storage/storageAccounts",
+    "Microsoft.Resources/deploymentStacks",
+    "Microsoft.Resources/resourceGroups",
+    "Microsoft.Resources/tags"
+]

@@ -1,0 +1,45 @@
+name: lz - flow - trigger landingzone pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      landingzones:
+        required: true
+        default: 'lz - online'
+        type: choice
+        options:
+          - 'lz - online'
+
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  run-all-workflows:
+    runs-on: ubuntu-latest
+    environment:  prod
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: get github token
+      id: github-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+        private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+        owner: ${{ github.repository_owner }}
+
+    - name: trigger workflows
+      env:
+        GH_TOKEN: ${{ steps.github-token.outputs.token }}
+      run: |
+        ids=$(gh workflow list --json id,name --jq '[.[] | select(.name | startswith("${{ inputs.landingzones }}")) | .id]')
+
+        echo $ids
+
+        ids_array=($(echo $ids | jq -r '.[]'))
+
+        for id in "${ids_array[@]}"; do
+          gh workflow run "$id"
+        done
