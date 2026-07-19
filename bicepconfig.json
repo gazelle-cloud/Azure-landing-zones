@@ -1,0 +1,36 @@
+{
+    "analyzers": {
+        "core": {
+            "rules": {
+                "no-unused-params": {
+                    "level": "warning"
+                },
+                "use-recent-api-versions": {
+                    "level": "warning",
+                    "maxAgeInDays": 0
+                },
+                "explicit-values-for-loc-params": {
+                    "level": "warning"
+                },
+                "no-hardcoded-location": {
+                    "level": "warning"
+                },
+                "use-stable-resource-identifiers": {
+                    "level": "warning"
+                },
+                "use-secure-value-for-secure-inputs": {
+                    "level": "warning"
+                },
+                "simplify-json-null": {
+                    "level": "warning"
+                },
+                "secure-parameter-default": {
+                    "level": "warning"
+                }
+            }
+        }
+    },
+    "extensions": {
+        "microsoftGraphV1": "br:mcr.microsoft.com/bicep/extensions/microsoftgraph/v1.0:1.0.0"
+    }
+}

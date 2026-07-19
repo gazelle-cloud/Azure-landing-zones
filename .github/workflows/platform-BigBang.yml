@@ -1,0 +1,68 @@
+name: platform - BigBang
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      managementGroupHierarchy:
+        description: "Management Group Hierarchy"
+        required: true
+        default: "test"
+        type: choice
+        options:
+          - "test"
+          - "prod"
+
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+  pull-requests: write
+
+jobs:
+  GitHubVariables:
+    uses: ./.github/workflows/template-GitHub-environment-variables.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy || 'test' }}
+    secrets: inherit
+
+  managementGroups:
+    needs:
+      - GitHubVariables
+    uses: ./.github/workflows/template-Management-Groups.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy || 'test' }}
+    secrets: inherit
+
+  identity:
+    needs: managementGroups
+    uses: ./.github/workflows/template-access-control.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy || 'test' }}
+    secrets: inherit
+
+  policy:
+    needs:
+      - managementGroups
+    uses: ./.github/workflows/template-Azure-Policy.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy || 'test' }}
+    secrets: inherit
+
+  automation-images:
+    needs:
+      - policy
+    uses: ./.github/workflows/template-push-Docker-images.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy || 'test' }}
+    secrets: inherit
+
+  landingZone-oases:
+    needs:
+      - policy
+    uses: ./.github/workflows/template-trigger-landingzone-workflows.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy || 'test' }}
+      landingzone-prefix: "lz - oases"
+    secrets: inherit

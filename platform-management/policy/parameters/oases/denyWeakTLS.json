@@ -1,0 +1,23 @@
+[
+    {
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/fe83a0eb-a853-422d-aac2-1bffd182c5d0",
+        "policyDefinitionReferenceId": "storageAccount-weakTLS",
+        "parameters": {
+            "effect": {
+                "value": "Deny"
+            },
+            "minimumTlsVersion": {
+                "value": "TLS1_2"
+            }
+        }
+    },
+    {
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/0e80e269-43a4-4ae9-b5bc-178126b8a5cb",
+        "policyDefinitionReferenceId": "containerApps-httpsOnly",
+        "parameters": {
+            "effect": {
+                "value": "Deny"
+            }
+        }
+    }
+]

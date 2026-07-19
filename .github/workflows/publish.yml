@@ -1,0 +1,83 @@
+name: publish
+
+on:
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
+    runs-on: ubuntu-latest
+    env:
+      COMMIT_MSG: ${{ github.event.pull_request.title || 'updated from manual trigger' }}
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          path: source
+
+      - name: Checkout target
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ github.repository_owner }}/Azure-landing-zones
+          path: target
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Sanitize - githubVariables.json
+        working-directory: source
+        run: |
+          jq '
+            .AzurePlatformVariables.organizationVariables.APP_GITHUB_AZUREPLATFORM_ID = "xxx" |
+            .AzurePlatformVariables.organizationVariables.APPLICATION_ENGINEERS_GROUP_ID = "xxx" |
+            .AzurePlatformVariables.organizationVariables.LANDING_ZONE_ALLOWED_PUBLIC_IP = "xxx" |
+            .AzurePlatformVariables.repositoryVariables.AZURE_TENANT_ID = "xxx" |
+            .AzurePlatformVariables.repositoryVariables.BILLING_ACCOUNT_ID = "xxx" |
+            .AzurePlatformVariables.repositoryVariables.BILLING_PROFILE_NAME = "xxx" |
+            .AzurePlatformVariables.repositoryVariables.SUBSCRIPTION_BANK_INVOICE_SECTION_ID = "xxx" |
+            .AzurePlatformVariables.repositoryVariables.AZURE_PLATFORM_ENGINEER_EMAIL = "***@***.**" |
+            .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_CLIENT_ID = {"test":"xxx","prod":"xxx"} |
+            .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_PRINCIPAL_ID = {"test":"xxx","prod":"xxx"} |
+            .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_ENGINEER_GROUP_ID = {"test":"xxx","prod":"xxx"} |
+            .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_OWNER_GROUP_ID = {"test":"xxx","prod":"xxx"} |
+            .NewRepoVariables.repositoryVariables.AZURE_TENANT_ID = "xxx"
+          ' githubVariables.json > tmp.json && mv tmp.json githubVariables.json
+
+      - name: Sanitize - application profile emails
+        working-directory: source
+        run: |
+          for f in application-profiles/*.json; do
+            [ "$(basename "$f")" = "template.json" ] && continue
+            jq '.ownerEmail = "***@***.**" | .engineerEmail = "***@***.**"' "$f" > tmp.json && mv tmp.json "$f"
+          done
+
+      - name: Sanitize - landing zone subscription IDs
+        working-directory: source
+        run: |
+          find landing-zones/oases-prod landing-zones/oases-test -name "*.bicepparam" \
+            -exec sed -i "s/param subscriptionId = '[^']*'/param subscriptionId = '00000000-0000-0000-0000-000000000000'/" {} +
+
+      - name: Sync
+        run: |
+          find target -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          find source -mindepth 1 -maxdepth 1 ! -name '.git' -exec cp -r {} target/ \;
+
+      - name: Commit and push
+        working-directory: target
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "$COMMIT_MSG" || echo "No changes to commit"
+          git push

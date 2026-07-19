@@ -1,0 +1,18 @@
+{
+    "id": "platform-identity-azure",
+    "decision": "The platform authenticates as an Entra ID app registration, not a managed identity",
+    "why": "A managed identity requires an Azure resource as its host, but the platform has no subscription of its own — an app registration exists in Entra ID independently of any Azure infrastructure.",
+    "links": [
+        {
+            "id": "platform-identity-graph",
+            "note": "The platform identity holds Directory.ReadWrite.All and Application.ReadWrite.All, used to perform appRoleAssignedTo during landing zone provisioning."
+        }
+    ],
+    "violations": [
+        "Platform app registration shared with non-platform workloads."
+    ],
+    "files": [
+        "githubVariables.json",
+        "landing-zones/bicep/modules/identity.bicep"
+    ]
+}

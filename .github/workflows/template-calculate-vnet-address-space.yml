@@ -1,0 +1,71 @@
+name: template - calculate vnet address space
+
+on:
+  workflow_call:
+    inputs:
+      CIDR:
+        required: true
+        type: number
+    outputs:
+      VNET_ADDRESS_SPACE:
+        value: ${{ jobs.calculateAddressSpace.outputs.VNET_ADDRESS_SPACE }}
+  workflow_dispatch:
+    inputs:
+      CIDR:
+        required: true
+        type: choice
+        options:
+          - 26
+          - 25
+          - 24
+          - 23
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  calculateAddressSpace:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: prod
+    outputs:
+      VNET_ADDRESS_SPACE: ${{ steps.calculate.outputs.VNET_ADDRESS_SPACE }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID}}
+          allow-no-subscriptions: true
+
+      - name: calulate vnet address space
+        id: calculate
+        shell: pwsh
+        run: |
+          import-module -name ./.github/utils/ipmgmt -verbose
+
+          $getVnets = az graph query --graph-query @"
+          resources
+          | where type == "microsoft.network/virtualnetworks"
+          | mv-expand  IP = properties.addressSpace.addressPrefixes
+          | project IP
+          "@ | ConvertFrom-Json
+
+          echo "Virtual network address spaces found:"
+          $getVnets.data.ip
+
+          $params = @{
+            networks = $getVnets.data.ip
+            CIDR     = ${{ inputs.CIDR }}
+            baseNet  = "${{ vars.IPAM_DEFAULT_NETWORK }}"
+          }
+
+          $IpRange = Get-IPRanges @params
+          $NextFreeIP = ($ipRange | Where-Object { $_.isFree -eq $true })[0].Network.IPAddressToString
+          $NextFreeAddressSpace = $NextFreeIP + "/${{ inputs.CIDR }}"
+
+          echo "VNET_ADDRESS_SPACE: $NextFreeAddressSpace"
+          echo "VNET_ADDRESS_SPACE=$NextFreeAddressSpace" >>  $env:GITHUB_OUTPUT

@@ -1,0 +1,117 @@
+name: lz - flow - destroy Landing Zone
+
+on:
+  workflow_dispatch:
+    inputs:
+      subscriptionId:
+        description: "Subscription ID of the landing zone to decommission"
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare-cleanup-pr:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: prod
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v7
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: resolve landing zone names
+        uses: azure/cli@v3
+        with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+          inlineScript: |
+            topLevelManagementGroup=$(echo "${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}" | cut -d'-' -f1)
+
+            mgmtName=$(az graph query -q "
+            resourcecontainers
+            | where type == 'microsoft.resources/subscriptions'
+            | where subscriptionId == '${{ inputs.subscriptionId }}'
+            | mv-expand chain = properties.managementGroupAncestorsChain
+            | extend mgmtName = tostring(chain.name)
+            | where mgmtName !contains '$topLevelManagementGroup' and mgmtName != '${{ vars.AZURE_TENANT_ID }}'
+            | project mgmtName" --output json | jq -r '.data[0].mgmtName')
+
+            env=$(echo $mgmtName | cut -d'-' -f2)
+            lzName=$(az account subscription show --id ${{ inputs.subscriptionId }} --query 'displayName' -o tsv)
+
+            # displayName is "oases-{AppName}-{env}" — strip the leading "oases-" and trailing "-{env}"
+            appName=$(echo $lzName | sed "s/^oases-//" | sed "s/-${env}$//")
+
+            echo "LZ_NAME=$lzName"         >> $GITHUB_ENV
+            echo "APP_NAME=$appName"       >> $GITHUB_ENV
+            echo "ENV=$env"                >> $GITHUB_ENV
+            echo "MGMT_NAME=$mgmtName"     >> $GITHUB_ENV
+
+            echo "Resolved: lzName=$lzName appName=$appName env=$env mgmtName=$mgmtName"
+
+      - name: locate files to delete
+        run: |
+          PARAM_FILE=$(find landing-zones -name "oases-${{ env.APP_NAME }}-${{ env.ENV }}.bicepparam" | head -1)
+          LZ_WORKFLOW=$(find .github/workflows -name "lz-oases-${{ env.APP_NAME }}-${{ env.ENV }}.yml" | head -1)
+
+          if [ -z "$PARAM_FILE" ]; then
+            echo "ERROR: parameter file not found for appName=${{ env.APP_NAME }} env=${{ env.ENV }}"
+            exit 1
+          fi
+
+          if [ -z "$LZ_WORKFLOW" ]; then
+            echo "ERROR: LZ workflow not found for appName=${{ env.APP_NAME }} env=${{ env.ENV }}"
+            exit 1
+          fi
+
+          echo "PARAM_FILE=$PARAM_FILE"     >> $GITHUB_ENV
+          echo "LZ_WORKFLOW=$LZ_WORKFLOW"   >> $GITHUB_ENV
+
+          echo "Will delete: $PARAM_FILE"
+          echo "Will delete: $LZ_WORKFLOW"
+
+      - name: create destroy branch and open cleanup PR
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          BRANCH="destroy-${{ env.APP_NAME }}-${{ env.ENV }}"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b $BRANCH
+
+          git rm "${{ env.PARAM_FILE }}"
+          git rm "${{ env.LZ_WORKFLOW }}"
+
+          git commit -m "destroy landingzone: ${{ inputs.subscriptionId }}"
+          git push origin $BRANCH
+
+          gh pr create \
+            --title "destroy landingzone: ${{ inputs.subscriptionId }}" \
+            --label "Azure-LandingZone" \
+            --label "Schema" \
+            --body "$(cat <<'EOF'
+          why: Decommission landing zone ${{ env.LZ_NAME }} — subscription leaves oases and returns to subscription-bank.
+
+          decision: Delete the parameter file and LZ workflow as the first step of the destroy sequence. Merging this PR triggers template-destroy-landing-zone which wipes Azure resources and moves the subscription to subscription-bank.
+
+          effect: Parameter file and LZ workflow are removed. On merge, Azure deployment stack, resource groups, role assignments, budget, and Defender settings are deleted and the subscription is moved to subscription-bank.
+          EOF
+          )"

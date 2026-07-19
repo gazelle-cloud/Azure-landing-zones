@@ -1,0 +1,33 @@
+{
+  "id": "landing-zone-resource-group",
+  "decision": "All platform-managed resources in a landing zone live in a single dedicated resource group, separate from application resources.",
+  "why": "Without a dedicated resource group, there is no clean boundary for teardown, RBAC, or incident management.",
+  "links": [
+    {
+      "id": "landing-zone-identity",
+      "note": "Managed identity is provisioned inside this resource group and managed by Azure Deployment Stack."
+    },
+    {
+      "id": "deployment-declarative-lifecycle",
+      "note": "Resource group is the Deployment Stack scope — deleteAll tears down every platform-managed resource in one operation."
+    },
+    {
+      "id": "landing-zone-monitoring",
+      "note": "Log Analytics workspace lives inside this resource group and managed by Azure Deployment Stack."
+    },
+    {
+      "id": "landing-zone-vnet",
+      "note": "VNet is provisioned inside this resource group and managed by platform Deployment Stack"
+    },
+    {
+      "id": "landing-zone-automation",
+      "note": "Container Apps environment and jobs are provisioned inside this resource group and managed by Azure Deployment Stack"
+    }
+  ],
+  "violations": [
+    "Provisioning a resource outside the main.bicep landing zone template"
+  ],
+  "files": [
+    "landing-zones/bicep/main.bicep"
+  ]
+}

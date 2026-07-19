@@ -1,0 +1,29 @@
+{
+  "id": "azure-native-services-only",
+  "decision": "Only Azure Resource Manager (ARM) reachable services are eligible.",
+  "why": "If a service isn't manageable through ARM, the platform cannot guarantee service integrity.",
+  "links": [
+    {
+      "id": "self-service-policy-exemptions",
+      "note": "Self-service exemptions are viable because every resource is within Azure Policy's reach — a non-ARM service sits outside Policy's scope entirely."
+    },
+    {
+      "id": "azure-policy-hard-deny",
+      "note": "Security defaults can not be configured for non-Azure services"
+    },
+    {
+      "id": "deployment-declarative-lifecycle",
+      "note": "3rd party services would not be managed by the Azure Deployment Stack."
+    },
+    {
+      "id": "landing-zone-diagnostic-settings",
+      "note": "Non ARM services would require additional logic to collect diagnostic settings"
+    }
+  ],
+  "violations": [
+    "Service adopted with no ARM resource representation — invisible to Policy, RBAC, and diagnostics."
+  ],
+  "files": [
+    "platform-management/policy/parameters/oases/allowedResources.json"
+  ]
+}

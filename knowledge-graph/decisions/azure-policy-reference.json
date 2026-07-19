@@ -1,0 +1,24 @@
+{
+  "id": "azure-policy-reference",
+  "decision": "Policy exemptions resolve assignment IDs from a platform-generated reference — never from hardcoded ARM IDs.",
+  "why": "Assignment ARM IDs change when a policy is redeployed; a hardcoded ID silently breaks every exemption that references it.",
+  "links": [
+    {
+      "id": "azure-policy-naming-convention",
+      "note": "Stable, predictable names are the keys the reference file is indexed by — they don't change when a policy is redeployed."
+    },
+    {
+      "id": "platform-test-environment",
+      "note": "The reference file must resolve against the correct management group hierarchy (test or prod) — a script determines which one the subscription belongs to"
+    }
+  ],
+  "violations": [
+    "Manually editing policy-assignment-reference.json."
+  ],
+  "files": [
+    "lz-flow-create-policy-exemption.yml",
+    "landing-zones/*/policy-assignment-reference.json",
+    ".github/utils/get-policyAssignmentsReference.ps1",
+    "landing-zones/managementGroup-AppName-environment.bicepparam"
+  ]
+}

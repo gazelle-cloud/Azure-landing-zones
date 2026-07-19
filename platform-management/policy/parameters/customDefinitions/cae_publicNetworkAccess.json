@@ -1,0 +1,40 @@
+{
+    "name": "cae_publicNetworkAccess",
+    "properties": {
+        "DisplayName": "Container Apps environment should disable public network access",
+        "mode": "All",
+        "metadata": {
+            "category": "Container Apps"
+        },
+        "parameters": {
+            "effect": {
+                "type": "String",
+                "allowedValues": [
+                    "Deny",
+                    "Audit",
+                    "Disabled"
+                ],
+                "defaultValue": "Deny"
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.App/managedEnvironments"
+                    },
+                    {
+                        "not": {
+                            "field": "Microsoft.App/managedEnvironments/publicNetworkAccess",
+                            "equals": "Disabled"
+                        }
+                    }
+                ]
+            },
+            "then": {
+                "effect": "[parameters('effect')]"
+            }
+        }
+    }
+}

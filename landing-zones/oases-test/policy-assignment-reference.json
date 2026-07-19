@@ -1,0 +1,41 @@
+{
+  "allowedLocations": {
+    "assignmentId": "/providers/Microsoft.Management/managementGroups/oases-test/providers/Microsoft.Authorization/policyAssignments/allowedLocations",
+    "referenceIds": {
+      "allowed-locations": "allowed-locations",
+      "allowed-locations-resourceGroups": "allowed-locations-resourceGroups"
+    }
+  },
+  "allowedResources": {
+    "assignmentId": "/providers/Microsoft.Management/managementGroups/oases-test/providers/Microsoft.Authorization/policyAssignments/allowedResources",
+    "referenceIds": {
+      "allowed-resources": "allowed-resources"
+    }
+  },
+  "denyCrossTenantReplicati": {
+    "assignmentId": "/providers/Microsoft.Management/managementGroups/oases-test/providers/Microsoft.Authorization/policyAssignments/denyCrossTenantReplicati",
+    "referenceIds": {
+      "storageAccount-crossTenantReplication": "storageAccount-crossTenantReplication"
+    }
+  },
+  "denyLocalAuthentication": {
+    "assignmentId": "/providers/Microsoft.Management/managementGroups/oases-test/providers/Microsoft.Authorization/policyAssignments/denyLocalAuthentication",
+    "referenceIds": {
+      "storageAccount-sharedAccessKeys": "storageAccount-sharedAccessKeys"
+    }
+  },
+  "denyPublicNetworkAccess": {
+    "assignmentId": "/providers/Microsoft.Management/managementGroups/oases-test/providers/Microsoft.Authorization/policyAssignments/denyPublicNetworkAccess",
+    "referenceIds": {
+      "containerApp-publicNetworkAccess": "containerApp-publicNetworkAccess",
+      "storageAccount-publicNetworkAccess": "storageAccount-publicNetworkAccess"
+    }
+  },
+  "denyWeakTLS": {
+    "assignmentId": "/providers/Microsoft.Management/managementGroups/oases-test/providers/Microsoft.Authorization/policyAssignments/denyWeakTLS",
+    "referenceIds": {
+      "containerApps-httpsOnly": "containerApps-httpsOnly",
+      "storageAccount-weakTLS": "storageAccount-weakTLS"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+name: GitHub - remove workflow history
+on:
+  workflow_dispatch:
+    inputs:
+      workflow:
+        description: "Name of the workflow to delete"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  delete-workflow:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: prod
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Delete all workflow runs
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          $runIds = gh run list --workflow '${{ inputs.workflow }}' --json databaseId -q '.[].databaseId'
+          foreach ($id in $runIds) {
+            gh run delete $id
+          }

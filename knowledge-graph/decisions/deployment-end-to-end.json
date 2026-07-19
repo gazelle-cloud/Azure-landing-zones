@@ -1,0 +1,30 @@
+{
+  "id": "deployment-end-to-end",
+  "decision": "Each platform capability owns its code and deployment pipeline end-to-end, with no shared pipelines crossing capability boundaries.",
+  "why": "Without isolation, changing one capability can trigger or break another's functionality.",
+  "links": [
+    {
+      "id": "deployment-declarative-lifecycle",
+      "note": "deleteAll on each capability's stack ensures no orphaned resources after a declaration is removed."
+    },
+    {
+      "id": "deployment-branch-gated-promotion",
+      "note": "Main branch is protected by branch policies."
+    },
+    {
+      "id": "deployment-config-in-repo",
+      "note": "Capability configuration is sourced from the repo."
+    },
+    {
+      "id": "platform-test-environment",
+      "note": "Each platform capability deploys to the test hierarchy before production."
+    }
+  ],
+  "violations": [
+    "Resource created or modified directly in Azure portal or CLI outside a Deployment Stack.",
+    "Configuration value hardcoded in Bicep instead of injected from GitHub variables."
+  ],
+  "files": [
+    ".github/workflows/platform-BigBang.yml"
+  ]
+}

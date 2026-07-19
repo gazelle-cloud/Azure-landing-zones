@@ -1,0 +1,20 @@
+[
+  {
+    "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/34c877ad-507e-4c82-993e-3452a6e0ad3c",
+    "policyDefinitionReferenceId": "storageAccount-publicNetworkAccess",
+    "parameters": {
+      "effect": {
+        "value": "Deny"
+      }
+    }
+  },
+  {
+    "policyDefinitionId": "{{custom}}/cae_publicNetworkAccess",
+    "policyDefinitionReferenceId": "containerApp-publicNetworkAccess",
+    "parameters": {
+      "effect": {
+        "value": "Deny"
+      }
+    }
+  }
+]

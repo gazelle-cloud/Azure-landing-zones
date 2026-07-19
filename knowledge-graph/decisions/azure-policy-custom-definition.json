@@ -1,0 +1,19 @@
+{
+  "id": "azure-policy-custom-definition",
+  "decision": "When no built-in policy provides a `Deny` or `DeployIfNotExists` effect, the platform authors a custom definition to close the gap",
+  "why": "Without custom policies, Audit-only coverage looks like enforcement but the violation still occurs.",
+  "links": [
+    {
+      "id": "azure-policy-naming-convention",
+      "note": "The naming convention constrains custom definitions to Deny, DeployIfNotExists, or Modify effects — the effect determines the assignment prefix."
+    }
+  ],
+  "violations": [
+    "Resource type whitelisted with a known Deny gap and no custom definition to close it."
+  ],
+  "files": [
+    "platform-management/policy/bicep/customPolicyDefinitions.bicep",
+    "platform-management/policy/parameters/customDefinitions/policyDefinitions.bicepparam",
+    "platform-management/policy/parameters/customDefinitions/*.json"
+  ]
+}

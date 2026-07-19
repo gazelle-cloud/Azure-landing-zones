@@ -1,0 +1,18 @@
+{
+  "id": "landing-zone-action-group",
+  "decision": "Alerts are never hardcoded to a person — they route through the landing zone's action group, which is always sourced from the application profile.",
+  "why": "Hardcoded contacts go stale as teams change — alerts fire to former members, incidents go unanswered, and nobody notices until production is affected.",
+  "links": [
+    {
+      "id": "landing-zone-application-profile",
+      "note": "Application Profile is an authorative source for application contact details."
+    }
+  ],
+  "violations": [
+    "Budget alert without an action group."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/base/actionGroup.bicep",
+    "landing-zones/bicep/modules/monitor.bicep"
+  ]
+}

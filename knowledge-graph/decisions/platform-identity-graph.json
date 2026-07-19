@@ -1,0 +1,23 @@
+{
+  "id": "platform-identity-graph",
+  "decision": "Landing zone identities receive granular Microsoft Graph read permissions — never broad directory access.",
+  "why": "Without these permissions, landing zone automation can't detect Entra ID users, groups and applications.",
+  "links": [
+    {
+      "id": "landing-zone-identity",
+      "note": "Receives User.Read.All, Group.Read.All, and Application.Read.All at landing zone creation time."
+    },
+    {
+      "id": "initial-setup",
+      "note": "Graph permissions are granted via admin consent as a manual prerequisite."
+    }
+  ],
+  "violations": [
+    "Landing zone identity granted write permissions to Microsoft Graph",
+    "Landing zone identity granted Directory.Read.All instead of granular read permissions."
+  ],
+  "files": [
+    "landing-zones/bicep/entra.bicep",
+    "landing-zones/bicep/modules/base/appRoleAssignedTo.bicep"
+  ]
+}

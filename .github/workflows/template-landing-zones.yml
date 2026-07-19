@@ -1,0 +1,249 @@
+name: template - Landing Zone
+
+on:
+  workflow_call:
+    inputs:
+      managementGroupScope:
+        required: true
+        type: string
+      managementGroupHierarchy:
+        required: true
+        type: string
+      location:
+        default: ${{ vars.AZURE_DEFAULT_LOCATION }}
+        type: string
+      mainBicep:
+        default: ./landing-zones/bicep/main.bicep
+        type: string
+      parameterFile:
+        required: true
+        type: string
+
+jobs:
+  create-landingzone:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: ${{ inputs.managementGroupHierarchy }}
+    steps:
+      - name: checkout local
+        uses: actions/checkout@v7
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Convert .bicepparam to JSON
+        run: |
+          az bicep build-params --file ${{ inputs.parameterFile }} --outfile lz-parameters.json
+          cat lz-parameters.json
+
+      - name: fetch JSON values
+        shell: pwsh
+        run: |
+          $content = Get-Content -Path ./lz-parameters.json | ConvertFrom-Json
+
+          $appName = $content.parameters.appName.value
+          $lzEnvironment = $content.parameters.environment.value
+          $subscriptionId = $content.parameters.subscriptionId.value
+
+          echo "appName=$appName"
+          echo "lzEnvironment=$lzEnvironment"
+          echo "subscriptionId=$subscriptionId"
+
+          echo "APP_NAME=$appName" >> $env:GITHUB_ENV
+          echo "LZ_ENVIRONMENT=$lzEnvironment" >> $env:GITHUB_ENV
+          echo "SUBSCRIPTION_ID=$subscriptionId" >> $env:GITHUB_ENV
+
+      - name: fetch application repo variables
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          invoiceSection=$(gh variable get INVOICE_SECTION_ID \
+            -R ${{ github.repository_owner }}/${{ env.APP_NAME }})
+          echo "INVOICE_SECTION_ID=$invoiceSection" >> $GITHUB_ENV
+
+          applicationReaders=$(gh variable get ENTRAID_READER_GROUP_ID \
+            -R ${{ github.repository_owner }}/${{ env.APP_NAME }})
+          echo "ENTRAID_READER_GROUP_ID=$applicationReaders" >> $GITHUB_ENV
+
+          engineerEmail=$(gh variable get ENGINEER_CONTACT \
+            -R ${{ github.repository_owner }}/${{ env.APP_NAME }})
+          echo "ENGINEER_CONTACT=$engineerEmail" >> $GITHUB_ENV
+
+          ownerEmail=$(gh variable get OWNER_CONTACT \
+            -R ${{ github.repository_owner }}/${{ env.APP_NAME }})
+          echo "OWNER_CONTACT=$ownerEmail" >> $GITHUB_ENV
+
+      - name: echo landing zone variables
+        run: |
+          echo "app name: ${{ env.APP_NAME }}"
+          echo "environment: ${{ env.LZ_ENVIRONMENT }}"
+          echo "subscription id: ${{ env.SUBSCRIPTION_ID }}"
+          echo "invoice section: ${{ env.INVOICE_SECTION_ID }}"
+          echo "reader group id: ${{ env.ENTRAID_READER_GROUP_ID }}"
+          echo "engineer contact: ${{ env.ENGINEER_CONTACT }}"
+          echo "owner contact: ${{ env.OWNER_CONTACT }}"
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Bring Your Own Subscription - rename
+        if: ${{ env.SUBSCRIPTION_ID != null }}
+        uses: azure/cli@v3
+        with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+          inlineScript: |
+            az account subscription rename --id ${{ env.SUBSCRIPTION_ID}} \
+              --name ${{ inputs.managementGroupScope }}-${{ env.APP_NAME }}-${{ env.LZ_ENVIRONMENT}}
+
+      - name: Bring Your Own Subscription - change invoice section
+        if: ${{ env.SUBSCRIPTION_ID != null }}
+        uses: azure/cli@v3
+        with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+          inlineScript: |
+            az rest \
+              --method POST \
+              --url "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/${{ vars.BILLING_ACCOUNT_ID }}/billingSubscriptions/${{ env.SUBSCRIPTION_ID}}/move?api-version=2024-04-01" \
+              --body '{"destinationInvoiceSectionId": "/providers/Microsoft.Billing/billingAccounts/${{ vars.BILLING_ACCOUNT_ID }}/billingProfiles/${{ vars.BILLING_PROFILE_NAME }}/invoiceSections/${{ env.INVOICE_SECTION_ID }}"}'
+
+      - name: create subscription
+        if: ${{ env.SUBSCRIPTION_ID == null }}
+        uses: azure/cli@v3
+        with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+          inlineScript: |
+            newSubscription=$(az account alias create --workload 'Production' \
+              --name ${{ inputs.managementGroupScope }}-${{ env.APP_NAME }}-${{ env.LZ_ENVIRONMENT}} \
+              --display-name ${{ inputs.managementGroupScope }}-${{ env.APP_NAME }}-${{ env.LZ_ENVIRONMENT}} \
+              --billing-scope "/providers/Microsoft.Billing/billingAccounts/${{ vars.BILLING_ACCOUNT_ID }}/billingProfiles/${{ vars.BILLING_PROFILE_NAME }}/invoiceSections/${{ env.INVOICE_SECTION_ID }}" \
+              )
+            echo "Subscription Alias: $newSubscription"
+            subscriptionId=$(echo $newSubscription | jq -r '.properties.subscriptionId')
+            echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_ENV
+
+      - name: move subscription to management group
+        uses: azure/cli@v3
+        with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+          inlineScript: |
+            az account management-group subscription add \
+              --name ${{ inputs.managementGroupScope }}-${{ inputs.managementGroupHierarchy}} \
+              --subscription ${{ env.SUBSCRIPTION_ID}}
+
+      - name: create GitHub environment
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          echo "create environment"
+          gh api --method PUT -H "Accept: application/vnd.github+json" repos/${{ github.repository_owner }}/${{ env.APP_NAME }}/environments/${{ env.LZ_ENVIRONMENT }}
+
+      - name: create landingzone
+        env:
+          GITHUB_ORGANIZATION_NAME: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ env.APP_NAME }}
+          ENVIRONMENT: ${{ env.LZ_ENVIRONMENT }}
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          . ./.github/utils/set-githubVariables.ps1
+          . ./.github/utils/write-stackSummary.ps1
+
+          $excludedActions = @(
+              "Microsoft.Insights/diagnosticSettings/write"
+              "Microsoft.ManagedIdentity/userAssignedIdentities/*/assign/action"
+              "Microsoft.Network/virtualNetworks/subnets/*"
+              "Microsoft.Network/networkSecurityGroups/*"
+              "microsoft.policyinsights/remediations/write"
+              "Microsoft.Resources/tags/write"
+              "Microsoft.OperationalInsights/workspaces/sharedKeys/action"
+          ) -join ' '
+
+          $excludedPrincipals = @(
+              "${{ vars.AZURE_PLATFORM_ENGINEER_GROUP_ID}}"
+              "${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }}"
+          ) -join ' '
+
+          $deployment = az stack mg create `
+              --name "${{ inputs.managementGroupScope }}-${{ env.APP_NAME }}-${{ env.LZ_ENVIRONMENT}}" `
+              --location ${{ vars.AZURE_DEFAULT_LOCATION }} `
+              --template-file "${{ inputs.mainBicep }}" `
+              --management-group-id ${{ inputs.managementGroupScope }}-${{ inputs.managementGroupHierarchy}} `
+              --deployment-subscription ${{ env.SUBSCRIPTION_ID }} `
+              --action-on-unmanage 'deleteAll' `
+              --deny-settings-mode 'denyWriteAndDelete' `
+              --deny-settings-apply-to-child-scopes `
+              --deny-settings-excluded-actions $excludedActions `
+              --deny-settings-excluded-principals $excludedPrincipals `
+              --parameters "${{ inputs.parameterFile }}" `
+                  environment=${{ env.LZ_ENVIRONMENT }} `
+                  GitHubOrganizationName=${{ github.repository_owner }} `
+                  GitHubRepositoryName=${{ env.APP_NAME }} `
+                  appEngineerEntraGroupId=${{ env.ENTRAID_READER_GROUP_ID }} `
+                  appEngineerRoleDefinitionId=${{ vars.APP_ENGINEER_ROLE_ID }} `
+                  engineerEmail=${{ env.ENGINEER_CONTACT }} `
+                  ownerEmail=${{ env.OWNER_CONTACT }} `
+                  GitHubOrganizationDatabaseId=${{ vars.GH_ORGANIZATION_DATABASE_ID }} `
+                  diagnosticSettingsPolicyResourceId=${{ vars.POLICY_CONFIG_DIAGNOSTICSETTINGS_RESOURCE_ID }}
+
+          Write-DeploymentStackSummary -StackJson $deployment
+
+          $dynamicVar = ($deployment | ConvertFrom-Json).outputs
+
+          Set-GitHubEnvironmentVariables $dynamicVar.GitHubEnvironmentVariables.Value.PSObject.Properties
+          Set-GitHubRepositoryVariables $dynamicVar.GitHubRepositoryVariables.Value.PSObject.Properties
+          Set-GitHubActionsVariables $dynamicVar.GitHubActionsVariables.Value.PSObject.Properties
+
+      - name: Entra ID Roles (classic deployment)
+        env:
+          GITHUB_ORGANIZATION_NAME: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ env.APP_NAME }}
+          ENVIRONMENT: ${{ env.LZ_ENVIRONMENT }}
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          . ./.github/utils/set-githubVariables.ps1
+
+          az account set --subscription ${{ env.SUBSCRIPTION_ID}}
+
+          $deployment = az deployment sub create `
+            --name 'entraRoles' `
+            --location ${{ vars.AZURE_DEFAULT_LOCATION }} `
+            --template-file './landing-zones/bicep/entra.bicep' `
+            --parameters principalId=${{ env.landingzone_principal_id }}
+
+          $deploymentObj = $deployment | ConvertFrom-Json
+
+          Set-GitHubEnvironmentVariables $deploymentObj.outputs.GitHubEnvironmentVariables
+          Set-GitHubRepositoryVariables $deploymentObj.outputs.GitHubRepositoryVariables
+          Set-GitHubActionsVariables $deploymentObj.outputs.GitHubActionsVariables
+
+      - name: Github runners network configuration
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+          GITHUB_ORGANIZATION_NAME: ${{ github.repository_owner }}
+          PRIVATE_RUNNERS_NAME: "${{ inputs.managementGroupScope }}-${{ env.APP_NAME }}-${{ env.LZ_ENVIRONMENT}}"
+        run: |
+          ./.github/utils/create-landingzone-gh-runners.ps1 `
+            -githubNetworkId "${{ env.gh_network_id }}" `
+            -GitHubRunnersName "${{ env.PRIVATE_RUNNERS_NAME }}" `
+            -GitHubOrganizationName "${{ env.GITHUB_ORGANIZATION_NAME }}"
+
+      - name: set PRIVATE_RUNNERS_NAME on application repo
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+          PRIVATE_RUNNERS_NAME: "${{ inputs.managementGroupScope }}-${{ env.APP_NAME }}-${{ env.LZ_ENVIRONMENT}}"
+        run: |
+          gh variable set PRIVATE_RUNNERS_NAME \
+            --body "${{ env.PRIVATE_RUNNERS_NAME }}" \
+            --env ${{ env.LZ_ENVIRONMENT }} \
+            --repo ${{ github.repository_owner }}/${{ env.APP_NAME }}

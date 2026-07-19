@@ -1,0 +1,29 @@
+{
+  "id": "landing-zone-allowed-public-ip",
+  "decision": "The platform provides an approved public IP that teams use to open firewall access to their Azure resources.",
+  "why": "Without this, application teams cannot access Azure data-plane resources from their laptops.",
+  "links": [
+    {
+      "id": "deployment-config-in-repo",
+      "note": "The IP is defined in githubVariables.json and propagated as an org variable."
+    },
+    {
+      "id": "azure-policy-hard-deny",
+      "note": "Deny policies are unchanged — firewall configuration is the application team's responsibility."
+    },
+    {
+      "id": "job-function-scoped-roles",
+      "note": "RBAC roles already grant the authorization — the public IP provides the missing network path."
+    },
+    {
+      "id": "landing-zone-getting-started",
+      "note": "Getting-started modules use this IP to open and close firewall access."
+    }
+  ],
+  "violations": [
+    "Platform configuring PaaS firewall rules on behalf of the application team."
+  ],
+  "files": [
+    "githubVariables.json"
+  ]
+}

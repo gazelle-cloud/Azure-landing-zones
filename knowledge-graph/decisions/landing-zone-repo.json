@@ -1,0 +1,27 @@
+{
+  "id": "landing-zone-repo",
+  "decision": "Each application has its own GitHub repository — the single control and deployment plane for all its landing zones.",
+  "why": "Without a repo, the platform has no deployment mechanism and nowhere to write configuration for the application.",
+  "links": [
+    {
+      "id": "landing-zone-application-profile",
+      "note": "repository is configured during application registration flow."
+    },
+    {
+      "id": "landing-zone-identity",
+      "note": "The landing zone identity's OIDC federation is scoped to this repo and environment"
+    },
+    {
+      "id": "landing-zone-template",
+      "note": "Each landing zone maps 1:1 to a GitHub environment on this repo."
+    },
+    {
+      "id": "platform-identity-github",
+      "note": "The GitHub App creates this repo, provisions GitHub environments, and seeds variables — without it, the repo has no provisioning mechanism."
+    }
+  ],
+  "violations": [
+    "Bring-your-own-Repo for landing zone creation"
+  ],
+  "files": []
+}

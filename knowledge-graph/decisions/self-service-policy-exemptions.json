@@ -1,0 +1,20 @@
+{
+  "id": "self-service-policy-exemptions",
+  "decision": "Application teams can exempt themselves from any policy assignment via Pull Request.",
+  "why": "The hard deny is only sustainable if teams can unblock themselves — without that, it erodes under operational pressure.",
+  "links": [
+    {
+      "id": "azure-policy-reference",
+      "note": "Exemptions reference a JSON file to look up the policy assignment ID — never a hardcoded ARM ID."
+    }
+  ],
+  "violations": [
+    "Exemption description that does not name the reason for the exemption."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/base/policyExemption.bicep",
+    "landing-zones/bicep/modules/azurePolicy.bicep",
+    "landing-zones/managementGroup-AppName-environment.bicepparam",
+    ".github/workflows/lz-flow-create-policy-exemption.yml"
+  ]
+}

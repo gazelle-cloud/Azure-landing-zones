@@ -1,0 +1,26 @@
+{
+    "id": "deployment-config-in-repo",
+    "decision": "Repo-specific configuration is driven through GitHub variables — no value is set manually.",
+    "why": "GitHub environments are destroyed and recreated during BigBang — without variables committed to the repo, the platform state cannot be reproduced.",
+    "links": [
+        {
+            "id": "landing-zone-application-profile",
+            "note": "New repos receive a subset of platform variables at creation."
+        },
+        {
+            "id": "platform-identity-azure",
+            "note": "Per-environment client IDs sourced from this file."
+        },
+        {
+            "id": "initial-setup",
+            "note": "githubVariables.json must be committed with initial platform config values before BigBang first runs."
+        }
+    ],
+    "violations": [
+        "Bicep parameter with hardcoded tenant ID or location instead of readEnvironmentVariable().",
+        "GitHub variable created in UI."
+    ],
+    "files": [
+        "githubVariables.json"
+    ]
+}

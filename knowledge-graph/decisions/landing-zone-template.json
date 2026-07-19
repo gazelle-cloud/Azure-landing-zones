@@ -1,0 +1,35 @@
+{
+    "id": "landing-zone-template",
+    "decision": "LEvery landing zone is provisioned from a single shared template, but each has its own dedicated parameter file and workflow.",
+    "why": "Without per-zone parameter files and workflows, a team couldn't act on their landing zone without risking triggering another's redeployment.",
+    "links": [
+        {
+            "id": "landing-zone-application-profile",
+            "note": "Landing zone initial values come from the application profile."
+        },
+        {
+            "id": "deployment-logic-reusable-workflow",
+            "note": "Each landing zone has a dedicated workflow that passes parameters to the centralized template."
+        },
+        {
+            "id": "platform-identity-azure",
+            "note": "The platform identity is used to create and configure landing zone resources."
+        },
+        {
+            "id": "platform-identity-graph",
+            "note": "The landing zone identity receives Microsoft Graph permissions at landing zone creation time."
+        },
+        {
+            "id": "landing-zone-repo",
+            "note": "landing zone provisioning writes environment scoped variables (resource ID) to the application repo."
+        }
+    ],
+    "violations": [
+        "Generated workflow name not matching lz-* prefix — breaks fan-out discovery."
+    ],
+    "files": [
+        "landing-zones/managementGroup-AppName-environment.bicepparam",
+        ".github/workflows/template-lz-template.yml",
+        ".github/workflows/requestNew-Landing-Zone.yml"
+    ]
+}

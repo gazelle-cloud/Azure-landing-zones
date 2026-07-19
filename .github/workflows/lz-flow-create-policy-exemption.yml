@@ -1,0 +1,103 @@
+name: lz - flow - create Policy Exemption
+
+on:
+  workflow_dispatch:
+    inputs:
+      AzurePolicy:
+        required: true
+        type: choice
+        options:
+          - "allowedLocations"
+          - "allowedResources"
+          - "denyPublicNetworkAccess"
+          - "denyLocalAuthentication"
+          - "denyCrossTenantReplicati"
+          - "denyWeakTLS"
+      subscriptionId:
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  fetchEnvironment:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: prod
+    outputs:
+      MANAGEMENT_GROUP_NAME: ${{ steps.set-env.outputs.MANAGEMENT_GROUP_NAME }}
+      ENVIRONMENT: ${{ steps.set-env.outputs.ENVIRONMENT }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID}}
+          allow-no-subscriptions: true
+
+      - name: fetch management group hierarchy
+        id: set-env
+        run: |
+          topLevelManagementGroup=$(echo "${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}" | cut -d'-' -f1)
+          echo "Top level management group: $topLevelManagementGroup"
+
+          mgmtName=$(az graph query -q "
+          resourcecontainers
+          | where type == 'microsoft.resources/subscriptions'
+          | where subscriptionId == '${{ inputs.subscriptionId }}'
+          | mv-expand chain = properties.managementGroupAncestorsChain
+          | extend mgmtName = tostring(chain.name)
+          | where mgmtName !contains '$topLevelManagementGroup' and  mgmtName  != '${{ vars.AZURE_TENANT_ID }}'
+          | project mgmtName" --output json | jq -r '.data[0].mgmtName')
+
+          environment=$(echo $mgmtName | cut -d'-' -f2)
+          echo "Environment: $environment"
+          echo "Management Group name: $mgmtName"
+
+          echo "MANAGEMENT_GROUP_NAME=$mgmtName" >> "$GITHUB_OUTPUT"
+          echo "ENVIRONMENT=$environment" >> "$GITHUB_OUTPUT"
+
+  createExemption:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    needs: fetchEnvironment
+    environment: ${{ needs.fetchEnvironment.outputs.ENVIRONMENT }}
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v7
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID}}
+          allow-no-subscriptions: true
+
+      - name: map GitHub inputs to Azure policy assignment id
+        env:
+          REFERENCE_FILE: "./landing-zones/${{ needs.fetchEnvironment.outputs.MANAGEMENT_GROUP_NAME }}/policy-assignment-reference.json"
+        run: |
+          policyAssignmentId=$(jq -r --arg item "${{ inputs.AzurePolicy }}" '.[$item].assignmentId' ${{ env.REFERENCE_FILE}})
+
+          echo "POLICY_ASSIGNMENT_ID=$policyAssignmentId" >> "$GITHUB_ENV"
+          echo "Policy to make exemption: $policyAssignmentId"
+
+      - name: calculate expiration date
+        run: echo "EXPIRATION_DATE=$(date -u -d "+8 hours" +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+
+      - name: create policy exemption
+        uses: azure/cli@v3
+        with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+          inlineScript: |
+            az policy exemption create \
+              --name "tmp-${{inputs.AzurePolicy}}" \
+              --policy-assignment ${{ env.POLICY_ASSIGNMENT_ID }} \
+              --display-name "temporary: ${{ inputs.AzurePolicy }}" \
+              --description "temporary exemption created via github action" \
+              --exemption-category "Waiver" \
+              --scope "/subscriptions/${{ inputs.subscriptionId }}" \
+              --expires-on "${{ env.EXPIRATION_DATE }}"

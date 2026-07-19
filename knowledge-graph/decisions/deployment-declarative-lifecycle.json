@@ -1,0 +1,29 @@
+{
+  "id": "deployment-declarative-lifecycle",
+  "decision": "Within a deployment stack, what is not declared in code is deleted on the next deployment.",
+  "why": "Without this, resources removed from the stack's code persist in Azure — the code stops being the source of truth.",
+  "links": [
+    {
+      "id": "platform-test-environment",
+      "note": "'deleteAll' in test verifies code produces the expected Azure state before promotion to prod."
+    },
+    {
+      "id": "landing-zone-lifecycle",
+      "note": "A subscription is guaranteed empty after deleteAll, which makes subscription reuse safe."
+    },
+    {
+      "id": "azure-native-services-only",
+      "note": "Only ARM-native resources are stack-managed — azure-native-services-only is the prerequisite for deleteAll lifecycle enforcement."
+    }
+  ],
+  "violations": [
+    "Deployment Stack configured with detachAll removed resources persist with no cleanup path.",
+    "Resources created directly in Azure are not managed by the Deployment Stack."
+  ],
+  "files": [
+    ".github/workflows/template-landing-zones.yml",
+    ".github/workflows/template-access-control.yml",
+    ".github/workflows/template-Azure-Policy.yml",
+    ".github/workflows/template-Management-Groups.yml"
+  ]
+}

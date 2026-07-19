@@ -1,0 +1,38 @@
+{
+  "id": "azure-policy-hard-deny",
+  "decision": "Security controls are enforced through hard deny policies — misconfiguration is blocked, not just reported.",
+  "why": "Without enforcement, misconfiguration is invisible.",
+  "links": [
+    {
+      "id": "azure-policy-naming-convention",
+      "note": "All deploy as Deny-prefixed assignments."
+    },
+    {
+      "id": "self-service-policy-exemptions",
+      "note": "Hard denial only works if teams can unblock themselves."
+    },
+    {
+      "id": "azure-policy-custom-definition",
+      "note": "Custom definitions close gaps where built-ins only offer Audit."
+    },
+    {
+      "id": "landing-zone-allowed-public-ip",
+      "note": "A platform-provided public IP exists for teams that need human access to the data plane."
+    },
+    {
+      "id": "landing-zone-getting-started",
+      "note": "Getting-started modules must comply with active deny policies"
+    }
+  ],
+  "violations": [
+    "Azure resource with public network access enabled.",
+    "Resource with local authentication enabled.",
+    "Key Vault configured with Access Policies instead of RBAC.",
+    "Resource with minimum TLS version below 1.2.",
+    "Storage account with cross-tenant object replication enabled."
+  ],
+  "files": [
+    "platform-management/policy/parameters/oases/*.json",
+    "platform-management/policy/bicep/oases.bicep"
+  ]
+}

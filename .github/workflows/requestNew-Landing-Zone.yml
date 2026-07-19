@@ -1,0 +1,161 @@
+name: request new - Landing Zone
+on:
+  workflow_dispatch:
+    inputs:
+      ApplicationName:
+        type: choice
+        required: true
+        options:
+          - HeyAzure
+          - LaPalma
+          - intgr
+          - GitHub-runners
+          - claudy
+          - babboom
+      Environment:
+        type: choice
+        required: true
+        options:
+          - test
+          - prod
+      ManagementGroupName:
+        type: choice
+        required: true
+        options:
+          - oases-prod
+          - oases-test
+      Budget:
+        type: number
+        required: false
+        default: 100
+      SubscriptionId:
+        type: string
+        required: false
+jobs:
+  CalculateVNetAddressSpace:
+    uses: ./.github/workflows/template-calculate-vnet-address-space.yml
+    with:
+      CIDR: 24
+  GenerateLandingZoneFiles:
+    needs: CalculateVNetAddressSpace
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    permissions: write-all
+    env:
+      VNET_ADDRESS_SPACE: ${{ needs.CalculateVNetAddressSpace.outputs.VNET_ADDRESS_SPACE }}
+    steps:
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ steps.github-token.outputs.token }}
+      - name: set environment variables
+        shell: pwsh
+        run: |
+          $scope = '${{ inputs.ManagementGroupName }}'.Split('-')[0]
+          $mgmtHierarchy = '${{ inputs.ManagementGroupName }}'.Split('-')[1]
+          $lzName = '{0}-{1}-{2}' -f $scope, '${{ inputs.ApplicationName }}', '${{ inputs.Environment }}'
+
+
+          Write-output "Application Name: ${{ inputs.ApplicationName }}"
+          Write-output "Environment: ${{ inputs.Environment }}"
+          Write-output "Subscription Id: ${{ inputs.SubscriptionId }}"
+          write-output "Vnet address space: ${{ env.VNET_ADDRESS_SPACE }}"
+          Write-output "Budget: ${{ inputs.Budget }}"
+          Write-output "Management Group Name: ${{ inputs.ManagementGroupName }}"
+          Write-output "Management Group Scope: $scope"
+          Write-output "Management Group Hierarchy: $mgmtHierarchy"
+          Write-output "Landing Zone Name: $lzName"
+
+
+          Write-output "APP_NAME=${{ inputs.ApplicationName }}" >> $env:GITHUB_ENV
+          Write-output "ENVIRONMENT=${{ inputs.Environment }}" >> $env:GITHUB_ENV
+          Write-output "SUBSCRIPTION_ID=${{ inputs.SubscriptionId }}" >> $env:GITHUB_ENV
+          Write-output "BUDGET=${{ inputs.Budget }}" >> $env:GITHUB_ENV
+          write-output "VNET_ADDRESS_SPACE=${{ env.VNET_ADDRESS_SPACE }}" >> $env:GITHUB_ENV
+          Write-output "MANAGEMENT_GROUP_NAME=${{ inputs.ManagementGroupName }}" >> $env:GITHUB_ENV
+          Write-output "MANAGEMENT_GROUP_SCOPE=${scope}" >> $env:GITHUB_ENV
+          Write-output "MANAGEMENT_GROUP_HIERARCHY=${mgmtHierarchy}" >> $env:GITHUB_ENV
+          Write-output "LANDING_ZONE_NAME=${lzName}" >> $env:GITHUB_ENV
+      - name: create landing zone parameter file
+        shell: pwsh
+        run: |
+          cp ./landing-zones/managementGroup-AppName-environment.bicepparam ./landing-zones/${{ env.MANAGEMENT_GROUP_NAME }}/${{ env.LANDING_ZONE_NAME }}.bicepparam
+      - name: create landing zone workflow file
+        run: |
+          cp .github/workflows/template-lz-template.yml .github/workflows/lz-${{ env.LANDING_ZONE_NAME }}.yml
+      - name: replace - parameter - appName
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__AppName__"
+          replace: "${{ env.APP_NAME }}"
+          include: "landing-zones/${{ env.MANAGEMENT_GROUP_NAME }}/${{ env.LANDING_ZONE_NAME }}.bicepparam"
+      - name: replace - parameter - environment
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__environment__"
+          replace: "${{ env.ENVIRONMENT }}"
+          include: "landing-zones/${{ env.MANAGEMENT_GROUP_NAME }}/${{ env.LANDING_ZONE_NAME }}.bicepparam"
+      - name: replace - parameter - budget
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__budget__"
+          replace: "${{ env.BUDGET }}"
+          include: "landing-zones/${{ env.MANAGEMENT_GROUP_NAME }}/${{ env.LANDING_ZONE_NAME }}.bicepparam"
+      - name: replace - parameter - vnetAddressSpace
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__vnetAddressSpace__"
+          replace: "${{ env.VNET_ADDRESS_SPACE }}"
+          include: "landing-zones/${{ env.MANAGEMENT_GROUP_NAME }}/${{ env.LANDING_ZONE_NAME }}.bicepparam"
+      - name: replace - parameter - subscriptionId
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__subscriptionId__"
+          replace: "${{ env.SUBSCRIPTION_ID }}"
+          include: "landing-zones/${{ env.MANAGEMENT_GROUP_NAME }}/${{ env.LANDING_ZONE_NAME }}.bicepparam"
+      - name: replace - workflow - landingzoneName
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__landingzoneName__"
+          replace: "${{ env.LANDING_ZONE_NAME }}"
+          include: ".github/workflows/lz-${{ env.LANDING_ZONE_NAME }}.yml"
+      - name: replace - workflow - managementGroupScope
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__managementGroupScope__"
+          replace: "${{ env.MANAGEMENT_GROUP_SCOPE }}"
+          include: ".github/workflows/lz-${{ env.LANDING_ZONE_NAME }}.yml"
+      - name: replace - workflow - managementGroupHierarchy
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__managementGroupHierarchy__"
+          replace: "${{ env.MANAGEMENT_GROUP_HIERARCHY }}"
+          include: ".github/workflows/lz-${{ env.LANDING_ZONE_NAME }}.yml"
+      - name: replace - workflow - managementGroup
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__managementGroup__"
+          replace: "${{ env.MANAGEMENT_GROUP_NAME }}"
+          include: ".github/workflows/lz-${{ env.LANDING_ZONE_NAME }}.yml"
+      - name: push param file
+        run: |
+          BRANCH="init-landingzone-${{ env.LANDING_ZONE_NAME }}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add .
+          git commit -m "init landingzone: ${{ env.LANDING_ZONE_NAME }}"
+          git push --force --set-upstream origin "$BRANCH"
+      - name: create pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "$PR_BRANCH" \
+            --title "init landingzone: ${{ env.LANDING_ZONE_NAME }}" \
+            --body "This adds initial landing zone files for \`${{ env.LANDING_ZONE_NAME }}\`."

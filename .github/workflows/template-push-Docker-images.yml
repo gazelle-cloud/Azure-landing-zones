@@ -1,0 +1,64 @@
+name: template - push Docker images
+
+on:
+  workflow_call:
+    inputs:
+      managementGroupHierarchy:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      managementGroupHierarchy:
+        description: "Management Group Hierarchy"
+        required: true
+        default: "test"
+        type: choice
+        options:
+          - "test"
+          - "prod"
+
+env:
+  MANAGEMENT_GROUP_ID: ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}
+  LOCATION: ${{ vars.AZURE_DEFAULT_LOCATION }}
+  DENY_SETTINGS_MODE: "None"
+  ACTION_ON_UNMANAGE: "deleteAll"
+  GITHUB_ORGANIZATION_NAME: ${{ github.repository_owner }}
+  GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+  ENVIRONMENT: ${{ inputs.managementGroupHierarchy }}
+jobs:
+  Publish-Docker-Image:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: ${{ inputs.managementGroupHierarchy }}
+    steps:
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: validate branch and environment
+        run: |
+          if [[ "${GITHUB_REF##*/}" != "main" && "${{ inputs.managementGroupHierarchy }}" == "prod" ]]; then
+            echo "ERROR: You cannot run on prod environment from a non-main branch."
+            exit 1
+          fi
+
+      - name: login to ghcr.io
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/automation:${{ inputs.managementGroupHierarchy }} -f landing-zones/automation/Dockerfile .
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/automation:${{ inputs.managementGroupHierarchy }}

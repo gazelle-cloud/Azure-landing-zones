@@ -1,0 +1,24 @@
+{
+  "id": "landing-zone-lifecycle",
+  "decision": "Landing zone provisioning draws from a subscription bank, returning the subscription to it when the landing zone is sunset.",
+  "why": "Azure subscription limit (MCA quota) counts cancelled subscriptions the same as active - it never frees up.",
+  "links": [
+    {
+      "id": "application-teams-own-the-cost",
+      "note": "Reused subscription must move to the application's invoice section before provisioning completes."
+    },
+    {
+      "id": "job-function-scoped-roles",
+      "note": "Subscription-bank read access is granted through the app engineer role, allowing to discover reusable subscriptions."
+    }
+  ],
+  "violations": [
+    "New subscription created when bank had an available empty subscription."
+  ],
+  "files": [
+    ".github/workflows/template-landing-zones.yml",
+    ".github/workflows/template-destroy-landing-zone.yml",
+    "landing-zones/managementGroup-AppName-environment.bicepparam",
+    "githubVariables.json"
+  ]
+}

@@ -1,0 +1,25 @@
+name: lz - oases-HeyAzure-test
+
+on:
+  workflow_dispatch:
+
+  pull_request_target:
+    types:
+      - closed
+    paths:
+      - "landing-zones/oases-test/oases-HeyAzure-test.bicepparam"
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  landingzone:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    uses: ./.github/workflows/template-landing-zones.yml
+    with:
+      managementGroupScope: "oases"
+      managementGroupHierarchy: "test"
+      parameterFile: ./landing-zones/oases-test/oases-HeyAzure-test.bicepparam
+    secrets: inherit

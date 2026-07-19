@@ -1,0 +1,20 @@
+{
+  "id": "deployment-branch-gated-promotion",
+  "decision": "No platform change reaches production without passing through the test environment first.",
+  "why": "Without an enforced gate, a single push can change production infrastructure with no prior validation.",
+  "links": [
+    {
+      "id": "platform-test-environment",
+      "note": "Promotion gate targets oases-test for validation."
+    }
+  ],
+  "violations": [
+    "Workflow deploying to prod from a non-main branch."
+  ],
+  "files": [
+    ".github/workflows/platform-Azure-Policy.yml",
+    ".github/workflows/platform-access-control.yml",
+    ".github/workflows/platform-Management-Groups.yml",
+    ".github/workflows/platform-automation.yml"
+  ]
+}

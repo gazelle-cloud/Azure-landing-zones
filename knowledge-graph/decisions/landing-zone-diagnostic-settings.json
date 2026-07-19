@@ -1,0 +1,23 @@
+{
+    "id": "landing-zone-diagnostic-settings",
+    "decision": "The platform centrally defines what diagnostic settings have to be enabled, but applies them at the landing zone level — telemetry stays local to the application environment.",
+    "why": "Without centrally defined diagnostic settings, the platform cannot guarantee that application data is routed to a Log Analytics workspace.",
+    "links": [
+        {
+            "id": "azure-policy-naming-convention",
+            "note": "Must use a Config-prefixed assignment for diagnostic settings."
+        },
+        {
+            "id": "azure-native-services-only",
+            "note": "Diagnostic settings target only Azure native resources."
+        }
+    ],
+    "violations": [
+        "Resource type added to allowedResources.json without a diagnostic settings definition."
+    ],
+    "files": [
+        "platform-management/policy/parameters/diagnosticSettings.bicepparam",
+        "platform-management/policy/bicep/configDiagnosticSettings.bicep",
+        "landing-zones/bicep/modules/base/logAnalyticsWorkspace.bicep"
+    ]
+}

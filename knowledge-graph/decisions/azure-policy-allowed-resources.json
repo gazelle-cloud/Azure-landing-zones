@@ -1,0 +1,46 @@
+{
+  "id": "azure-policy-allowed-resources",
+  "decision": "Every resource type is denied until the platform has validated its security controls, telemetry, and integration pattern",
+  "why": "Without an approved list, the platform cannot guarantee that every resource follows its configuration rules.",
+  "links": [
+    {
+      "id": "azure-policy-naming-convention",
+      "note": "Must use an Allowed-prefixed assignment for resource-type compliance."
+    },
+    {
+      "id": "landing-zone-diagnostic-settings",
+      "note": "Every approved type must have a diagnostic settings definition."
+    },
+    {
+      "id": "job-function-scoped-roles",
+      "note": "New resource type triggers review of whether function-scoped roles need new actions."
+    },
+    {
+      "id": "self-service-policy-exemptions",
+      "note": "Hard deny becomes a bottleneck without a self-service exemption path."
+    },
+    {
+      "id": "azure-policy-custom-definition",
+      "note": "New resource type with no built-in Deny policy requires a custom definition before security coverage is complete."
+    },
+    {
+      "id": "azure-native-services-only",
+      "note": "ARM-reachability is the prerequisite for allowlisting — types outside ARM are ineligible."
+    },
+    {
+      "id": "self-service-policy-exemptions-defender-for-cloud",
+      "note": "Whitelisting triggers a Defender check — paid-SKU recommendations or remediation that requires cost go on the exemption list."
+    },
+    {
+      "id": "landing-zone-getting-started",
+      "note": "Whitelisting is incomplete until the template has a thin example module"
+    }
+  ],
+  "violations": [
+    "Extending the allowed resources file without reviewing deny policies first."
+  ],
+  "files": [
+    "platform-management/policy/parameters/oases/allowedResources.json",
+    "platform-management/policy/bicep/oases.bicep"
+  ]
+}

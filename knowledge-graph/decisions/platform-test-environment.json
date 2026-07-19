@@ -1,0 +1,41 @@
+{
+  "id": "platform-test-environment",
+  "decision": "Every platform change passes through a parallel test environment before reaching production.",
+  "why": "Without a parallel hierarchy, platform changes would hit production directly, with failures landing on live landing zones.",
+  "links": [
+    {
+      "id": "deployment-logic-reusable-workflow",
+      "note": "Template workflow changes are validated here first."
+    },
+    {
+      "id": "landing-zone-application-profile",
+      "note": "The 'Application Registration' workflow is validated here before any platform change reaches production."
+    },
+    {
+      "id": "azure-policy-allowed-resources",
+      "note": "New whitelisted resource types are manually tested here before reaching production."
+    },
+    {
+      "id": "platform-identity-azure",
+      "note": "Test has its own dedicated app registration, sourced from a GitHub variable."
+    },
+    {
+      "id": "platform-identity-graph",
+      "note": "Test identity holds the same Graph permissions as production."
+    },
+    {
+      "id": "platform-identity-github",
+      "note": "Test and production share the same GitHub App."
+    }
+  ],
+  "violations": [
+    "Application landing zone created in platforms test environment."
+  ],
+  "files": [
+    ".github/workflows/platform-Azure-Policy.yml",
+    ".github/workflows/platform-access-control.yml",
+    ".github/workflows/platform-Management-Groups.yml",
+    ".github/workflows/platform-automation.yml",
+    ".github/workflows/platform-BigBang.yml"
+  ]
+}

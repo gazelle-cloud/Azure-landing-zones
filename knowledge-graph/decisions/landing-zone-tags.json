@@ -1,0 +1,26 @@
+{
+  "id": "landing-zone-tags",
+  "decision": "The platform enforces tags on every landing zone, sourced from the application profile.",
+  "why": "Manually applied tags drift — when an incident fires, the email points to someone who left the team, and the alert goes unanswered.",
+  "links": [
+    {
+      "id": "landing-zone-automation",
+      "note": "Nightly tag remediation runs as a Container App Job."
+    },
+    {
+      "id": "landing-zone-application-profile",
+      "note": "Engineer and owner emails are fetched from the application profile."
+    },
+    {
+      "id": "azure-policy-naming-convention",
+      "note": "Tags are enforced via Azure Policy at the subscription level, using a Config-prefixed assignment name."
+    }
+  ],
+  "violations": [
+    "Introducing a tag that does not apply to all application landing zones"
+  ],
+  "files": [
+    "landing-zones/bicep/modules/azurePolicy.bicep",
+    "landing-zones/managementGroup-AppName-environment.bicepparam"
+  ]
+}

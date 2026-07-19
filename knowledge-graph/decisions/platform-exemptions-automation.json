@@ -1,0 +1,19 @@
+{
+  "id": "platform-exemptions-automation",
+  "decision": "Automation images are hosted outside Azure to avoid a fixed cost.",
+  "why": "Azure Container Registry carries a flat fee, breaking the no-fixed-cost guarantee.",
+  "links": [
+    {
+      "id": "azure-native-services-only",
+      "note": "GitHub Container Registry is a deliberate exception to azure-native-services-only — its cost profile outweighs the native-services preference here."
+    }
+  ],
+  "violations": [
+    "Automation job that accumulates cost for a task that could run free."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/landingzone-automation.bicep",
+    "landing-zones/bicep/modules/base/jobs-cron.bicep",
+    "landing-zones/bicep/modules/base/managedEnvironments.bicep"
+  ]
+}

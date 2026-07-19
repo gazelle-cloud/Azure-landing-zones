@@ -1,0 +1,79 @@
+name: platform - destroy platform
+
+on:
+  schedule:
+    - cron: "0 1 * * 1"
+  workflow_dispatch:
+    inputs:
+      managementGroupHierarchy:
+        description: "Management Group Hierarchy"
+        required: true
+        default: "test"
+        type: choice
+        options:
+          - "test"
+          - "prod"
+
+      actionOnUnmanage:
+        required: true
+        default: "DeleteAll"
+        type: choice
+        options:
+          - DeleteAll
+          - DetachAll
+          - DeleteResources
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroying-platform:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: ${{ inputs.managementGroupHierarchy || 'test'}}
+    env:
+      MANAGEMENT_GROUP_HIERARCHY: ${{ inputs.managementGroupHierarchy || 'test'}}
+      TOP_LEVEL_MANAGEMENT_GROUP_NAME: ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}
+      ACTION_ON_UNMANAGE: ${{ inputs.actionOnUnmanage || 'DeleteAll' }}
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v7
+
+      - name: validate branch and environment
+        run: |
+          if [[ "${GITHUB_REF##*/}" != "main" && "${{ inputs.managementGroupHierarchy }}" == "prod" ]]; then
+            echo "ERROR: You cannot run on prod environment from a non-main branch."
+            exit 1
+          fi
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: powershell scripts
+        shell: pwsh
+        run: |
+          ./.github/utils/destroy-platform.ps1 `
+            -ChildManagementGroupName 'oases-${{ env.MANAGEMENT_GROUP_HIERARCHY }}' `
+            -TopLevelManagementGroupName ${{ env.TOP_LEVEL_MANAGEMENT_GROUP_NAME }} `
+            -actionOnUnmanage '${{  env.ACTION_ON_UNMANAGE }}'`
+            -SetDefinitionId '${{ vars.POLICY_CONFIG_DIAGNOSTICSETTINGS_RESOURCE_ID }}'
+
+      - name: delete GitHub environment
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          echo "delete deployment environment"
+          gh api --method DELETE -H "Accept: application/vnd.github+json" \
+          repos/${{ github.repository }}/environments/${{ inputs.managementGroupHierarchy || 'test'}}

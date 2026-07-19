@@ -1,0 +1,53 @@
+name: template - trigger landingzone workflows
+
+on:
+  workflow_call:
+    inputs:
+      managementGroupHierarchy:
+        required: true
+        type: string
+      landingzone-prefix:
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  trigger:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: ${{ inputs.managementGroupHierarchy }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: trigger workflows
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          ids=$(gh workflow list --json id,name,path \
+          --jq '[.[] | select(.name | startswith("${{ inputs.landingzone-prefix }}"))]')
+
+          ids_array=($(echo "$ids" | jq -r '.[].id'))
+          paths_array=($(echo "$ids" | jq -r '.[].path'))
+
+          for i in "${!ids_array[@]}"; do
+            id="${ids_array[$i]}"
+            path="${paths_array[$i]}"
+
+            if grep -Eq "managementGroupHierarchy.*${{ inputs.managementGroupHierarchy }}" "$path"; then
+              echo "Running: $path"
+              gh workflow run "$id"
+            else
+              echo "Skipping: $path"
+            fi
+          done

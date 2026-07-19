@@ -1,0 +1,25 @@
+{
+  "id": "no-platform-ops",
+  "intent": "The platform grows more self-sufficient, landing zones take on more ownership, and the platform team becomes less and less necessary.",
+  "decisions": [
+    "landing-zone-application-profile",
+    "landing-zone-lifecycle",
+    "landing-zone-ipam",
+    "landing-zone-diagnostic-settings",
+    "landing-zone-vnet",
+    "landing-zone-resource-group",
+    "landing-zone-monitoring",
+    "landing-zone-github-runners",
+    "landing-zone-tags",
+    "landing-zone-action-group",
+    "landing-zone-identity",
+    "job-function-scoped-roles",
+    "platform-identity-graph",
+    "landing-zone-repo",
+    "landing-zone-getting-started",
+    "landing-zone-allowed-public-ip"
+  ],
+  "violations": [
+    "Platform team operating resources inside a landing zone on behalf of the application team."
+  ]
+}

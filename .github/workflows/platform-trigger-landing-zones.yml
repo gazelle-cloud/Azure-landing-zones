@@ -1,0 +1,28 @@
+name: platform - trigger Landing Zones
+
+on:
+  workflow_dispatch:
+    inputs:
+      managementGroupHierarchy:
+        description: "Management Group Hierarchy"
+        type: environment
+        required: true
+      landingzone-prefix:
+        description: "Landing Zone Prefix"
+        type: choice
+        required: true
+        default: "lz - oases"
+        options:
+          - lz - oases
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  landingZone-oases:
+    uses: ./.github/workflows/template-trigger-landingzone-workflows.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy }}
+      landingzone-prefix: ${{ github.event.inputs.landingzone-prefix }}
+    secrets: inherit

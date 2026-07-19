@@ -1,0 +1,22 @@
+[
+    // network
+    "storageaccountshoulduseaprivatelinkconnectionmonitoringeffect",
+    "networkwatchershouldbeenabledmonitoringeffect",
+    "storageAccountsShouldPreventSharedKeyAccessExDataBricks",
+    // identity
+    "userbacrulesmonitoring",
+    "identityDesignateMoreThanOneOwnerMonitoring",
+    // defender for cloud
+    "appservicesadvancedthreatprotectionmonitoringeffect",
+    "keyvaultsadvanceddatasecuritymonitoringeffect",
+    "containersadvancedthreatprotectionmonitoringeffect",
+    "azuredefenderforopensourcerelationaldatabasesshouldbeenabledmonitoringeffect",
+    "enabledefenderforapis",
+    "azuredefenderforresourcemanagershouldbeenabledmonitoringeffect",
+    "virtualmachinesadvancedthreatprotectionmonitoringeffect",
+    "microsoftdefendercspmshouldbeenabledmonitoringeffect",
+    "sqlserversadvanceddatasecuritymonitoringeffect",
+    "defenderforstorageshouldbeenabledmonitoring",
+    "vnetenableddosprotectionmonitoring",
+    "sqlserversvirtualmachinesadvanceddatasecuritymonitoringeffect"
+]

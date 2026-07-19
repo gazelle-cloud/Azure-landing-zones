@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-IPRanges</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>IPRanges</command:noun>
+      <maml:description>
+        <maml:para>This command is to find a free range of a given size among the list of occupied ranges of a "base" network</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>This command is to find a free range of a given size among the list of occupied ranges of a "base" network. It takes a list of networks of some "base" range and a CIDR/Length of a subnet you need and then searches through the list to find a free slot of the requested size. The command uses ipnetwork2 library, compiled for netstandard.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-IPRanges</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>BaseNet</maml:name>
+          <maml:Description>
+            <maml:para>General "base" network, that "supernets" or contains all ranges provided for the "Networks" parameter</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">IPNetwork</command:parameterValue>
+          <dev:type>
+            <maml:name>IPNetwork</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>CIDR</maml:name>
+          <maml:Description>
+            <maml:para>The length of the range we search for</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <dev:type>
+            <maml:name>Int32</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>Networks</maml:name>
+          <maml:Description>
+            <maml:para>The list of ranges of the "base" network which are in use</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+          <dev:type>
+            <maml:name>Object</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>BaseNet</maml:name>
+        <maml:Description>
+          <maml:para>General "base" network, that "supernets" or contains all ranges provided for the "Networks" parameter</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">IPNetwork</command:parameterValue>
+        <dev:type>
+          <maml:name>IPNetwork</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>CIDR</maml:name>
+        <maml:Description>
+          <maml:para>The length of the range we search for</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+        <dev:type>
+          <maml:name>Int32</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Networks</maml:name>
+        <maml:Description>
+          <maml:para>The list of ranges of the "base" network which are in use</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+        <dev:type>
+          <maml:name>Object</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>None</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Object</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt;  Get-IPRanges -Networks "10.10.5.0/24", "10.10.7.0/24" -CIDR 22 -BaseNet "10.10.0.0/16"</dev:code>
+        <dev:remarks>
+          <maml:para>Base network is "10.10.0.0/16", the list of ranges already in use is ("10.10.5.0/24", "10.10.7.0/24"), we are looking for a free range of a size /22</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>ipnetwork2 library</maml:linkText>
+        <maml:uri>https://github.com/lduchosal/ipnetwork</maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>cloudmgmt module</maml:linkText>
+        <maml:uri>https://github.com/eosfor/cloudmgmt</maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>ipmgmt module</maml:linkText>
+        <maml:uri>https://github.com/eosfor/ipmgmt</maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-VLSMBreakdown</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>VLSMBreakdown</command:noun>
+      <maml:description>
+        <maml:para>This command is to calculate the network range breakdown to subnets, given the list of subnets and their sizes</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>This command is to calculate the network range breakdown to subnets, given the list of subnets and their sizes. Command takes a list of subnets in a form of hashtable with subnet names and their sizes, and the IP range to break in a form of a CIDR notation. Then in calculates the breakdown and returns it. If it is not possible - nothing is returned.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-VLSMBreakdown</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+          <maml:name>Network</maml:name>
+          <maml:Description>
+            <maml:para>The network range we want to break</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">IPNetwork</command:parameterValue>
+          <dev:type>
+            <maml:name>IPNetwork</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+          <maml:name>SubnetSize</maml:name>
+          <maml:Description>
+            <maml:para>The array of subnets in a form of a hashtable @{type = "&lt;name&gt;"; size = &lt;int&gt;} we want to put into the specified network range</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+          <dev:type>
+            <maml:name>Array</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
+        <maml:name>Network</maml:name>
+        <maml:Description>
+          <maml:para>The network range we want to break</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">IPNetwork</command:parameterValue>
+        <dev:type>
+          <maml:name>IPNetwork</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <maml:name>SubnetSize</maml:name>
+        <maml:Description>
+          <maml:para>The array of subnets in a form of a hashtable @{type = "&lt;name&gt;"; size = &lt;int&gt;} we want to put into the specified network range</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">Array</command:parameterValue>
+        <dev:type>
+          <maml:name>Array</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <maml:name>None</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <maml:name>System.Object</maml:name>
+        </dev:type>
+        <maml:description>
+          <maml:para></maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para></maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; $subnets = @{type = "GTWSUBNET"; size = 30},
+&gt;&gt; @{type = "DMZSUBNET"; size = 62},
+&gt;&gt; @{type = "EDGSUBNET"; size = 30},
+&gt;&gt; @{type = "APPSUBNET"; size = 62},
+&gt;&gt; @{type = "CRESUBNET"; size = 62}
+PS C:\&gt; Get-VLSMBreakdown -Network 10.10.5.0/24 -SubnetSize $subnets</dev:code>
+        <dev:remarks>
+          <maml:para>The variable $subnets contains subnets, or subnet zones we want to use. "Type" - specifies the name of the zone or subnet. "Size" - sets the maximum number of IPs which will be available for the subnet.</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>ipnetwork2 library</maml:linkText>
+        <maml:uri>https://github.com/lduchosal/ipnetwork</maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>cloudmgmt module</maml:linkText>
+        <maml:uri>https://github.com/eosfor/cloudmgmt</maml:uri>
+      </maml:navigationLink>
+      <maml:navigationLink>
+        <maml:linkText>ipmgmt module</maml:linkText>
+        <maml:uri>https://github.com/eosfor/ipmgmt</maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+</helpItems>

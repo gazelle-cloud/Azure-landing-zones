@@ -1,0 +1,39 @@
+{
+    "id": "landing-zone-github-runners",
+    "decision": "Every landing zone has its own private GitHub runners provisioned inside the landing zone VNet.",
+    "why": "Public runners have no network path to PaaS data plane once public access is denied.",
+    "links": [
+        {
+            "id": "azure-policy-hard-deny",
+            "note": "Public runners have no data-plane path once public network access is denied."
+        },
+        {
+            "id": "landing-zone-vnet",
+            "note": "Runners get a dedicated /28 subnet, delegated for runner integration, within the landing zone VNet."
+        },
+        {
+            "id": "platform-identity-github",
+            "note": "GitHub App permissions are used for runner registration and configuration."
+        },
+        {
+            "id": "landing-zone-allowed-public-ip",
+            "note": "Runners provide the network path for automation — human access requires configuring the approved public IP on PaaS firewalls."
+        },
+        {
+            "id": "landing-zone-template",
+            "note": "PRIVATE_GITHUB_RUNNERS is computed and propagated as an environment variable during landing zone provisioning."
+        },
+        {
+            "id": "deployment-config-in-repo",
+            "note": "PUBLIC_GITHUB_RUNNERS is defined in githubVariables.json and seeded to application repos at creation."
+        }
+    ],
+    "violations": [
+        "Application team using a separate VNet for runner integration."
+    ],
+    "files": [
+        "landing-zones/bicep/modules/base/virtualNetwork.bicep",
+        ".github/utils/create-landingzone-gh-runners.ps1",
+        ".github/workflows/template-landing-zones.yml"
+    ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "landing-zone-monitoring",
+  "decision": "The platform configures a Log Analytics workspace per landing zone, with retention set to stay within the free SKU.",
+  "why": "A shared workspace merges ingestion costs across landing zones, which breaks the cost ownership model.",
+  "links": [
+    { "id": "application-teams-own-the-cost", "note": "The cost of diagnostic ingestion lands on the application team's bill." },
+    { "id": "landing-zone-diagnostic-settings", "note": "Diagnostic settings are platform-defined — the platform controls what ingests into this workspace" },
+    { "id": "single-region", "note": "Log Analytics workspace is regional." }
+  ],
+  "violations": [
+    "Centralized Log Analytics workspace for general purpose logs."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/monitor.bicep",
+    "landing-zones/bicep/modules/base/logAnalyticsWorkspace.bicep",
+    "landing-zones/bicep/modules/base/ActivityLogAlerts.bicep"
+  ]
+}

@@ -1,0 +1,54 @@
+name: platform - push Docker images
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - "platform-management/automation/**"
+      - ".github/workflows/template-push-Docker-images.yml"
+      - ".github/workflows/platform-automation.yml"
+
+  pull_request_target:
+    types:
+      - closed
+    paths:
+      - "platform-management/automation/**"
+
+  workflow_dispatch:
+    inputs:
+      managementGroupHierarchy:
+        description: "Management Group Hierarchy"
+        required: true
+        default: "test"
+        type: choice
+        options:
+          - "test"
+          - "prod"
+
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    if: |
+      github.actor != 'dependabot[bot]' &&
+      (
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.managementGroupHierarchy == 'test') ||
+        github.ref != 'refs/heads/main'
+      )
+    uses: ./.github/workflows/template-push-Docker-images.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy || 'test' }}
+    secrets: inherit
+
+  prod:
+    if:
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.managementGroupHierarchy == 'prod') ||
+      github.event.pull_request.merged == true
+    uses: ./.github/workflows/template-push-Docker-images.yml
+    with:
+      managementGroupHierarchy: ${{ github.event.inputs.managementGroupHierarchy || 'prod' }}
+    secrets: inherit

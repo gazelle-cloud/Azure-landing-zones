@@ -1,0 +1,16 @@
+{
+  "id": "landing-zone-automation",
+  "decision": "Automation runs inside each landing zone's own subscription, not in a shared platform subscription.",
+  "why": "The platform has no management subscription - there is no place to host shared automation runtime.",
+  "links": [
+    { "id": "platform-identity-graph", "note": "Automation jobs query Entra ID, so landing zone identities receive Graph permissions." }
+  ],
+  "violations": [
+    "Automation job running from a resource outside the landing zone subscription."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/landingzone-automation.bicep",
+    "landing-zones/bicep/modules/base/jobs-cron.bicep",
+    "landing-zones/bicep/modules/base/managedEnvironments.bicep"
+  ]
+}

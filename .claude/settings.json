@@ -1,0 +1,42 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat knowledge-graph/**/*.json | jq -s '.'"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(gh issue:*)",
+      "Bash(gh pr create:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(az bicep build-params:*)",
+      "Bash(az bicep build:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh workflow run:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh deployment list:*)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)",
+      "Bash(az account management-group subscription show-sub-under-mg:*)",
+      "Bash(bash .claude/validate-knowledge-base.sh:*)",
+      "WebFetch(domain:github.blog)",
+      "mcp__azure__wellarchitectedframework",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__azure__pricing"
+    ]
+  }
+}

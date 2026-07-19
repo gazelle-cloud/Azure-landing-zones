@@ -1,0 +1,35 @@
+{
+  "id": "update-knowledge-base",
+  "triggers": [
+    "add a decision",
+    "update a decision",
+    "add an operation",
+    "update an operation",
+    "refine reasoning",
+    "add a link",
+    "update knowledge graph"
+  ],
+  "intent": "What was unclear becomes a clear picture — the more the graph grows, the fewer questions need a human to answer.",
+  "decisions": [],
+  "violations": [
+    "writing a file before presenting a draft to the user",
+    "adding a bidirectional link",
+    "link note that does not answer 'how does this linked decision specifically affect or constrain this decision?'",
+    "violation that restates the decision instead of describing a detectable breach"
+  ],
+  "steps": [
+    "Identify whether this is a new entry or an update to an existing one. For an update, read the existing file first.",
+    "Determine the type: guiding-principles, decisions, or operations.",
+    "Draft the entry. For decisions: id matches filename; decision is a single clear statement; why explains the consequence of not following it; links are organic and unidirectional — each note answers 'how does this linked decision specifically affect or constrain this decision?'; violations are specific enough to detect in a code review; files list only files where a reviewer would look to verify the decision is respected.",
+    "For links: only add one if the note would change how someone implements or reviews this decision. Drop it if the relationship is obvious from context alone.",
+    "Present the complete draft to the user before writing any file.",
+    "Write the file.",
+    "Run the validation script: bash .claude/validate-knowledge-base.sh. Fix any errors before proceeding.",
+    "Open a PR."
+  ],
+  "files": [
+    "knowledge-graph/guiding-principles/",
+    "knowledge-graph/decisions/",
+    "knowledge-graph/operations/"
+  ]
+}

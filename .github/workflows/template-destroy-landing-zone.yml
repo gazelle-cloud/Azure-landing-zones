@@ -1,0 +1,144 @@
+name: template - destroy Landing Zone
+
+on:
+  workflow_dispatch:
+    inputs:
+      subscriptionId:
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      subscriptionId:
+        description: "Subscription id"
+        required: true
+        type: string
+
+  pull_request_target:
+    types:
+      - closed
+    paths:
+      - "landing-zones/oases-prod/*.bicepparam"
+
+permissions: write-all
+
+jobs:
+  Destroy-Landing-Zone:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.head.ref, 'destroy-')
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: prod
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Fetch subscription Id
+        env:
+          PR_TITLE_PREFIX: "destroy landingzone:"
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+            if [ -z "$PR_TITLE" ]; then
+            echo "PR title is empty. Using workflow input"
+            echo "SUBSCRIPTION_ID ${{ inputs.subscriptionId }}"
+            echo "SUBSCRIPTION_ID=${{ inputs.subscriptionId }}" >> $GITHUB_ENV
+          else
+            echo "Extracting subscription Id from PR: $PR_TITLE"
+            echo "SUBSCRIPTION_ID ${PR_TITLE#${{ env.PR_TITLE_PREFIX }} }"
+            echo "SUBSCRIPTION_ID=${PR_TITLE#${{ env.PR_TITLE_PREFIX }} }" >> $GITHUB_ENV
+          fi
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID}}
+          allow-no-subscriptions: true
+
+      - name: fetch landing zone name
+        uses: azure/cli@v3
+        env:
+          PR_TITLE_PREFIX: "destroy landingzone:"
+        with:
+          inlineScript: |
+            lzName=$(az account subscription show --id ${{ env.SUBSCRIPTION_ID }} --query 'displayName' -o tsv)
+            echo "LANDING_ZONE_NAME=$lzName" >> $GITHUB_ENV
+            echo "LandingZoneName: $lzName"
+
+      - name: verify subscription status
+        uses: azure/cli@v3
+        env:
+          PR_TITLE_PREFIX: "destroy landingzone:"
+        with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+          inlineScript: |
+            az account set -s ${{ env.SUBSCRIPTION_ID }}
+            subscriptionState=$(az account show --query "state" -o tsv)
+
+            if [ "$subscriptionState" != "Enabled" ]; then
+              echo "Subscription is not Active. Current state: $subscriptionState"
+              exit 1
+            fi
+
+      - name: remove lock
+        shell: pwsh
+        env:
+          PR_TITLE_PREFIX: "destroy landingzone:"
+        run: |
+          az account set -s ${{ env.SUBSCRIPTION_ID }}
+
+          $locks = az lock list --query "[].id" -o tsv
+
+          $locks | ForEach-Object {
+            Write-Output "Removing lock: $_"
+            az lock delete --ids $_
+          }
+
+      - name: take subscription ownership
+        uses: azure/cli@v3
+        env:
+          PR_TITLE_PREFIX: "destroy landingzone:"
+        with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+          inlineScript: |
+            az role assignment create \
+              --assignee "${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }}" \
+              --role "Owner" \
+              --scope "/subscriptions/${{ env.SUBSCRIPTION_ID }}"
+
+      - name: Github runners cleanup
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          ./.github/utils/destroy-landingzone-gh-runners.ps1 `
+            -GitHubRunnersName '${{ env.LANDING_ZONE_NAME }}' `
+            -GitHubOrganizationName '${{ github.repository_owner }}'
+
+      - name: powershell scripts
+        shell: pwsh
+        env:
+          PR_TITLE_PREFIX: "destroy landingzone:"
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          ./.github/utils/destroy-landingzone.ps1 `
+            -subscriptionId '${{ env.SUBSCRIPTION_ID }}' `
+            -PlatformObjectId '${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }}' `
+            -TenantId '${{ vars.AZURE_TENANT_ID }}'
+
+      - name: change invoice section
+        uses: azure/cli@v3
+        env:
+          PR_TITLE_PREFIX: "destroy landingzone:"
+        with:
+          azcliversion: ${{ vars.AZURE_CLI_VERSION }}
+          inlineScript: |
+            az rest \
+              --method POST \
+              --url "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/${{ vars.BILLING_ACCOUNT_ID }}/billingSubscriptions/${{ env.SUBSCRIPTION_ID }}/move?api-version=2024-04-01" \
+              --body '{"destinationInvoiceSectionId": "/providers/Microsoft.Billing/billingAccounts/${{ vars.BILLING_ACCOUNT_ID }}/billingProfiles/${{ vars.BILLING_PROFILE_NAME }}/invoiceSections/${{ vars.SUBSCRIPTION_BANK_INVOICE_SECTION_ID }}"}'

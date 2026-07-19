@@ -1,0 +1,17 @@
+{
+  "id": "no-unapproved-resources",
+  "intent": "The allowed list starts empty. A resource type joins the platform only after its security controls, telemetry, and integration patterns are in place — once it is, app teams can use it freely within the boundaries Azure Policy guarantees.",
+  "decisions": [
+    "azure-policy-allowed-resources",
+    "azure-native-services-only",
+    "azure-policy-custom-definition",
+    "azure-policy-hard-deny",
+    "self-service-policy-exemptions",
+    "self-service-policy-exemptions-defender-for-cloud",
+    "azure-policy-naming-convention",
+    "azure-policy-reference"
+  ],
+  "violations": [
+    "Resource type added to the allowed list before Deny policies and diagnostic settings are wired."
+  ]
+}

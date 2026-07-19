@@ -1,0 +1,25 @@
+name: lz - __landingzoneName__
+
+on:
+  workflow_dispatch:
+
+  pull_request_target:
+    types:
+      - closed
+    paths:
+      - "landing-zones/__managementGroup__/__landingzoneName__.bicepparam"
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  landingzone:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    uses: ./.github/workflows/template-landing-zones.yml
+    with:
+      managementGroupScope: "__managementGroupScope__"
+      managementGroupHierarchy: "__managementGroupHierarchy__"
+      parameterFile: ./landing-zones/__managementGroup__/__landingzoneName__.bicepparam
+    secrets: inherit

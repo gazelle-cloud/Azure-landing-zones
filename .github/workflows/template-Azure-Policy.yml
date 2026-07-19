@@ -1,0 +1,197 @@
+name: template - Azure Policy
+
+on:
+  workflow_call:
+    inputs:
+      managementGroupHierarchy:
+        required: true
+        type: string
+
+env:
+  MANAGEMENT_GROUP_ID: ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }}
+  GITHUB_ORGANIZATION_NAME: ${{ github.repository_owner }}
+  GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+  ENVIRONMENT: ${{ inputs.managementGroupHierarchy }}
+jobs:
+  definitions:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: ${{ inputs.managementGroupHierarchy }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: validate branch and environment
+        run: |
+          if [[ "${GITHUB_REF##*/}" != "main" && "${{ inputs.managementGroupHierarchy }}" == "prod" ]]; then
+            echo "ERROR: You cannot run on prod environment from a non-main branch."
+            exit 1
+          fi
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID}}
+          allow-no-subscriptions: true
+
+      - name: custom definitions
+        env:
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          . ./.github/utils/set-githubVariables.ps1
+          . ./.github/utils/write-stackSummary.ps1
+
+          $deployment = az stack mg create `
+              --name 'policy-customDefinitions' `
+              --location ${{ vars.AZURE_DEFAULT_LOCATION }} `
+              --template-file './platform-management/policy/bicep/customPolicyDefinitions.bicep' `
+              --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }} `
+              --deny-settings-mode 'None' `
+              --action-on-unmanage 'deleteAll' `
+              --deny-settings-apply-to-child-scopes `
+              --parameters './platform-management/policy/parameters/customDefinitions/policyDefinitions.bicepparam' `
+                  environment=${{ inputs.managementGroupHierarchy }}
+              
+          Write-DeploymentStackSummary -StackJson $deployment
+
+          $dynamicVar = ($deployment | ConvertFrom-Json).outputs
+
+          Set-GitHubEnvironmentVariables $dynamicVar.GitHubEnvironmentVariables.Value.PSObject.Properties
+          Set-GitHubRepositoryVariables $dynamicVar.GitHubRepositoryVariables.Value.PSObject.Properties
+          Set-GitHubActionsVariables $dynamicVar.GitHubActionsVariables.Value.PSObject.Properties
+
+      - name: setDefinitions - diagnostic settings
+        env:
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          . ./.github/utils/set-githubVariables.ps1
+          . ./.github/utils/write-stackSummary.ps1
+
+          $deployment = az stack mg create `
+              --name 'policy-diagnosticSettings' `
+              --location ${{ vars.AZURE_DEFAULT_LOCATION }} `
+              --template-file './platform-management/policy/bicep/configDiagnosticSettings.bicep' `
+              --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }} `
+              --deny-settings-mode 'None' `
+              --action-on-unmanage 'deleteAll' `
+              --deny-settings-apply-to-child-scopes `
+              --parameters './platform-management/policy/parameters/diagnosticSettings.bicepparam'
+
+          Write-DeploymentStackSummary -StackJson $deployment
+
+          $dynamicVar = ($deployment | ConvertFrom-Json).outputs
+
+          Set-GitHubEnvironmentVariables $dynamicVar.GitHubEnvironmentVariables.Value.PSObject.Properties
+          Set-GitHubRepositoryVariables $dynamicVar.GitHubRepositoryVariables.Value.PSObject.Properties
+          Set-GitHubActionsVariables $dynamicVar.GitHubActionsVariables.Value.PSObject.Properties
+
+  assignments:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    needs:
+      - definitions
+    environment: ${{ inputs.managementGroupHierarchy }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID}}
+          allow-no-subscriptions: true
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: policy assignments
+        env:
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          . ./.github/utils/set-githubVariables.ps1
+          . ./.github/utils/write-stackSummary.ps1
+
+          $deployment = az stack mg create `
+              --name 'policy-assignments-oases' `
+              --location ${{ vars.AZURE_DEFAULT_LOCATION }} `
+              --template-file './platform-management/policy/bicep/oases.bicep' `
+              --management-group-id ${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }} `
+              --deny-settings-mode 'None' `
+              --action-on-unmanage 'deleteAll' `
+              --deny-settings-apply-to-child-scopes `
+              --parameters `
+                  environment=${{ inputs.managementGroupHierarchy }}
+
+          Write-DeploymentStackSummary -StackJson $deployment
+
+          $dynamicVar = ($deployment | ConvertFrom-Json).outputs
+
+          Set-GitHubEnvironmentVariables $dynamicVar.GitHubEnvironmentVariables.Value.PSObject.Properties
+          Set-GitHubRepositoryVariables $dynamicVar.GitHubRepositoryVariables.Value.PSObject.Properties
+          Set-GitHubActionsVariables $dynamicVar.GitHubActionsVariables.Value.PSObject.Properties
+
+      - name: wait while policy data propagates to graph
+        run: sleep 30
+
+      - name: generate Azure policy reference JSON
+        shell: pwsh
+        run: |
+          $Parameters = @{
+            policyAssignmentScope = '${{ env.policy_assignment_scope }}'
+          }
+
+           write-output $Parameters
+
+          ./.github/utils/get-policyAssignmentsReference.ps1 @Parameters
+
+      - name: push JSON to repo
+        if: github.ref != 'refs/heads/main'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+          git commit -m "Azure Policy: update reference file" || echo "No changes to commit"
+          git push
+
+      - name: create PR if main
+        if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="azure-policy-reference-${GITHUB_RUN_NUMBER}"
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit; skipping PR."
+            exit 0
+          fi
+
+          git commit -m "Azure Policy: update reference file"
+          git push --set-upstream origin "$BRANCH"
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "azure-policy-reference" \
+            --body "update azure policy reference JSON file that is used for landing zone policy exemptions"

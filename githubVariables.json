@@ -1,0 +1,93 @@
+{
+  "AzurePlatformVariables": {
+    "organizationVariables": {
+      "APP_GITHUB_AZUREPLATFORM_ID": "xxx",
+      "APPLICATION_ENGINEERS_GROUP_ID": "xxx",
+      "LANDING_ZONE_ALLOWED_PUBLIC_IP": "xxx"
+    },
+    "repositoryVariables": {
+      "AZURE_TENANT_ID": "xxx",
+      "AZURE_DEFAULT_LOCATION": "francecentral",
+      "RUNNER_IMAGE_VERSION": "ubuntu-latest",
+      "AZURE_CLI_VERSION": "latest",
+      "BILLING_ACCOUNT_ID": "xxx",
+      "BILLING_PROFILE_NAME": "xxx",
+      "SUBSCRIPTION_BANK_INVOICE_SECTION_ID": "xxx",
+      "AZURE_PLATFORM_ENGINEER_EMAIL": "***@***.**",
+      "IPAM_DEFAULT_NETWORK": "10.10.0.0/16",
+      "SUBSCRIPTION_BANK_NAME": "subscription-bank"
+    },
+    "environmentVariables": {
+      "AZURE_PLATFORM_CLIENT_ID": {
+        "test": "xxx",
+        "prod": "xxx"
+      },
+      "AZURE_PLATFORM_PRINCIPAL_ID": {
+        "test": "xxx",
+        "prod": "xxx"
+      },
+      "TOP_LEVEL_MANAGEMENT_GROUP_NAME": {
+        "test": "gazelle-test",
+        "prod": "gazelle-prod"
+      },
+      "AZURE_PLATFORM_ENGINEER_GROUP_ID": {
+        "test": "xxx",
+        "prod": "xxx"
+      },
+      "AZURE_PLATFORM_OWNER_GROUP_ID": {
+        "test": "xxx",
+        "prod": "xxx"
+      }
+    }
+  },
+  "Labels": {
+    "Azure-Policy": {
+      "color": "#81be81",
+      "description": "Policy Definitions, Assignments, Exemptions and everything else related to Azure Policy"
+    },
+    "Azure-AccessControl": {
+      "color": "#81be81",
+      "description": "Who has access to what"
+    },
+    "Azure-Automation": {
+      "color": "#81be81",
+      "description": "Container App Environments, Container Apps, PowerShell scripts"
+    },
+    "Azure-ManagementGroups": {
+      "color": "#81be81",
+      "description": "Mangement Group structure and configuration"
+    },
+    "Azure-LandingZone": {
+      "color": "#81be81",
+      "description": "Azure landing zone resources and configuration"
+    },
+    "Deployment-Logic": {
+      "color": "#81be81",
+      "description": "Github Actions, Environment variables, reusable workflows, pwsh scripts"
+    },
+    "ai-generated": {
+      "color": "#a2eeef",
+      "description": "The job is done by AI generated code"
+    },
+    "Schema": {
+      "color": "#f9d0c4",
+      "description": "Structural change broadly: new Bicep file or module, new workflow, new pattern file, new capability"
+    },
+    "Config": {
+      "color": "#f9d0c4",
+      "description": "Value change: bicepparam edit, JSON file edit, variable update, existing param value"
+    },
+    "Docs": {
+      "color": "#f9d0c4",
+      "description": "Patterns, references, AI knowledge base"
+    }
+  },
+  "NewRepoVariables": {
+    "repositoryVariables": {
+      "AZURE_TENANT_ID": "xxx",
+      "AZURE_DEFAULT_LOCATION": "francecentral",
+      "RUNNER_IMAGE_VERSION": "ubuntu-latest",
+      "AZURE_CLI_VERSION": "latest"
+    }
+  }
+}

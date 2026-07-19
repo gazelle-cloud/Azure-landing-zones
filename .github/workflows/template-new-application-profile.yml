@@ -1,0 +1,178 @@
+name: template - New Application Profile
+
+on:
+  workflow_dispatch:
+    inputs:
+      applicationName:
+        required: true
+        type: string
+
+  pull_request_target:
+    types:
+      - closed
+    paths:
+      - "application-profiles/*.json"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  setup-applicationProfile:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: prod
+    env:
+      PR_TITLE_PREFIX: "init applicationProfile:"
+    steps:
+      - name: checkout local
+        uses: actions/checkout@v7
+
+      - name: Set Application Name as variable
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+            if [ -z "$PR_TITLE" ]; then
+            echo "PR title is empty. Using workflow input"
+            echo "APP_NAME ${{ inputs.applicationName }}"
+            echo "APP_NAME=${{ inputs.applicationName }}" >> $GITHUB_ENV
+          else
+            echo "Extracting application name from PR: $PR_TITLE"
+            echo "APP_NAME ${PR_TITLE#${{ env.PR_TITLE_PREFIX }} }"
+            echo "APP_NAME=${PR_TITLE#${{ env.PR_TITLE_PREFIX }} }" >> $GITHUB_ENV
+          fi
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_PLATFORM_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID}}
+          allow-no-subscriptions: true
+
+      - name: read application parameters
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          $filePath = "./application-profiles/${{ env.APP_NAME }}.json"
+
+          $params = Get-Content $filePath -Raw | ConvertFrom-Json
+
+          foreach ($property in $params.PSObject.Properties) {
+            $line = "$($property.Name)=$($property.Value)"
+            Write-Host "Setting env var: $line"
+            Add-Content -Path $env:GITHUB_ENV -Value $line
+            }
+
+      - name: generate names
+        run: |
+          echo "EntraGroupName=Azure-${{ env.APP_NAME }}-Engineer" >> $GITHUB_ENV
+
+      - name: create repo
+        env:
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          if gh repo view '${{ github.repository_owner }}/${{ env.APP_NAME }}'; then
+            echo 'Repo exists'
+          else
+            echo 'Repo not found, creating...'
+            gh repo create '${{ github.repository_owner }}/${{ env.APP_NAME }}' \
+              --template '${{ github.repository_owner }}/landingzone-template' \
+              --private
+          fi
+
+      - name: set static environment variables
+        env:
+          GITHUB_ORGANIZATION_NAME: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ env.APP_NAME }}
+          ENVIRONMENT: prod
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          . ./.github/utils/set-githubVariables.ps1
+
+          $GitHubVariables = (Get-Content ./githubVariables.json -Raw | ConvertFrom-Json -Depth 20).NewRepoVariables
+
+          $repoVars = @()
+          foreach ($item in $GitHubVariables.repositoryVariables.PSObject.Properties) {
+              $name = $item.Name
+              $value = $item.Value
+              $repoVars += [PSCustomObject]@{ Name = $name; Value = $value }
+          }
+          Set-GitHubRepositoryVariables $repoVars
+
+      - name: create Entra ID group
+        run: |
+          if az ad group show --group "${{ env.EntraGroupName }}" >/dev/null 2>&1; then
+            echo 'Entra ID group exists'
+            EntraGroup=$(az ad group show \
+              --group "${{ env.EntraGroupName }}" \
+              --query "id" -o tsv)
+          else
+            echo 'Entra ID group not found, creating...'
+            EntraGroup=$(az ad group create \
+              --display-name "${{ env.EntraGroupName }}" \
+              --mail-nickname "${{ env.EntraGroupName }}" \
+              --query "id" -o tsv)
+          fi
+
+          echo "EntraGroupId=$EntraGroup" >> $GITHUB_ENV
+
+      - name: add App Engineers to Entra group
+        run: |
+          if ! az ad group show --group "${{ vars.APPLICATION_ENGINEERS_GROUP_ID }}" >/dev/null 2>&1; then
+            echo "Target Entra ID group '${{ vars.APPLICATION_ENGINEERS_GROUP_ID }}' was not found"
+            exit 1
+          fi
+
+          IsMember=$(az ad group member check \
+            --group "${{ vars.APPLICATION_ENGINEERS_GROUP_ID }}" \
+            --member-id "${{ env.EntraGroupId }}" \
+            --query "value" -o tsv)
+
+          if [ "$IsMember" = "true" ]; then
+            echo "Entra group is already a member of '${{ vars.APPLICATION_ENGINEERS_GROUP_ID }}'"
+          else
+            echo "Adding Entra group to '${{ vars.APPLICATION_ENGINEERS_GROUP_ID }}'"
+            az ad group member add \
+              --group "${{ vars.APPLICATION_ENGINEERS_GROUP_ID }}" \
+              --member-id "${{ env.EntraGroupId }}"
+          fi
+
+      - name: create Invoice section
+        run: |
+          InvoiceId=$(az billing invoice section create \
+            --account-name "${{ vars.BILLING_ACCOUNT_ID }}" \
+            --profile-name "${{ vars.BILLING_PROFILE_NAME }}" \
+            --name "${{ env.APP_NAME }}" \
+            --display-name "${{ env.APP_NAME }}" \
+            --query "systemId" \
+            -o tsv)
+          echo "invoiceId=$InvoiceId" >> $GITHUB_ENV
+
+      - name: Assign Invoice section reader role
+        env:
+          scope: "providers/Microsoft.Billing/billingAccounts/${{ vars.BILLING_ACCOUNT_ID }}/billingProfiles/${{ vars.BILLING_PROFILE_NAME }}/invoiceSections/${{ env.invoiceId }}"
+          invoiceSectionReader: "30000000-aaaa-bbbb-cccc-100000000002"
+        run: |
+          az rest --method post \
+            --uri "https://management.azure.com/${scope}/createBillingRoleAssignment?api-version=2024-04-01" \
+            --body "{
+              \"principalId\": \"${{ env.EntraGroupId }}\",
+              \"roleDefinitionId\": \"${{ env.invoiceSectionReader }}\"
+            }" -o jsonc
+
+      - name: set dynamic GitHub environment variables
+        env:
+          GH_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          gh variable set invoice_Section_Id --body ${{ env.invoiceId }} -R '${{ github.repository_owner }}/${{ env.APP_NAME}}'
+          gh variable set entraID_reader_group_Id --body ${{ env.EntraGroupId }} -R '${{ github.repository_owner }}/${{ env.APP_NAME }}'
+          gh variable set owner_contact --body ${{ env.ownerEmail  }} -R '${{ github.repository_owner }}/${{ env.APP_NAME }}'
+          gh variable set engineer_contact --body ${{ env.engineerEmail  }} -R '${{ github.repository_owner }}/${{ env.APP_NAME }}'

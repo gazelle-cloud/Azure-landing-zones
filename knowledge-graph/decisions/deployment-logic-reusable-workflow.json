@@ -1,0 +1,29 @@
+{
+  "id": "deployment-logic-reusable-workflow",
+  "decision": "Deployment logic is written once in reusable workflows — each environment only controls when and with what inputs to run it.",
+  "why": "Without reuse, a fix to deployment logic has to be repeated in every environment workflow.",
+  "links": [
+    {
+      "id": "deployment-end-to-end",
+      "note": "Reusable workflows give each platform capability its end-to-end deployment structure."
+    },
+    {
+      "id": "deployment-branch-gated-promotion",
+      "note": "Gating lives in the trigger layer only."
+    }
+  ],
+  "files": [
+    ".github/workflows/template-landing-zones.yml",
+    ".github/workflows/template-Azure-Policy.yml",
+    ".github/workflows/template-access-control.yml",
+    ".github/workflows/template-Management-Groups.yml",
+    ".github/workflows/template-push-Docker-images.yml",
+    ".github/workflows/template-GitHub-environment-variables.yml",
+    ".github/workflows/template-calculate-vnet-address-space.yml",
+    ".github/workflows/template-trigger-landingzone-workflows.yml",
+    ".github/workflows/template-lz-template.yml",
+    ".github/workflows/template-new-application-profile.yml",
+    ".github/workflows/template-cancel-landing-zone.yml",
+    ".github/workflows/template-destroy-landing-zone.yml"
+  ]
+}

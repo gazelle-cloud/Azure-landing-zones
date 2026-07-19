@@ -1,0 +1,99 @@
+name: request new - Application Profile
+
+on:
+  workflow_dispatch:
+    inputs:
+      ApplicationName:
+        required: true
+        type: string
+      OwnerContact:
+        required: true
+        type: string
+      engineerContact:
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  ApplicationProfileSetup:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    permissions: write-all
+    steps:
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ steps.github-token.outputs.token }}
+
+      - name: output parsed issue
+        shell: pwsh
+        run: |
+          write-output "appName=${{ inputs.ApplicationName }}"
+          write-output "ownerEmail=${{ inputs.OwnerContact }}"
+          write-output "engineerEmail=${{ inputs.engineerContact }}"  
+          write-output "appName=${{ inputs.ApplicationName }}" >> $env:GITHUB_ENV
+          write-output "ownerEmail=${{ inputs.OwnerContact }}" >> $env:GITHUB_ENV
+          write-output "engineerEmail=${{ inputs.engineerContact }}" >> $env:GITHUB_ENV
+
+      - name: create application profile parameter file
+        shell: pwsh
+        run: |
+          cp ./application-profiles/template.json ./application-profiles/${{ env.appName }}.json
+
+      - name: replace - parameter - appName
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__applicationName__"
+          replace: "${{ env.appName }}"
+          include: "application-profiles/${{ env.appName }}.json"
+
+      - name: replace - parameter - ownerEmail
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__ownerEmail__"
+          replace: "${{ env.ownerEmail }}"
+          include: "application-profiles/${{ env.appName }}.json"
+
+      - name: replace - parameter - engineerEmail
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__engineerEmail__"
+          replace: "${{ env.engineerEmail }}"
+          include: "application-profiles/${{ env.appName }}.json"
+
+      - name: extend ApplicationName
+        run: |
+          set -euo pipefail
+          file='.github/workflows/requestNew-Landing-Zone.yml'
+          app="${appName:-}"
+
+          yq -i '.on.workflow_dispatch.inputs.ApplicationName.options += ["'"$app"'"]' "$file"
+
+      - name: push param file
+        run: |
+          BRANCH="init-applicationProfile-${{ env.appName }}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add .
+          git commit -m "init applicationProfile: ${{ env.appName }}"
+          git push --force --set-upstream origin "$BRANCH"
+
+      - name: create pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "$PR_BRANCH" \
+            --title "init applicationProfile: ${{ env.appName }}" \
+            --body "This adds initial applicationProfile for \`${{ env.appName }}\`."

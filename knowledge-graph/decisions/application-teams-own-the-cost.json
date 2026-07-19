@@ -1,0 +1,22 @@
+{
+    "id": "application-teams-own-the-cost",
+    "decision": "Each application has its own billing scope; every subscription it provisions bills to it.",
+    "why": "Tag-based cost attribution doesn't scale — the aggregation logic grows with every resource and drifts as tags fall out of sync.",
+    "links": [
+        {
+            "id": "landing-zone-application-profile",
+            "note": "Application Profile registration creates the Azure Invoice Section."
+        },
+        {
+            "id": "landing-zone-action-group",
+            "note": "Landing zone budget alerts are routed via the action group to the team that owns the spend."
+        }
+    ],
+    "violations": [
+        "Tags as primary cost attribution instead of invoice section isolation."
+    ],
+    "files": [
+        "githubVariables.json",
+        ".github/workflows/template-landing-zones.yml"
+    ]
+}

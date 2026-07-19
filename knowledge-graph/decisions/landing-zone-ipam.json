@@ -1,0 +1,19 @@
+{
+  "id": "landing-zone-ipam",
+  "decision": "VNet address spaces are allocated by querying the live Azure environment, not by maintaining a registry of what has been assigned.",
+  "why": "The platform has no management subscription — there is no place to host ad-hoc tooling like a registry",
+  "links": [
+    {
+      "id": "single-region",
+      "note": "Address space is allocated without regional segmentation."
+    }
+  ],
+  "violations": [
+    "VNet with a manually assigned address space."
+  ],
+  "files": [
+    "githubVariables.json",
+    ".github/workflows/template-calculate-vnet-address-space.yml",
+    "landing-zones/managementGroup-AppName-environment.bicepparam"
+  ]
+} 

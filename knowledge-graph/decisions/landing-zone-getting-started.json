@@ -1,0 +1,27 @@
+{
+    "id": "landing-zone-getting-started",
+    "decision": "The platform ships every application repo with a 'hello-world' deployment pipeline, enough to prove it works end-to-end.",
+    "why": "Without it, there is no way to verify that a freshly provisioned landing zone is wired correctly end-to-end",
+    "links": [
+        {
+            "id": "landing-zone-repo",
+            "note": "The getting-started modules live in the application repo"
+        },
+        {
+            "id": "deployment-declarative-lifecycle",
+            "note": "Examples use deployment stacks with deleteAll"
+        },
+        {
+            "id": "deployment-logic-reusable-workflow",
+            "note": "Examples follow the same trigger/template separation"
+        },
+        {
+            "id": "deployment-branch-gated-promotion",
+            "note": "Examples use the same test-then-prod promotion"
+        }
+    ],
+    "violations": [
+        "getting-started modules tailored for a specific application requirements"
+    ],
+    "files": []
+}

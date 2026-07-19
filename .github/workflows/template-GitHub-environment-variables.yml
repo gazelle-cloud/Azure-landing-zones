@@ -1,0 +1,115 @@
+name: template - GitHub environment variables
+
+on:
+  workflow_call:
+    inputs:
+      managementGroupHierarchy:
+        required: true
+        type: string
+
+jobs:
+  Config-GitHub-Variables:
+    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    environment: ${{ inputs.managementGroupHierarchy }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: validate branch and environment
+        run: |
+          if [[ "${GITHUB_REF##*/}" != "main" && "${{ inputs.managementGroupHierarchy }}" == "prod" ]]; then
+            echo "ERROR: You cannot run on prod environment from a non-main branch."
+            exit 1
+          fi
+
+      - name: get github token
+        id: github-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_GITHUB_AZUREPLATFORM_ID }}
+          private-key: ${{ secrets.APP_GITHUB_AZUREPLATFORM_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: create GitHub environment
+        env:
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        run: |
+          echo "create environment"
+          gh api --method PUT -H "Accept: application/vnd.github+json" \
+          repos/${{ github.repository }}/environments/${{ inputs.managementGroupHierarchy }}
+
+      - name: set environment variables
+        env:
+          GITHUB_ORGANIZATION_NAME: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+          ENVIRONMENT: ${{ inputs.managementGroupHierarchy }}
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          . ./.github/utils/set-githubVariables.ps1
+
+          $GitHubVariables = (Get-Content ./githubVariables.json -Raw | ConvertFrom-Json -Depth 20).AzurePlatformVariables
+
+          $envVars = @()
+          foreach ($item in $GitHubVariables.environmentVariables.PSObject.Properties) {
+            $name = $item.Name
+            $value = $item.Value.${{ inputs.managementGroupHierarchy }}
+            $envVars += [PSCustomObject]@{ Name = $name; Value = $value }
+          }
+
+          $repoVars = @()
+          foreach ($item in $GitHubVariables.repositoryVariables.PSObject.Properties) {
+            $name = $item.Name
+            $value = $item.Value
+            $repoVars += [PSCustomObject]@{ Name = $name; Value = $value }
+          }
+
+          $orgVars = @()
+          foreach ($item in $GitHubVariables.organizationVariables.PSObject.Properties) {
+            $name = $item.Name
+            $value = $item.Value
+            $orgVars += [PSCustomObject]@{ Name = $name; Value = $value }
+          }
+
+          Set-GitHubEnvironmentVariables $envVars
+          Set-GitHubRepositoryVariables $repoVars
+          Set-GitHubOrganizationVariables $orgVars
+
+      - name: GitHub organization databaseId
+        if: ${{ inputs.managementGroupHierarchy == 'prod' }}
+        env:
+          GITHUB_ORGANIZATION_NAME: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+          ENVIRONMENT: ${{ inputs.managementGroupHierarchy }}
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          . ./.github/utils/set-githubVariables.ps1
+
+          $query = gh api graphql -f query='query($login:String!){ organization(login:$login){ login databaseId id } }' -f login=${{ env.GITHUB_ORGANIZATION_NAME}}
+
+          $obj = $query | ConvertFrom-Json
+
+          $databaseId = $obj.data.organization.databaseId
+
+          $var = [PSCustomObject]@{ Name = "GH_ORGANIZATION_DATABASE_ID"; Value = $databaseId }
+
+          Set-GitHubOrganizationVariables $var
+
+      - name: github labels
+        if: ${{ inputs.managementGroupHierarchy == 'prod' }}
+        env:
+          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
+        shell: pwsh
+        run: |
+          $readJson = Get-Content ./githubVariables.json -Raw | ConvertFrom-Json -Depth 20
+          $labels = $readJson.labels
+
+          foreach ($item in $labels.PSObject.Properties) {
+            $name  = $item.Name
+            $color = $item.value.color
+            $desc  = $item.value.description
+
+            Write-Host "Creating label: $name"
+            gh label create "$name" --color "$color" --description "$desc" --force
+          }

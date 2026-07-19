@@ -1,0 +1,23 @@
+{
+  "id": "single-region",
+  "decision": "All landing zones deploy to a single region — the platform, owns the region decision.",
+  "why": "Without a single region, every deployment carries its own region decision — service parity depends on each engineer's choice rather than being a platform default.",
+  "links": [
+    {
+      "id": "deployment-config-in-repo",
+      "note": "The region is defined once in githubVariables.json — all deployments read it from there."
+    },
+    {
+      "id": "landing-zone-github-runners",
+      "note": "GitHub runner VNet integration is region-gated, so the platform's chosen region must support it."
+    }
+  ],
+  "violations": [
+    "bicepparam with hardcoded location overrides workflow-injected region.",
+    "Platform region set to a region where GitHub runners VNet integration is unavailable."
+  ],
+  "files": [
+    "githubVariables.json",
+    ".github/workflows/template-landing-zones.yml"
+  ]
+}

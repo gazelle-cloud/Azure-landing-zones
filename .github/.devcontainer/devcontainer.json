@@ -1,0 +1,10 @@
+{
+  "name": "working hard",
+  "image": "mcr.microsoft.com/vscode/devcontainers/base:alpine",
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": ["teabyii.ayu"]
+    }
+  }
+}

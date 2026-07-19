@@ -1,0 +1,18 @@
+{
+  "id": "landing-zone-identity",
+  "decision": "Each landing zone has a single managed identity — shared across all its workflows, jobs, and service integrations.",
+  "why": "Without a single identity, every new capability multiplies the permission surface — RBAC and OIDC config sprawl with no clean audit boundary.",
+  "links": [
+    {
+      "id": "landing-zone-automation",
+      "note": "Automation jobs authenticate as the landing zone's managed identity."
+    }
+  ],
+  "violations": [
+    "Managed identity shared across multiple landing zones."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/identity.bicep",
+    "landing-zones/bicep/modules/base/appRoleAssignedTo.bicep"
+  ]
+}
