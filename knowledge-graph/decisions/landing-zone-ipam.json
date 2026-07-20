@@ -16,4 +16,4 @@
     ".github/workflows/template-calculate-vnet-address-space.yml",
     "landing-zones/managementGroup-AppName-environment.bicepparam"
   ]
-} 
+}

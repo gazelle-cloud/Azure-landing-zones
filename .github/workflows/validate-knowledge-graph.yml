@@ -1,0 +1,96 @@
+name: validate - knowledge graph decisions
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - "knowledge-graph/decisions/*.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  models: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: get changed decision files
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            files=$(git diff --name-only origin/main HEAD -- 'knowledge-graph/decisions/*.json' | tr '\n' ' ')
+          else
+            files=$(git diff --name-only HEAD~1 HEAD -- 'knowledge-graph/decisions/*.json' | tr '\n' ' ')
+          fi
+          echo "files=$files" >> $GITHUB_OUTPUT
+
+      - name: validate decisions
+        if: steps.changed.outputs.files != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          decisions=$(for file in ${{ steps.changed.outputs.files }}; do
+            jq '{id: .id, decision: .decision, why: .why}' "$file"
+          done | jq -s '.')
+
+          payload=$(jq -n \
+            --argjson decisions "$decisions" \
+            '{
+              model: "openai/gpt-4o",
+              temperature: 0,
+              response_format: { type: "json_object" },
+              messages: [
+                {
+                  role: "system",
+                  content: "You are a validator for an architectural knowledge graph. Evaluate each entry in the decisions array against two rules.\n\nBefore evaluating each field, identify its core claim:\n- decision_core: what specific structural choice is being made? (one phrase)\n- why_core: what specific system failure occurs when this decision is absent? (one phrase)\n\nThen evaluate against the rules:\n\nRule 1 — decision: Must be an architectural or design statement — a structural choice about what the system is or how it is shaped. Must NOT contain its own rationale (no \"to avoid\", \"to ensure\", \"because\"), describe a process step or procedure, include a vague goal statement, or mix implementation details into the architectural statement.\n\nFAIL: \"The platform has a one-time manual setup process to configure...\" — decision_core is a procedure, not a structural choice.\nFAIL: \"Automation images are hosted outside Azure to avoid a fixed cost.\" — decision_core contains its own rationale.\nPASS: \"Each landing zone has a single managed identity — shared across all its workflows, jobs, and service integrations.\"\n\nRule 2 — why: The why_core must name the failure that occurs when the decision is absent — not what makes an alternative undesirable, not why an alternative is impossible, not a general benefit. Ask: if this decision were removed and nothing replaced it, what specifically breaks?\n\nFAIL: \"The platform has no management subscription — there is no place to host shared automation runtime.\" — why_core explains why an alternative is impossible, not what breaks when the decision is absent.\nFAIL: \"Tag-based cost attribution does not scale — the aggregation logic grows with every resource.\" — why_core describes a flaw in the rejected alternative, not the failure when billing isolation is absent.\nPASS: \"Without a single identity, every new capability multiplies the permission surface — RBAC and OIDC config sprawl with no clean audit boundary.\"\n\nReturn a JSON object: {\"results\": [{\"id\": \"...\", \"decision_core\": \"one phrase\", \"decision\": \"pass|fail\", \"decision_reason\": \"one sentence\", \"why_core\": \"one phrase\", \"why\": \"pass|fail\", \"why_reason\": \"one sentence\"}]}"
+                },
+                {
+                  role: "user",
+                  content: ($decisions | tostring)
+                }
+              ]
+            }')
+
+          raw=$(curl -s -X POST https://models.github.ai/inference/chat/completions \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$payload")
+          response=$(echo "$raw" | jq -r '.choices[0].message.content')
+
+          failed=0
+
+          echo "## knowledge graph validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| id | decision | why |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
+
+          while IFS= read -r result; do
+            id=$(echo "$result" | jq -r '.id')
+            d_core=$(echo "$result" | jq -r '.decision_core')
+            d_result=$(echo "$result" | jq -r '.decision')
+            d_reason=$(echo "$result" | jq -r '.decision_reason')
+            w_core=$(echo "$result" | jq -r '.why_core')
+            w_result=$(echo "$result" | jq -r '.why')
+            w_reason=$(echo "$result" | jq -r '.why_reason')
+
+            d_cell=$([ "$d_result" = "pass" ] && echo "pass" || echo "**$d_reason** <br><sub>core: $d_core</sub>")
+            w_cell=$([ "$w_result" = "pass" ] && echo "pass" || echo "**$w_reason** <br><sub>core: $w_core</sub>")
+
+            echo "| $id | $d_cell | $w_cell |" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$d_result" = "fail" ] || [ "$w_result" = "fail" ]; then
+              failed=1
+            fi
+          done < <(echo "$response" | jq -c '.results[]')
+
+          if [ $failed -ne 0 ]; then
+            echo ""
+            echo "one or more decisions failed validation — fix before opening a PR."
+            exit 1
+          fi

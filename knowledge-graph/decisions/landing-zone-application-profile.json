@@ -1,6 +1,6 @@
 {
   "id": "landing-zone-application-profile",
-  "decision": "Registering an Application Profile is what establishes the fundamentals to enable self-service and autonomy for landing zones.",
+  "decision": "Registering an Application Profile is what establishe the fundamentals to enable self-service and autonomy for landing zones.",
   "why": "Without a registered profile, the platform has no application to provision landing zones for.",
   "links": [
     {

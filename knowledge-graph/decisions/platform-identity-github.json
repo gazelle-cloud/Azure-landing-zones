@@ -1,13 +1,13 @@
 {
-    "id": "platform-identity-github",
-    "decision": "All platform and landing zone workflows authenticate to GitHub using a single, shared GitHub App identity.",
-    "why": "Without a shared GitHub App, the platform has no mechanism to provision and configure application repos and environments.",
-    "links": [],
-    "violations": [
-        "GITHUB_TOKEN used to write org-level variables or trigger other workflows."
-    ],
-    "files": [
-        "githubVariables.json",
-        ".github/workflows/template-landing-zones.yml"
-    ]
+  "id": "platform-identity-github",
+  "decision": "All platform and landing zone workflows authenticate to GitHub using a single, shared GitHub App identity.",
+  "why": "Without a shared GitHub App, the platform has no mechanism to provision and configure application repos and environments.",
+  "links": [],
+  "violations": [
+    "GITHUB_TOKEN used to write org-level variables or trigger other workflows."
+  ],
+  "files": [
+    "githubVariables.json",
+    ".github/workflows/template-landing-zones.yml"
+  ]
 }

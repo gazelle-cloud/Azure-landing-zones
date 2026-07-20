@@ -1,26 +1,26 @@
 {
-    "id": "job-function-scoped-roles",
-    "decision": "Access is granted by job function, not by resource type — adding a new resource type never requires a new role.",
-    "why": "Resource-scoped roles couple access control to the allowed resources list — every new resource type forces a role review and team re-onboarding.",
-    "links": [
-        {
-            "id": "landing-zone-application-profile",
-            "note": "The Application Profile creates an Entra ID group dedicated to application engineers, providing only the minimum access that does not break Infrastructure-as-Code principles."
-        },
-        {
-            "id": "deployment-config-in-repo",
-            "note": "The platform-wide engineers group name (APP_ENGINEERS_GROUP_NAME) is sourced from githubVariables.json"
-        },
-        {
-            "id": "landing-zone-lifecycle",
-            "note": "Reader on the 'Subscription Bank' is what allows engineers to discover subscriptions available for reuse."
-        }
-    ],
-    "violations": [
-        "Custom role with wildcard write permissions."
-    ],
-    "files": [
-        "platform-management/access-control/parameters/accessControl.bicepparam",
-        "platform-management/access-control/bicep/modules/customRoleDefinitions.bicep"
-    ]
+  "id": "job-function-scoped-roles",
+  "decision": "Access is granted by job function, not by resource type — adding a new resource type never requires a new role.",
+  "why": "Resource-scoped roles couple access control to the allowed resources list — every new resource type forces a role review and team re-onboarding.",
+  "links": [
+    {
+      "id": "landing-zone-application-profile",
+      "note": "The Application Profile creates an Entra ID group dedicated to application engineers, providing only the minimum access that does not break Infrastructure-as-Code principles."
+    },
+    {
+      "id": "deployment-config-in-repo",
+      "note": "The platform-wide engineers group name (APP_ENGINEERS_GROUP_NAME) is sourced from githubVariables.json"
+    },
+    {
+      "id": "landing-zone-lifecycle",
+      "note": "Reader on the 'Subscription Bank' is what allows engineers to discover subscriptions available for reuse."
+    }
+  ],
+  "violations": [
+    "Custom role with wildcard write permissions."
+  ],
+  "files": [
+    "platform-management/access-control/parameters/accessControl.bicepparam",
+    "platform-management/access-control/bicep/modules/customRoleDefinitions.bicep"
+  ]
 }

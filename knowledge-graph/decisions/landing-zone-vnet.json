@@ -1,30 +1,30 @@
 {
-    "id": "landing-zone-vnet",
-    "decision": "Each landing zone has its own isolated VNet with no connectivity to other landing zones or on-premises networks",
-    "why": "A shared networking solution would introduce fixed costs, breaking the no-fixed-cost principle.",
-    "links": [
-        {
-            "id": "azure-policy-hard-deny",
-            "note": "PaaS service firewalls must restrict public network access."
-        },
-        {
-            "id": "landing-zone-ipam",
-            "note": "IPAM allocates the VNet's address space, defaulting to a /24."
-        },
-        {
-            "id": "landing-zone-github-runners",
-            "note": "Each VNet hosts its own runner subnet, registered with GitHub as a dedicated runner group."
-        },
-        {
-            "id": "single-region",
-            "note": "The VNet is provisioned in AZURE_DEFAULT_LOCATION; a second region would require a new VNet and a separate regional IPAM allocation."
-        }
-    ],
-    "violations": [
-        "VNet provisioned outside the landing-zone-resources stack.",
-        "Private Link/endpoint configuration on platform managed services."
-    ],
-    "files": [
-        "landing-zones/bicep/modules/base/virtualNetwork.bicep"
-    ]
+  "id": "landing-zone-vnet",
+  "decision": "Each landing zone has its own isolated VNet with no connectivity to other landing zones or on-premises networks",
+  "why": "A shared networking solution would introduce fixed costs, breaking the no-fixed-cost principle.",
+  "links": [
+    {
+      "id": "azure-policy-hard-deny",
+      "note": "PaaS service firewalls must restrict public network access."
+    },
+    {
+      "id": "landing-zone-ipam",
+      "note": "IPAM allocates the VNet's address space, defaulting to a /24."
+    },
+    {
+      "id": "landing-zone-github-runners",
+      "note": "Each VNet hosts its own runner subnet, registered with GitHub as a dedicated runner group."
+    },
+    {
+      "id": "single-region",
+      "note": "The VNet is provisioned in AZURE_DEFAULT_LOCATION; a second region would require a new VNet and a separate regional IPAM allocation."
+    }
+  ],
+  "violations": [
+    "VNet provisioned outside the landing-zone-resources stack.",
+    "Private Link/endpoint configuration on platform managed services."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/base/virtualNetwork.bicep"
+  ]
 }
