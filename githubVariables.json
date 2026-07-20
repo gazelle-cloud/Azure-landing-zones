@@ -34,7 +34,7 @@
         "test": "xxx",
         "prod": "xxx"
       },
-      "AZURE_PLATFORM_OWNER_GROUP_ID": {
+      "BREAK_GLASS_GROUP_ID": {
         "test": "xxx",
         "prod": "xxx"
       }

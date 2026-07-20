@@ -54,7 +54,7 @@ param subscriptionBankName string
 #disable-next-line no-unused-params
 param azurePlatformEngineerGroupId string
 #disable-next-line no-unused-params
-param azurePlatformOwnerGroupId string
+param breakGlassGroupId string
 #disable-next-line no-unused-params
 param applicationEngineersGroupId string
 param deploymentNameSuffix string = take(newGuid(), 4)

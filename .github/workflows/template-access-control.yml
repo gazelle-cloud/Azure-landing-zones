@@ -59,7 +59,7 @@ jobs:
               --parameters './platform-management/access-control/parameters/accessControl.bicepparam' `
                   topLevelManagementGroupName=${{ vars.TOP_LEVEL_MANAGEMENT_GROUP_NAME }} `
                   environment=${{ inputs.managementGroupHierarchy }} `
-                  azurePlatformOwnerGroupId=${{ vars.AZURE_PLATFORM_OWNER_GROUP_ID }} `
+                  breakGlassGroupId=${{ vars.BREAK_GLASS_GROUP_ID }} `
                   azurePlatformEngineerGroupId=${{ vars.AZURE_PLATFORM_ENGINEER_GROUP_ID }} `
                   applicationEngineersGroupId=${{ vars.APPLICATION_ENGINEERS_GROUP_ID }} `
                   subscriptionBankName=${{ vars.SUBSCRIPTION_BANK_NAME }}

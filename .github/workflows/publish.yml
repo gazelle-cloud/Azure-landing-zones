@@ -50,7 +50,7 @@ jobs:
             .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_CLIENT_ID = {"test":"xxx","prod":"xxx"} |
             .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_PRINCIPAL_ID = {"test":"xxx","prod":"xxx"} |
             .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_ENGINEER_GROUP_ID = {"test":"xxx","prod":"xxx"} |
-            .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_OWNER_GROUP_ID = {"test":"xxx","prod":"xxx"} |
+            .AzurePlatformVariables.environmentVariables.BREAK_GLASS_GROUP_ID = {"test":"xxx","prod":"xxx"} |
             .NewRepoVariables.repositoryVariables.AZURE_TENANT_ID = "xxx"
           ' githubVariables.json > tmp.json && mv tmp.json githubVariables.json
 
