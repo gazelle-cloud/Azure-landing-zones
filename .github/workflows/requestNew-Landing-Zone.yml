@@ -12,6 +12,7 @@ on:
           - GitHub-runners
           - claudy
           - babboom
+          - join-me
       Environment:
         type: choice
         required: true
