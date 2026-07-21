@@ -6,19 +6,19 @@
     "onboard team",
     "new team",
     "add application",
-    "create application profile"
+    "join the platform"
   ],
   "intent": "The platform extends its reach to a new team — from this point, they provision and manage their own landing zones.",
-  "workflow": "requestNew-Application-Profile",
+  "workflow": "requestNew-Join-The-Platform",
   "decisions": [
-    "landing-zone-application-profile"
+    "landing-zone-join-the-platform"
   ],
   "violations": [
     "implementing before reading all decisions"
   ],
   "steps": [
     "Collect from the user: application name, owner email, and engineer email.",
-    "Confirm the values with the user, then trigger the workflow: gh workflow run requestNew-Application-Profile.yml -f ApplicationName=\"{AppName}\" -f OwnerContact=\"{ownerEmail}\" -f engineerContact=\"{engineerEmail}\" — this raises a pull request.",
+    "Confirm the values with the user, then trigger the workflow: gh workflow run requestNew-Join-The-Platform.yml -f ApplicationName=\"{AppName}\" -f OwnerContact=\"{ownerEmail}\" -f engineerContact=\"{engineerEmail}\" — this raises a pull request.",
     "A platform engineer reviews and approves the pull request — approval is what triggers the automation to complete provisioning."
   ],
   "files": []

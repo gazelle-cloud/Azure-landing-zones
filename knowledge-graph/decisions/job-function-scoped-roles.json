@@ -1,11 +1,11 @@
 {
   "id": "job-function-scoped-roles",
   "decision": "Access is granted by job function, not by resource type — adding a new resource type never requires a new role.",
-  "why": "Resource-scoped roles couple access control to the allowed resources list — every new resource type forces a role review and team re-onboarding.",
+  "why": "Without job-function scoping, every new allowed resource type forces team re-onboarding.",
   "links": [
     {
-      "id": "landing-zone-application-profile",
-      "note": "The Application Profile creates an Entra ID group dedicated to application engineers, providing only the minimum access that does not break Infrastructure-as-Code principles."
+      "id": "landing-zone-join-the-platform",
+      "note": "Joining the platform creates the Entra ID group that scopes engineer access — roles target the group."
     },
     {
       "id": "deployment-config-in-repo",

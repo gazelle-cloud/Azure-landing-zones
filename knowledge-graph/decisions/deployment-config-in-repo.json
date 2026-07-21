@@ -4,7 +4,7 @@
   "why": "GitHub environments are destroyed and recreated during BigBang — without variables committed to the repo, the platform state cannot be reproduced.",
   "links": [
     {
-      "id": "landing-zone-application-profile",
+      "id": "landing-zone-join-the-platform",
       "note": "New repos receive a subset of platform variables at creation."
     },
     {

@@ -1,4 +1,4 @@
-name: template - New Application Profile
+name: template - New Join The Platform
 
 on:
   workflow_dispatch:
@@ -11,18 +11,18 @@ on:
     types:
       - closed
     paths:
-      - "application-profiles/*.json"
+      - "join-the-platform/*.json"
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  setup-applicationProfile:
+  setup-join-the-platform:
     runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
     environment: prod
     env:
-      PR_TITLE_PREFIX: "init applicationProfile:"
+      PR_TITLE_PREFIX: "init join-the-platform:"
     steps:
       - name: checkout local
         uses: actions/checkout@v7
@@ -60,7 +60,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.github-token.outputs.token }}
         run: |
-          $filePath = "./application-profiles/${{ env.APP_NAME }}.json"
+          $filePath = "./join-the-platform/${{ env.APP_NAME }}.json"
 
           $params = Get-Content $filePath -Raw | ConvertFrom-Json
 

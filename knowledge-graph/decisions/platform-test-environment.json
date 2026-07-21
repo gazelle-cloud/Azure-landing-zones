@@ -8,7 +8,7 @@
       "note": "Template workflow changes are validated here first."
     },
     {
-      "id": "landing-zone-application-profile",
+      "id": "landing-zone-join-the-platform",
       "note": "The 'Application Registration' workflow is validated here before any platform change reaches production."
     },
     {

@@ -1,6 +1,6 @@
 {
-  "id": "landing-zone-application-profile",
-  "decision": "Registering an Application Profile is what establishe the fundamentals to enable self-service and autonomy for landing zones.",
+  "id": "landing-zone-join-the-platform",
+  "decision": "Each application joins the platform once — establishing the Entra ID group, billing scope, and GitHub repo that all its landing zones build on.",
   "why": "Without a registered profile, the platform has no application to provision landing zones for.",
   "links": [
     {
@@ -20,8 +20,8 @@
     "Landing zone bicepparam with hardcoded owner/engineer email instead of readEnvironmentVariable."
   ],
   "files": [
-    "application-profiles/template.json",
-    ".github/workflows/requestNew-Application-Profile.yml",
-    ".github/workflows/template-new-application-profile.yml"
+    "join-the-platform/template.json",
+    ".github/workflows/requestNew-Join-The-Platform.yml",
+    ".github/workflows/template-new-join-the-platform.yml"
   ]
 }

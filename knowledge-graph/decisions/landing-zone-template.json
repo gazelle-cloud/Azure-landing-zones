@@ -4,8 +4,8 @@
   "why": "Without per-zone parameter files and workflows, a team couldn't act on their landing zone without risking triggering another's redeployment.",
   "links": [
     {
-      "id": "landing-zone-application-profile",
-      "note": "Landing zone initial values come from the application profile."
+      "id": "landing-zone-join-the-platform",
+      "note": "Landing zone initial values come from joining the platform."
     },
     {
       "id": "deployment-logic-reusable-workflow",

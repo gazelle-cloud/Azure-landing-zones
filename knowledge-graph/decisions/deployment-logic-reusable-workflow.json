@@ -22,7 +22,7 @@
     ".github/workflows/template-calculate-vnet-address-space.yml",
     ".github/workflows/template-trigger-landingzone-workflows.yml",
     ".github/workflows/template-lz-template.yml",
-    ".github/workflows/template-new-application-profile.yml",
+    ".github/workflows/template-new-join-the-platform.yml",
     ".github/workflows/template-cancel-landing-zone.yml",
     ".github/workflows/template-destroy-landing-zone.yml"
   ]

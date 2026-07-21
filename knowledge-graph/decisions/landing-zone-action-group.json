@@ -4,7 +4,7 @@
   "why": "Hardcoded contacts go stale as teams change — alerts fire to former members, incidents go unanswered, and nobody notices until production is affected.",
   "links": [
     {
-      "id": "landing-zone-application-profile",
+      "id": "landing-zone-join-the-platform",
       "note": "Application Profile is an authorative source for application contact details."
     }
   ],
