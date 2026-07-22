@@ -1,6 +1,6 @@
 {
   "id": "landing-zone-automation",
-  "decision": "Automation runs inside each landing zone's own subscription, not in a shared platform subscription.",
+  "decision": "Automation runtime is isolated to the landing zone scope runs inside each landing zone's own subscription.",
   "why": "The platform has no management subscription - there is no place to host shared automation runtime.",
   "links": [
     {
@@ -16,4 +16,4 @@
     "landing-zones/bicep/modules/base/jobs-cron.bicep",
     "landing-zones/bicep/modules/base/managedEnvironments.bicep"
   ]
-}
+} 

@@ -1,4 +1,4 @@
-name: request new - Join The Platform
+name: request new - Platform Members
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 jobs:
-  JoinThePlatformSetup:
+  PlatformMembersSetup:
     runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
     permissions: write-all
     steps:
@@ -44,31 +44,31 @@ jobs:
           write-output "ownerEmail=${{ inputs.OwnerContact }}" >> $env:GITHUB_ENV
           write-output "engineerEmail=${{ inputs.engineerContact }}" >> $env:GITHUB_ENV
 
-      - name: create join-the-platform parameter file
+      - name: create platform-members parameter file
         shell: pwsh
         run: |
-          cp ./join-the-platform/template.json ./join-the-platform/${{ env.appName }}.json
+          cp ./platform-members/template.json ./platform-members/${{ env.appName }}.json
 
       - name: replace - parameter - appName
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "__applicationName__"
           replace: "${{ env.appName }}"
-          include: "join-the-platform/${{ env.appName }}.json"
+          include: "platform-members/${{ env.appName }}.json"
 
       - name: replace - parameter - ownerEmail
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "__ownerEmail__"
           replace: "${{ env.ownerEmail }}"
-          include: "join-the-platform/${{ env.appName }}.json"
+          include: "platform-members/${{ env.appName }}.json"
 
       - name: replace - parameter - engineerEmail
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "__engineerEmail__"
           replace: "${{ env.engineerEmail }}"
-          include: "join-the-platform/${{ env.appName }}.json"
+          include: "platform-members/${{ env.appName }}.json"
 
       - name: extend ApplicationName
         run: |
@@ -80,12 +80,13 @@ jobs:
 
       - name: push param file
         run: |
-          BRANCH="init-join-the-platform-${{ env.appName }}"
+          BRANCH="init-platform-members-${{ env.appName }}"
+          echo "PR_BRANCH=$BRANCH" >> $GITHUB_ENV
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
           git add .
-          git commit -m "init join-the-platform: ${{ env.appName }}"
+          git commit -m "init platform-members: ${{ env.appName }}"
           git push --force --set-upstream origin "$BRANCH"
 
       - name: create pull request
@@ -95,5 +96,5 @@ jobs:
           gh pr create \
             --base main \
             --head "$PR_BRANCH" \
-            --title "init join-the-platform: ${{ env.appName }}" \
-            --body "Joins \`${{ env.appName }}\` to the platform."
+            --title "init platform-members: ${{ env.appName }}" \
+            --body "Registers \`${{ env.appName }}\` as a platform member."

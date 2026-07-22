@@ -1,0 +1,28 @@
+{
+  "id": "register-platform-member",
+  "triggers": [
+    "register application",
+    "new application team",
+    "onboard team",
+    "new team",
+    "add application",
+    "platform member",
+    "join the platform"
+  ],
+  "intent": "The platform registers a new application as a platform member — from this point, the application team can provision and manage its own landing zones.",
+  "workflow": "requestNew-Platform-Members",
+  "decisions": [
+    "landing-zone-platform-members"
+  ],
+  "violations": [
+    "implementing before reading all decisions"
+  ],
+  "steps": [
+    "Collect from the user: application name, owner email, and engineer email.",
+    "Confirm the values with the user, then trigger the workflow: gh workflow run requestNew-Platform-Members.yml -f ApplicationName=\"{AppName}\" -f OwnerContact=\"{ownerEmail}\" -f engineerContact=\"{engineerEmail}\" — this raises a pull request that creates platform-members/{AppName}.json.",
+    "A platform engineer reviews and approves the pull request — approval triggers provisioning of the application repo, Entra group, billing scope, and repository variables."
+  ],
+  "files": [
+    "platform-members/"
+  ]
+}

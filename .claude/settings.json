@@ -32,7 +32,6 @@
       "Edit(*)",
       "Write(*)",
       "Bash(az account management-group subscription show-sub-under-mg:*)",
-      "Bash(bash .claude/validate-knowledge-base.sh:*)",
       "WebFetch(domain:github.blog)",
       "mcp__azure__wellarchitectedframework",
       "WebFetch(domain:raw.githubusercontent.com)",

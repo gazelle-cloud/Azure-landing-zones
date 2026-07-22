@@ -7,7 +7,7 @@
       "id": "landing-zone-repo",
       "note": "The getting-started modules live in the application repo"
     },
-    {
+    { 
       "id": "deployment-declarative-lifecycle",
       "note": "Examples use deployment stacks with deleteAll"
     },

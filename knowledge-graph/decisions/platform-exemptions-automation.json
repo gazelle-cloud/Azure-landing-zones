@@ -1,7 +1,7 @@
 {
   "id": "platform-exemptions-automation",
-  "decision": "Automation images are hosted outside Azure to avoid a fixed cost.",
-  "why": "Azure Container Registry carries a flat fee, breaking the no-fixed-cost guarantee.",
+  "decision": "Platform automation Docker images are hosted outside the landing zones.",
+  "why": "Without an external image registry, each landing zone needs persistent image hosting infrastructure, adding always-on cost before any application workload exists.",
   "links": [
     {
       "id": "azure-native-services-only",

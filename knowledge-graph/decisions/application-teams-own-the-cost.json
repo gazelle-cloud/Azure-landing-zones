@@ -1,22 +1,22 @@
 {
-  "id": "application-teams-own-the-cost",
-  "decision": "Each application has its own billing scope; every subscription it provisions bills to it.",
-  "why": "Without per-application billing scope, cost ownership and autonomy breaks.",
-  "links": [
-    {
-      "id": "landing-zone-join-the-platform",
-      "note": "Joining the platform creates the Azure Invoice Section."
-    },
-    {
-      "id": "landing-zone-action-group",
-      "note": "Landing zone budget alerts are routed via the action group to the team that owns the spend."
-    }
-  ],
-  "violations": [
-    "Tags as primary cost attribution instead of invoice section isolation."
-  ],
-  "files": [
-    "githubVariables.json",
-    ".github/workflows/template-landing-zones.yml"
-  ]
+    "id": "application-teams-own-the-cost",
+    "decision": "Each application has its own billing scope; every subscription it provisions bills to it.",
+    "why": "Without per-application billing scope, application teams are unable to independently track, manage, and be accountable for their own costs.",
+    "links": [
+        {
+            "id": "landing-zone-platform-members",
+            "note": "Joining the platform creates the Azure Invoice Section."
+        },
+        {
+            "id": "landing-zone-action-group",
+            "note": "Landing zone budget alerts are routed via the action group to the team that owns the spend."
+        }
+    ],
+    "violations": [
+        "Tags as primary cost attribution instead of invoice section isolation."
+    ],
+    "files": [
+        "githubVariables.json",
+        ".github/workflows/template-landing-zones.yml"
+    ]
 }

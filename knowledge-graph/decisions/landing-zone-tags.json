@@ -1,6 +1,6 @@
 {
   "id": "landing-zone-tags",
-  "decision": "Tags are configured automatically across every landing zone, driven by your platform membership.",
+  "decision": "Tags are configured automatically across every landing zone, driven by your platform member profile.",
   "why": "Without automatic enforcement, tags drift — when an incident fires, alerts point to stale contacts and go unanswered.",
   "links": [
     {
@@ -8,7 +8,7 @@
       "note": "Nightly tag remediation runs as a Container App Job."
     },
     {
-      "id": "landing-zone-join-the-platform",
+      "id": "landing-zone-platform-members",
       "note": "Engineer and owner emails come from the platform enrollment."
     },
     {

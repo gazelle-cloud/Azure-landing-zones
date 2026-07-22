@@ -6,10 +6,6 @@
     {
       "id": "landing-zone-identity",
       "note": "Receives User.Read.All, Group.Read.All, and Application.Read.All at landing zone creation time."
-    },
-    {
-      "id": "initial-setup",
-      "note": "Graph permissions are granted via admin consent as a manual prerequisite."
     }
   ],
   "violations": [

@@ -6,8 +6,6 @@
   "outputStyle": "default",
   "spinnerTipsEnabled": false,
   "permissions": {
-    "allow": [
-      "Bash(cd /c/gazelle/AzurePlatform && powershell.exe -ExecutionPolicy Bypass -File .claude/validate-knowledge-base.ps1 2>&1)"
-    ]
+    "allow": []
   }
 }

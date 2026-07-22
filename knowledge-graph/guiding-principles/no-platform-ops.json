@@ -2,7 +2,7 @@
   "id": "no-platform-ops",
   "intent": "The platform grows more self-sufficient, landing zones take on more ownership, and the platform team becomes less and less necessary.",
   "decisions": [
-    "landing-zone-join-the-platform",
+    "landing-zone-platform-members",
     "landing-zone-lifecycle",
     "landing-zone-ipam",
     "landing-zone-diagnostic-settings",

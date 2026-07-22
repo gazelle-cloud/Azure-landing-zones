@@ -9,7 +9,6 @@
     "deployment-logic-reusable-workflow",
     "platform-test-environment",
     "deployment-branch-gated-promotion",
-    "initial-setup",
     "platform-identity-azure",
     "platform-identity-github"
   ],

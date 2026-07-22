@@ -4,7 +4,7 @@
   "why": "Without a repo, the platform has no deployment mechanism and nowhere to write configuration for the application.",
   "links": [
     {
-      "id": "landing-zone-join-the-platform",
+      "id": "landing-zone-platform-members",
       "note": "repository is configured during application registration flow."
     },
     {

@@ -8,8 +8,8 @@
       "note": "Template workflow changes are validated here first."
     },
     {
-      "id": "landing-zone-join-the-platform",
-      "note": "The 'Application Registration' workflow is validated here before any platform change reaches production."
+      "id": "landing-zone-platform-members",
+      "note": "The platform member registration workflow is validated here before any platform change reaches production."
     },
     {
       "id": "azure-policy-allowed-resources",

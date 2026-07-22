@@ -19,13 +19,13 @@
   ],
   "steps": [
     "Identify whether this is a new entry or an update to an existing one. For an update, read the existing file first.",
-    "Determine the type: guiding-principles, decisions, or operations.",
+    "Determine the type: decisions, or operations.",
     "Draft the entry. For decisions: id matches filename; decision is a single clear statement; why explains the consequence of not following it; links are organic and unidirectional — each note answers 'how does this linked decision specifically affect or constrain this decision?'; violations are specific enough to detect in a code review; files list only files where a reviewer would look to verify the decision is respected.",
     "For links: only add one if the note would change how someone implements or reviews this decision. Drop it if the relationship is obvious from context alone.",
     "Present the complete draft to the user before writing any file.",
     "Write the file.",
-    "Run the validation script: bash .claude/validate-knowledge-base.sh. Fix any errors before proceeding.",
-    "Open a PR."
+    "Run the static validation scripts: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confim-knowledge-graph-schema.ps1, then pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confirm-knowledge-graph-integrity.ps1. CI runs semantic validation for changed decisions with .github/utils/confirm-knowledge-graph-semantic.ps1. Fix any errors before proceeding.",
+    "Open a PR. CI runs static tests and LLM checks on changed decisions — the PR cannot merge until it passes."
   ],
   "files": [
     "knowledge-graph/guiding-principles/",

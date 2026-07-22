@@ -54,10 +54,10 @@ jobs:
             .NewRepoVariables.repositoryVariables.AZURE_TENANT_ID = "xxx"
           ' githubVariables.json > tmp.json && mv tmp.json githubVariables.json
 
-      - name: Sanitize - join-the-platform emails
+      - name: Sanitize - platform member emails
         working-directory: source
         run: |
-          for f in join-the-platform/*.json; do
+          for f in platform-members/*.json; do
             [ "$(basename "$f")" = "template.json" ] && continue
             jq '.ownerEmail = "***@***.**" | .engineerEmail = "***@***.**"' "$f" > tmp.json && mv tmp.json "$f"
           done
