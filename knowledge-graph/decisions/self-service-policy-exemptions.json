@@ -1,7 +1,7 @@
 {
   "id": "self-service-policy-exemptions",
   "decision": "Application teams can exempt themselves from any policy assignment via Pull Request.",
-  "why": "The hard deny is only sustainable if teams can unblock themselves — without that, it erodes under operational pressure.",
+  "why": "A deny policy without an exemption path gets worked around rather than enforced — teams find other routes when blocked.",
   "links": [
     {
       "id": "azure-policy-reference",

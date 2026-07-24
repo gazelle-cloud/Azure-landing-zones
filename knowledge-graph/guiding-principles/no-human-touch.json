@@ -1,6 +1,6 @@
 {
   "id": "no-human-touch",
-  "intent": "BigBang brings the platform alive. After that, code is the only path to production — and the proof it can always be rebuilt from scratch.",
+  "intent": "BigBang initializes the platform. After that, code is the only path to production — proof it can always be rebuilt from scratch.",
   "decisions": [
     "deployment-end-to-end",
     "deployment-declarative-lifecycle",

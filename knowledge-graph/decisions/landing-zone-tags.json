@@ -1,7 +1,7 @@
 {
   "id": "landing-zone-tags",
   "decision": "Tags are configured automatically across every landing zone, driven by your platform member profile.",
-  "why": "Without automatic enforcement, tags drift — when an incident fires, alerts point to stale contacts and go unanswered.",
+  "why": "Without automatic enforcement, tags drift — alerts route to stale contacts with no response.",
   "links": [
     {
       "id": "landing-zone-automation",

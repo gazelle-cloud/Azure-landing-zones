@@ -1,0 +1,26 @@
+{
+  "id": "landing-zone-ownership",
+  "decision": "What the landing zone template declares, the platform owns and maintains; everything else in the subscription belongs to the application team.",
+  "why": "Without a declared boundary, application teams cannot act in their own subscription without checking with the platform first.",
+  "links": [
+    {
+      "id": "deployment-declarative-lifecycle",
+      "note": "Resources removed from Bicep are removed from Azure."
+    },
+    {
+      "id": "job-function-scoped-roles",
+      "note": "Platform engineers are exempted from Deployment Stack deny assignments — they can modify platform-declared resources directly."
+    },
+    {
+      "id": "application-teams-own-the-cost",
+      "note": "The team's billing scope aligns with their ownership surface."
+    }
+  ],
+  "violations": [
+    "Management lock applied to a platform-owned resource preventing Deployment Stack teardown."
+  ],
+  "files": [
+    "landing-zones/bicep/main.bicep",
+    ".github/workflows/template-landing-zones.yml"
+  ]
+}

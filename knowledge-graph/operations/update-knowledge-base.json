@@ -9,7 +9,7 @@
     "add a link",
     "update knowledge graph"
   ],
-  "intent": "What was unclear becomes a clear picture — the more the graph grows, the fewer questions need a human to answer.",
+  "intent": "Every entry reduces the number of questions that need a human to answer.",
   "decisions": [],
   "violations": [
     "writing a file before presenting a draft to the user",

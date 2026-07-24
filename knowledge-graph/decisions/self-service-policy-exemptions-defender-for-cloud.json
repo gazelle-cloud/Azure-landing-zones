@@ -1,7 +1,7 @@
 {
   "id": "self-service-policy-exemptions-defender-for-cloud",
   "decision": "The platform pre-exempts Defender for Cloud recommendations that have no free remediation path",
-  "why": "A recommendation with no free remediation path is unactionable noise that erodes trust in the dashboards.",
+  "why": "An unactionable recommendation left on the dashboard erodes confidence in the rest of the data.",
   "links": [
     {
       "id": "self-service-policy-exemptions",

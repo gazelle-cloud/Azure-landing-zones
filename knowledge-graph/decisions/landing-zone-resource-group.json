@@ -1,7 +1,7 @@
 {
   "id": "landing-zone-resource-group",
-  "decision": "All platform-managed resources in a landing zone live in a single dedicated resource group, separate from application resources.",
-  "why": "Without a dedicated resource group, there is no clean boundary for teardown, RBAC, or incident management.",
+  "decision": "Platform-managed landing zone resources live in a single dedicated resource group, separate from application resources.",
+  "why": "Without a single resource group, platform resources scatter across the subscription — no single place to see what the platform owns.",
   "links": [
     {
       "id": "landing-zone-identity",
