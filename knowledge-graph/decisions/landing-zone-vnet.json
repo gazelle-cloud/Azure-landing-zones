@@ -18,6 +18,10 @@
     {
       "id": "single-region",
       "note": "The VNet is provisioned in AZURE_DEFAULT_LOCATION; a second region would require a new VNet and a separate regional IPAM allocation."
+    },
+    {
+      "id": "landing-zone-ownership",
+      "note": "Application teams own subnet configuration — the VNet boundary is where platform ownership ends."
     }
   ],
   "violations": [

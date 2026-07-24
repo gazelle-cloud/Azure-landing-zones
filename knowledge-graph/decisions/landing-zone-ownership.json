@@ -10,10 +10,6 @@
     {
       "id": "job-function-scoped-roles",
       "note": "Platform engineers are exempted from Deployment Stack deny assignments — they can modify platform-declared resources directly."
-    },
-    {
-      "id": "application-teams-own-the-cost",
-      "note": "The team's billing scope aligns with their ownership surface."
     }
   ],
   "violations": [

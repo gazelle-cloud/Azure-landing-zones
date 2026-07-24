@@ -9,7 +9,7 @@
     },
     {
       "id": "deployment-declarative-lifecycle",
-      "note": "Resource group is the Deployment Stack scope — deleteAll tears down every platform-managed resource in one operation."
+      "note": "The Deployment Stack is configured so resources removed from Bicep are also removed from Azure."
     },
     {
       "id": "landing-zone-monitoring",
@@ -22,6 +22,10 @@
     {
       "id": "landing-zone-automation",
       "note": "Container Apps environment and jobs are provisioned inside this resource group and managed by Azure Deployment Stack"
+    },
+    {
+      "id": "landing-zone-ownership",
+      "note": "Subscription-scoped platform resources sit outside the resource group but within the Deployment Stack."
     }
   ],
   "violations": [
