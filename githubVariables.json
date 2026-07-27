@@ -4,7 +4,7 @@
       "APP_GITHUB_AZUREPLATFORM_ID": "xxx",
       "APPLICATION_ENGINEERS_GROUP_ID": "xxx",
       "LANDING_ZONE_ALLOWED_PUBLIC_IP": "xxx",
-      "GH_ORGANIZATION_DATABASE_ID": "167230007"
+      "GH_ORGANIZATION_DATABASE_ID": "xxx"
     },
     "repositoryVariables": {
       "AZURE_TENANT_ID": "xxx",

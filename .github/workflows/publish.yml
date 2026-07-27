@@ -42,6 +42,7 @@ jobs:
             .AzurePlatformVariables.organizationVariables.APP_GITHUB_AZUREPLATFORM_ID = "xxx" |
             .AzurePlatformVariables.organizationVariables.APPLICATION_ENGINEERS_GROUP_ID = "xxx" |
             .AzurePlatformVariables.organizationVariables.LANDING_ZONE_ALLOWED_PUBLIC_IP = "xxx" |
+            .AzurePlatformVariables.organizationVariables.GH_ORGANIZATION_DATABASE_ID = "xxx" |
             .AzurePlatformVariables.repositoryVariables.AZURE_TENANT_ID = "xxx" |
             .AzurePlatformVariables.repositoryVariables.BILLING_ACCOUNT_ID = "xxx" |
             .AzurePlatformVariables.repositoryVariables.BILLING_PROFILE_NAME = "xxx" |

@@ -2,7 +2,7 @@ name: platform - destroy platform
 
 on:
   schedule:
-    - cron: "0 1 * * 1"
+    - cron: "0 1 * * *"
   workflow_dispatch:
     inputs:
       managementGroupHierarchy:
