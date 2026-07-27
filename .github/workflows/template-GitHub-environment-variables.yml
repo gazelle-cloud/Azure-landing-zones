@@ -9,7 +9,7 @@ on:
 
 jobs:
   Config-GitHub-Variables:
-    runs-on: ${{ vars.RUNNER_IMAGE_VERSION }}
+    runs-on: ubuntu-latest
     environment: ${{ inputs.managementGroupHierarchy }}
     steps:
       - name: Checkout
