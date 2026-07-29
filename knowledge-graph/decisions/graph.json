@@ -2,7 +2,12 @@
   "id": "graph",
   "decision": "Decision records connect through unidirectional links — each note answers how the target constrains the source.",
   "why": "Without directed notes, the graph shows what is related but not what depends on what.",
-  "links": [],
+  "links": [
+    {
+      "id": "knowledge",
+      "note": "empty"
+    }
+  ],
   "violations": [
     "Link added in both directions between two entries."
   ],
