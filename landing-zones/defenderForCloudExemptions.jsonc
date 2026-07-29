@@ -6,10 +6,12 @@
     "storageaccountsshouldrestrictnetworkaccessusingvirtualnetworkrulesexaromonitoringeffect",
     "storageaccountsshouldrestrictnetworkaccessusingvirtualnetworkrulesexdatabricksmonitoringeffect",
     "networkwatchershouldbeenabledmonitoringeffect",
+    "storageaccountshoulduseaprivatelinkconnectionexdatabricksmonitoringeffect",
     // identity
     "storageAccountsShouldPreventSharedKeyAccessExDataBricks",
     "userbacrulesmonitoring",
     "identityDesignateMoreThanOneOwnerMonitoring",
+    "identitydesignatelessthanownersmonitoring",
     // defender for cloud
     "appservicesadvancedthreatprotectionmonitoringeffect",
     "keyvaultsadvanceddatasecuritymonitoringeffect",

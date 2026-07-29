@@ -5,7 +5,7 @@ param policyAssignmentId string
 param description string
 param policyDefinitionReferenceIds array
 
-resource policyExemption 'Microsoft.Authorization/policyExemptions@2024-12-01-preview' = {
+resource policyExemption 'Microsoft.Authorization/policyExemptions@2026-01-01-preview' = {
   name: policyExemptionName
   properties: {
     exemptionCategory: 'Waiver'

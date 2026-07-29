@@ -31,7 +31,7 @@ var PowerShellJobs = {
   }
 }
 
-resource landingzoneResources 'Microsoft.Resources/resourceGroups@2024-11-01' = {
+resource landingzoneResources 'Microsoft.Resources/resourceGroups@2025-04-01' = {
   name: 'landingzone-resources'
   location: location
 }

@@ -1,7 +1,7 @@
 
 param actionGroupId string
 
-resource ActivityLogAlert 'Microsoft.Insights/activityLogAlerts@2020-10-01' = {
+resource ActivityLogAlert 'Microsoft.Insights/activityLogAlerts@2026-01-01' = {
   name: 'alert-Azure-health'
   location: 'global'
   properties: {
