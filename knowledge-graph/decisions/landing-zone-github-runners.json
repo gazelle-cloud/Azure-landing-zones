@@ -7,7 +7,11 @@
       "id": "azure-policy-hard-deny",
       "note": "Public runners have no data-plane path once public network access is denied."
     },
-{
+    {
+      "id": "landing-zone-vnet",
+      "note": "Runners get a dedicated /28 subnet, delegated for runner integration, within the landing zone VNet."
+    },
+    {
       "id": "platform-identity-github",
       "note": "GitHub App permissions are used for runner registration and configuration."
     },

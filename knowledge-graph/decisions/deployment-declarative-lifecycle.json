@@ -11,6 +11,10 @@
       "id": "landing-zone-lifecycle",
       "note": "A subscription is guaranteed empty after deleteAll, which makes subscription reuse safe."
     },
+    {
+      "id": "azure-native-services-only",
+      "note": "Only ARM-native resources are stack-managed — azure-native-services-only is the prerequisite for deleteAll lifecycle enforcement."
+    }
   ],
   "violations": [
     "Deployment Stack configured with detachAll removed resources persist with no cleanup path.",
