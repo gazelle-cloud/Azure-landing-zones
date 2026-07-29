@@ -8,7 +8,7 @@ Gazelle sets the rules and writes down why. Teams build in Azure, ship through G
 
 | Directory | Path pattern | Content |
 |---|---|---|
-| guiding-principles | `knowledge-graph/guiding-principles/<id>.json` | Non-negotiable platform values |
+| nature | `knowledge-graph/nature/<id>.json` | Non-negotiable platform values |
 | decisions | `knowledge-graph/decisions/<id>.json` | Design decisions and reasoning |
 | operations | `knowledge-graph/operations/<id>.json` | Workflow definitions |
 | github | `.github/workflows/<name>.yml` | GitHub Actions workflows — platform triggers, reusable templates, per-landing-zone generated workflows, and self-service flows |

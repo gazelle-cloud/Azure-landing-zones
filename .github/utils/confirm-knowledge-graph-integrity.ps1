@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 
 $root = Join-Path $PSScriptRoot '..' '..' 'knowledge-graph'
 $decisionRoot = Join-Path $root 'decisions'
-$guidingPrincipleRoot = Join-Path $root 'guiding-principles'
+$guidingPrincipleRoot = Join-Path $root 'nature'
 $operationRoot = Join-Path $root 'operations'
 $errors = [System.Collections.Generic.List[string]]::new()
 
@@ -79,7 +79,7 @@ foreach ($directory in @($decisionRoot, $guidingPrincipleRoot, $operationRoot)) 
 }
 
 $decisionIds = Get-IdSet -Directory $decisionRoot -Kind 'decisions'
-$guidingPrincipleIds = Get-IdSet -Directory $guidingPrincipleRoot -Kind 'guiding-principles'
+$guidingPrincipleIds = Get-IdSet -Directory $guidingPrincipleRoot -Kind 'nature'
 $operationIds = Get-IdSet -Directory $operationRoot -Kind 'operations'
 
 foreach ($file in Get-ChildItem -Path $operationRoot -Filter '*.json' | Sort-Object Name) {
@@ -101,7 +101,7 @@ foreach ($file in Get-ChildItem -Path $operationRoot -Filter '*.json' | Sort-Obj
 }
 
 foreach ($file in Get-ChildItem -Path $guidingPrincipleRoot -Filter '*.json' | Sort-Object Name) {
-    $displayPath = "guiding-principles/$($file.Name)"
+    $displayPath = "nature/$($file.Name)"
     $document = Read-JsonFile -File $file -DisplayPath $displayPath
     if ($null -eq $document) {
         continue
@@ -124,7 +124,7 @@ foreach ($file in Get-ChildItem -Path $decisionRoot -Filter '*.json' | Sort-Obje
     foreach ($link in Get-ArrayValues -Value $document.links) {
         $linkId = $link.id
         if (-not $decisionIds.Contains($linkId) -and -not $guidingPrincipleIds.Contains($linkId)) {
-            Add-Error -File $displayPath -Message "links[] -> '$linkId' not found in decisions or guiding-principles"
+            Add-Error -File $displayPath -Message "links[] -> '$linkId' not found in decisions or nature"
         }
     }
 }
