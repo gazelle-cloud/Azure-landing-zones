@@ -14,7 +14,7 @@ param subscriptionLevelTags = {
 param resourceLevelTags = {
   engineerEmail: engineerEmail
 }
-param defenderRecommendationExemptions = false
+param defenderRecommendationExemptions = true
 param diagSettingsExemption = true
 param exemptions = []
 

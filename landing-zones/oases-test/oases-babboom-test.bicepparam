@@ -12,7 +12,7 @@ param subscriptionLevelTags = {
   ownerEmail: ownerEmail
 }
 param resourceLevelTags = {}
-param defenderRecommendationExemptions = false
+param defenderRecommendationExemptions = true
 param diagSettingsExemption = false
 param exemptions = []
 

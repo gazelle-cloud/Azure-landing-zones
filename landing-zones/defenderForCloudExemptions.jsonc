@@ -1,9 +1,13 @@
 [
     // network
     "storageaccountshoulduseaprivatelinkconnectionmonitoringeffect",
+    "storageaccountshoulduseaprivatelinkconnectionexaromonitoringeffect",
+    "storageaccountsshouldrestrictnetworkaccessusingvirtualnetworkrulesmonitoringeffect",
+    "storageaccountsshouldrestrictnetworkaccessusingvirtualnetworkrulesexaromonitoringeffect",
+    "storageaccountsshouldrestrictnetworkaccessusingvirtualnetworkrulesexdatabricksmonitoringeffect",
     "networkwatchershouldbeenabledmonitoringeffect",
-    "storageAccountsShouldPreventSharedKeyAccessExDataBricks",
     // identity
+    "storageAccountsShouldPreventSharedKeyAccessExDataBricks",
     "userbacrulesmonitoring",
     "identityDesignateMoreThanOneOwnerMonitoring",
     // defender for cloud
