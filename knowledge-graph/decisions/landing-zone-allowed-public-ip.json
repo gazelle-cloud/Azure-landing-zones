@@ -7,11 +7,7 @@
       "id": "deployment-config-in-repo",
       "note": "The IP is defined in githubVariables.json and propagated as an org variable."
     },
-    {
-      "id": "azure-policy-hard-deny",
-      "note": "Deny policies are unchanged — firewall configuration is the application team's responsibility."
-    },
-    {
+{
       "id": "job-function-scoped-roles",
       "note": "RBAC roles already grant the authorization — the public IP provides the missing network path."
     },

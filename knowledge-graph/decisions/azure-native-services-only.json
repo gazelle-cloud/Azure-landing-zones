@@ -15,10 +15,6 @@
             "id": "deployment-declarative-lifecycle",
             "note": "3rd party services would not be managed by the Azure Deployment Stack."
         },
-        {
-            "id": "landing-zone-diagnostic-settings",
-            "note": "Non ARM services would require additional logic to collect diagnostic settings"
-        }
     ],
     "violations": [
         "Service adopted with no ARM resource representation — invisible to Policy, RBAC, and diagnostics."
