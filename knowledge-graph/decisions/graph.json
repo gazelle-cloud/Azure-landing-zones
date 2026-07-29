@@ -1,0 +1,14 @@
+{
+  "id": "graph",
+  "decision": "Decision records connect through unidirectional links — each note answers how the target constrains the source.",
+  "why": "Without directed notes, the graph shows what is related but not what depends on what.",
+  "links": [],
+  "violations": [
+    "Link added in both directions between two entries."
+  ],
+  "files": [
+    "knowledge-graph/decisions/",
+    "knowledge-graph/nature/",
+    "knowledge-graph/operations/"
+  ]
+}
