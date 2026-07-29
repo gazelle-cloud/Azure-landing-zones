@@ -7,7 +7,7 @@ param setDefinitions array
 
 var shortenPolicyName = take(policyName, 24)
 
-resource initiative 'Microsoft.Authorization/policySetDefinitions@2026-06-01' = {
+resource initiative 'Microsoft.Authorization/policySetDefinitions@2025-11-01' = {
   name: shortenPolicyName
   properties: {
     displayName: displayName
@@ -15,7 +15,7 @@ resource initiative 'Microsoft.Authorization/policySetDefinitions@2026-06-01' = 
   }
 }
 
-resource assignment 'Microsoft.Authorization/policyAssignments@2026-06-01' = {
+resource assignment 'Microsoft.Authorization/policyAssignments@2025-11-01' = {
   name: shortenPolicyName
   location: location
   properties: {

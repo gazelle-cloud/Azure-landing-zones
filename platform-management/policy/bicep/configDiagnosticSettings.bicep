@@ -2,7 +2,7 @@ targetScope = 'managementGroup'
 
 param policyDefinitions array
 
-resource diagnosticSettings 'Microsoft.Authorization/policySetDefinitions@2026-06-01' = {
+resource diagnosticSettings 'Microsoft.Authorization/policySetDefinitions@2025-11-01' = {
   name: 'diagnosticSettings'
   properties: {
     displayName: 'config diagnostic settings'

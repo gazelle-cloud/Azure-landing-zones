@@ -6,7 +6,7 @@ param parameters object
 param policyDefinitionId string
 param name string
 
-resource policyAssignment 'Microsoft.Authorization/policyAssignments@2026-06-01' = {
+resource policyAssignment 'Microsoft.Authorization/policyAssignments@2025-11-01' = {
   name: name
   location: location
   properties: {
