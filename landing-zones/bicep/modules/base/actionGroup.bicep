@@ -2,7 +2,7 @@ targetScope = 'resourceGroup'
 
 param email string
 
-resource notifyEngineer 'Microsoft.Insights/actionGroups@2024-10-01-preview' = {
+resource notifyEngineer 'Microsoft.Insights/actionGroups@2023-01-01' = {
   name: 'ag-notify-engineer'
   location: 'global'
   properties: {

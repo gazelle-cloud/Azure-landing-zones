@@ -3,7 +3,7 @@ targetScope = 'managementGroup'
 param policyName string
 param policyProperties object
 
-resource policyDefinition 'Microsoft.Authorization/policyDefinitions@2025-03-01' = {
+resource policyDefinition 'Microsoft.Authorization/policyDefinitions@2026-06-01' = {
   name: policyName
   properties: policyProperties
 }
