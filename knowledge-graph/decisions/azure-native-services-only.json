@@ -14,7 +14,7 @@
         {
             "id": "deployment-declarative-lifecycle",
             "note": "3rd party services would not be managed by the Azure Deployment Stack."
-        },
+        }
     ],
     "violations": [
         "Service adopted with no ARM resource representation — invisible to Policy, RBAC, and diagnostics."

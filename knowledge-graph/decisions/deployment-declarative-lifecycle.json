@@ -10,7 +10,7 @@
     {
       "id": "landing-zone-lifecycle",
       "note": "A subscription is guaranteed empty after deleteAll, which makes subscription reuse safe."
-    },
+    }
   ],
   "violations": [
     "Deployment Stack configured with detachAll removed resources persist with no cleanup path.",

@@ -6,7 +6,7 @@
     {
       "id": "application-teams-own-the-cost",
       "note": "Reused subscription must move to the application's invoice section before provisioning completes."
-    },
+    }
   ],
   "violations": [
     "New subscription created when bank had an available empty subscription."
