@@ -7,7 +7,7 @@
       "id": "azure-policy-hard-deny",
       "note": "Public runners have no data-plane path once public network access is denied."
     },
-{
+    {
       "id": "platform-identity-github",
       "note": "GitHub App permissions are used for runner registration and configuration."
     },

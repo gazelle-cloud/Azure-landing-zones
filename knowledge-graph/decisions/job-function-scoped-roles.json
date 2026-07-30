@@ -11,7 +11,7 @@
       "id": "deployment-config-in-repo",
       "note": "The platform-wide engineers group name (APP_ENGINEERS_GROUP_NAME) is sourced from githubVariables.json"
     },
-{
+    {
       "id": "landing-zone-lifecycle",
       "note": "Reader on the 'Subscription Bank' is what allows engineers to discover subscriptions available for reuse."
     }

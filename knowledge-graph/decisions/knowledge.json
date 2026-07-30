@@ -1,7 +1,7 @@
 {
   "id": "knowledge",
-  "decision": "Each entry is a single architectural decision record — one constraint, stated plainly, with the consequence of ignoring it.",
-  "why": "Without this, contributors add goals and descriptions that look like decisions but give no signal when violated.",
+  "decision": "Each decision record states one constraint plainly.",
+  "why": "Without this, goal-shaped entries pass review but give no signal when the system drifts.",
   "links": [
     {
       "id": "graph",

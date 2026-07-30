@@ -16,4 +16,4 @@
     "landing-zones/bicep/modules/base/jobs-cron.bicep",
     "landing-zones/bicep/modules/base/managedEnvironments.bicep"
   ]
-} 
+}

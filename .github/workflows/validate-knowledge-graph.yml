@@ -1,14 +1,14 @@
-name: validate - knowledge graph decisions
+name: validate - knowledge graph
 
 on:
   push:
     branches-ignore:
       - main
     paths:
-      - "knowledge-graph/decisions/*.json"
-      - ".github/utils/confim-knowledge-graph-schema.ps1"
+      - "knowledge-graph/**/*.json"
+      - ".github/utils/confirm-knowledge-graph-schema.ps1"
       - ".github/utils/confirm-knowledge-graph-integrity.ps1"
-      - ".github/utils/confirm-knowledge-graph-semantic.ps1"
+      - ".github/utils/confirm-knowledge-graph-decision.ps1"
       - ".github/workflows/validate-knowledge-graph.yml"
   workflow_dispatch:
     inputs:
@@ -29,13 +29,18 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: validate JSON syntax
+        run: |
+          find knowledge-graph -name '*.json' | sort | xargs jq empty
+          echo "OK: JSON syntax"
+
       - name: validate schema
-        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confim-knowledge-graph-schema.ps1
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confirm-knowledge-graph-schema.ps1
 
       - name: validate referential integrity
         run: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confirm-knowledge-graph-integrity.ps1
 
-      - name: get changed decision files
+      - name: get changed files
         id: changed
         run: |
           if [ "${{ inputs.validate_all }}" = "true" ]; then
@@ -47,8 +52,14 @@ jobs:
           fi
           echo "files=$files" >> $GITHUB_OUTPUT
 
-      - name: validate semantic decisions
+      - name: validate knowledge
         if: steps.changed.outputs.files != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confirm-knowledge-graph-semantic.ps1 -Files ${{ steps.changed.outputs.files }}
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confirm-knowledge-graph-decision.ps1 -Decision knowledge -Fields decision,why -Files ${{ steps.changed.outputs.files }}
+
+      - name: validate graph
+        if: steps.changed.outputs.files != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confirm-knowledge-graph-decision.ps1 -Decision graph -Fields links -Files ${{ steps.changed.outputs.files }}

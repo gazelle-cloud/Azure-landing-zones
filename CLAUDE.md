@@ -22,4 +22,5 @@ Gazelle sets the rules and writes down why. Teams build in Azure, ship through G
 - Always consult the knowledge graph first. It is already loaded in context — cite the relevant decision(s) before reading any file.
 - Never write, edit, or delete any file until the user explicitly says to proceed.
 - For any task that matches a platform operation, read the relevant `knowledge-graph/operations/<id>.json` file first and follow its steps exactly. Do not explore the codebase or use intuition — the operation defines the procedure.
+- After every `git push`, check the triggered workflow run: poll `gh run list` until the status is no longer `in_progress`, then run `gh run view` to show step-level results. Only fetch `gh run view --log-failed` if the run failed.
 - Start every response with a single inline source indicator, and repeat it after every agent result before continuing: `Code [█░░░░] · knowledge [░░░░░] · ∿ [████░]` — 5 blocks each, filled proportionally. Code = number of codebase files read in this response; knowledge = number of knowledge graph nodes actively cited; ∿ = reliance on training/intuition for everything else.

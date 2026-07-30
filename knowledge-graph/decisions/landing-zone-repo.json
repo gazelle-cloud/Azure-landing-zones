@@ -7,7 +7,7 @@
       "id": "landing-zone-identity",
       "note": "The landing zone identity's OIDC federation is scoped to this repo and environment"
     },
-{
+    {
       "id": "platform-identity-github",
       "note": "The GitHub App creates this repo, provisions GitHub environments, and seeds variables — without it, the repo has no provisioning mechanism."
     }
