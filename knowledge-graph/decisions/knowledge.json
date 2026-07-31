@@ -5,7 +5,7 @@
   "links": [
     {
       "id": "graph",
-      "note": "The graph's link rules only hold when entries are well-formed — a link note cannot express a meaningful constraint if the source entry conflates multiple decisions."
+      "note": "Graph connects decisions — each must be singular."
     }
   ],
   "violations": [

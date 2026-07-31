@@ -8,7 +8,6 @@ on:
       - "knowledge-graph/**/*.json"
       - ".github/utils/confirm-knowledge-graph-schema.ps1"
       - ".github/utils/confirm-knowledge-graph-integrity.ps1"
-      - ".github/utils/confirm-knowledge-graph-decision.ps1"
       - ".github/workflows/validate-knowledge-graph.yml"
   workflow_dispatch:
     inputs:
@@ -19,7 +18,6 @@ on:
 
 permissions:
   contents: read
-  models: read
 
 jobs:
   validate:
@@ -54,12 +52,70 @@ jobs:
 
       - name: validate knowledge
         if: steps.changed.outputs.files != ''
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confirm-knowledge-graph-decision.ps1 -Decision knowledge -Fields decision,why -Files ${{ steps.changed.outputs.files }}
+        uses: anthropics/claude-code-base-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          model: claude-sonnet-4-6
+          allowed_tools: "View,Bash"
+          max_turns: 30
+          prompt: |
+            You are a CI check validating knowledge graph decision records.
+
+            1. Run this exact Bash command to load all entries at once:
+               jq -s '[.[] | {id, decision, why}]' ${{ steps.changed.outputs.files }}
+            2. Read knowledge-graph/decisions/knowledge.json for the `violations` list.
+            3. Use your judgment to evaluate each entry's `decision` and `why` against the violations — do not write a script to do this.
+            4. Use Bash to append a markdown table to $GITHUB_STEP_SUMMARY:
+               ## knowledge validation
+               | id | decision | why |
+               |---|---|---|
+               Write "pass" for passing fields, or the specific failure reason.
+            5. If any entry fails, use Bash to run: touch /tmp/knowledge_failed
+
+      - name: check knowledge result
+        if: steps.changed.outputs.files != ''
+        continue-on-error: true
+        run: |
+          if [ -f /tmp/knowledge_failed ]; then
+            echo "::error::one or more decisions failed knowledge validation — see step summary"
+            exit 1
+          fi
 
       - name: validate graph
-        if: steps.changed.outputs.files != ''
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confirm-knowledge-graph-decision.ps1 -Decision graph -Fields links -Files ${{ steps.changed.outputs.files }}
+        if: always() && steps.changed.outputs.files != ''
+        uses: anthropics/claude-code-base-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          model: claude-sonnet-4-6
+          allowed_tools: "View,Bash"
+          max_turns: 30
+          prompt: |
+            You are a CI check validating knowledge graph decision records.
+
+            1. Read knowledge-graph/decisions/graph.json — its `violations` array defines what to reject.
+            2. Read and evaluate the `links` field of each file:
+               ${{ steps.changed.outputs.files }}
+            3. Use Bash to append a markdown table to $GITHUB_STEP_SUMMARY:
+               ## graph validation
+               | id | links |
+               |---|---|
+               Write "pass" or the specific failure reason.
+            4. If any entry fails, use Bash to run: touch /tmp/graph_failed
+
+      - name: check graph result
+        if: always() && steps.changed.outputs.files != ''
+        run: |
+          if [ -f /tmp/graph_failed ]; then
+            echo "::error::one or more decisions failed graph validation — see step summary"
+            exit 1
+          fi
+
+      - name: fail if any validation failed
+        if: always() && steps.changed.outputs.files != ''
+        run: |
+          failed=false
+          [ -f /tmp/knowledge_failed ] && failed=true
+          [ -f /tmp/graph_failed ] && failed=true
+          if [ "$failed" = "true" ]; then
+            exit 1
+          fi

@@ -17,8 +17,8 @@ if ($Files.Count -eq 0) {
     exit 0
 }
 
-if ([string]::IsNullOrWhiteSpace($env:GH_TOKEN)) {
-    throw 'GH_TOKEN is required to call GitHub Models.'
+if ([string]::IsNullOrWhiteSpace($env:CLAUDE_CODE_OAUTH_TOKEN)) {
+    throw 'CLAUDE_CODE_OAUTH_TOKEN is required to call the Anthropic API.'
 }
 
 $systemPrompt = @'
@@ -44,17 +44,10 @@ $decisions = @(foreach ($file in $Files) {
 })
 
 $payload = @{
-    model           = 'openai/gpt-4o'
-    temperature     = 0
-    max_tokens      = 4096
-    response_format = @{
-        type = 'json_object'
-    }
-    messages        = @(
-        @{
-            role    = 'system'
-            content = $systemPrompt
-        },
+    model      = 'claude-sonnet-4-6'
+    max_tokens = 4096
+    system     = $systemPrompt
+    messages   = @(
         @{
             role    = 'user'
             content = (ConvertTo-Json -InputObject $decisions -Depth 10 -Compress)
@@ -64,14 +57,15 @@ $payload = @{
 
 $raw = Invoke-RestMethod `
     -Method Post `
-    -Uri 'https://models.github.ai/inference/chat/completions' `
+    -Uri 'https://api.anthropic.com/v1/messages' `
     -Headers @{
-        Authorization = "Bearer $env:GH_TOKEN"
+        'Authorization'     = "Bearer $env:CLAUDE_CODE_OAUTH_TOKEN"
+        'anthropic-version' = '2023-06-01'
     } `
     -ContentType 'application/json' `
     -Body $payload
 
-$response = $raw.choices[0].message.content | ConvertFrom-Json
+$response = $raw.content[0].text | ConvertFrom-Json
 $summaryLines = [System.Collections.Generic.List[string]]::new()
 $summaryLines.Add('## knowledge graph validation')
 $summaryLines.Add('')
