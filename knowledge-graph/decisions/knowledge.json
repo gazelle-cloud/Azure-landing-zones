@@ -14,8 +14,6 @@
     "Multiple decisions collapsed into a single entry."
   ],
   "files": [
-    "knowledge-graph/decisions/",
-    "knowledge-graph/nature/",
-    "knowledge-graph/operations/"
+    "knowledge-graph/decisions/"
   ]
 }
