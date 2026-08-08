@@ -1,15 +1,11 @@
 {
   "id": "self-service-policy-exemptions-defender-for-cloud",
-  "decision": "The platform pre-exempts Defender for Cloud recommendations that have no free remediation path",
+  "decision": "Defender for Cloud recommendations with no free remediation path must be pre-exempted by the platform.",
   "why": "An unactionable recommendation left on the dashboard erodes confidence in the rest of the data.",
   "links": [
     {
-      "id": "self-service-policy-exemptions",
-      "note": "Defender exemptions follow the same long-lived exemption mechanism — the PR is the review and audit record."
-    },
-    {
       "id": "application-teams-own-the-cost",
-      "note": "The cost of a Defender for Cloud paid SKU lands on the application's subscription billing."
+      "note": "Paid-SKU recommendations impose cost on the application team's subscription, breaking the zero-cost principle."
     }
   ],
   "violations": [

@@ -4,16 +4,14 @@
   "why": "Without a repo, the platform has no deployment mechanism and nowhere to write configuration for the application.",
   "links": [
     {
-      "id": "landing-zone-identity",
-      "note": "The landing zone identity's OIDC federation is scoped to this repo and environment"
-    },
-    {
       "id": "platform-identity-github",
-      "note": "The GitHub App creates this repo, provisions GitHub environments, and seeds variables — without it, the repo has no provisioning mechanism."
+      "note": "Without the GitHub App, nothing can create the repo or seed its variables."
     }
   ],
   "violations": [
     "Bring-your-own-Repo for landing zone creation"
   ],
-  "files": []
+  "files": [
+    ".github/workflows/template-new-platform-members.yml"
+  ]
 }

@@ -1,15 +1,15 @@
 {
   "id": "single-region",
-  "decision": "All landing zones deploy to a single region — the platform, owns the region decision.",
-  "why": "Without a single region, every deployment carries its own region decision — service parity depends on each engineer's choice rather than being a platform default.",
+  "decision": "All landing zones deploy to a single region — the platform owns the region decision.",
+  "why": "Without a single region, service parity depends on each engineer's choice rather than a platform default.",
   "links": [
     {
       "id": "deployment-config-in-repo",
-      "note": "The region is defined once in githubVariables.json — all deployments read it from there."
+      "note": "The region is a platform variable, not a team parameter — that is what makes the platform own it."
     },
     {
       "id": "landing-zone-github-runners",
-      "note": "GitHub runner VNet integration is region-gated, so the platform's chosen region must support it."
+      "note": "The region decision depends on runner VNet integration being available there."
     }
   ],
   "violations": [

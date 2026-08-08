@@ -6,6 +6,10 @@
     {
       "id": "azure-policy-reference",
       "note": "Exemptions reference a JSON file to look up the policy assignment ID — never a hardcoded ARM ID."
+    },
+    {
+        "id": "azure-policy-naming-convention",
+        "note": "Self-service policy exemptions rely on predictable policy assignment names."
     }
   ],
   "violations": [

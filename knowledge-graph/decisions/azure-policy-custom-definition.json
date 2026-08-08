@@ -1,6 +1,6 @@
 {
   "id": "azure-policy-custom-definition",
-  "decision": "When no built-in policy provides a `Deny` or `DeployIfNotExists` effect, the platform authors a custom definition to close the gap",
+  "decision": "Every Deny or DeployIfNotExists gap with no built-in policy requires a custom definition.",
   "why": "Without custom policies, Audit-only coverage looks like enforcement but the violation still occurs.",
   "links": [
     {

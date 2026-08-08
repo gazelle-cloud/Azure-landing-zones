@@ -4,28 +4,13 @@
   "why": "Public runners have no network path to PaaS data plane once public access is denied.",
   "links": [
     {
-      "id": "azure-policy-hard-deny",
-      "note": "Public runners have no data-plane path once public network access is denied."
-    },
-    {
       "id": "platform-identity-github",
-      "note": "GitHub App permissions are used for runner registration and configuration."
-    },
-    {
-      "id": "landing-zone-allowed-public-ip",
-      "note": "Runners provide the network path for automation — human access requires configuring the approved public IP on PaaS firewalls."
-    },
-    {
-      "id": "landing-zone-template",
-      "note": "PRIVATE_GITHUB_RUNNERS is computed and propagated as an environment variable during landing zone provisioning."
-    },
-    {
-      "id": "deployment-config-in-repo",
-      "note": "PUBLIC_GITHUB_RUNNERS is defined in githubVariables.json and seeded to application repos at creation."
+      "note": "Runner registration requires the GitHub App — no other identity has the permissions to register runners to a repo."
     }
   ],
   "violations": [
-    "Application team using a separate VNet for runner integration."
+    "Application team using a separate VNet for runner integration.",
+    "Runner label that implies capability differences instead of network accessibility."
   ],
   "files": [
     "landing-zones/bicep/modules/base/virtualNetwork.bicep",

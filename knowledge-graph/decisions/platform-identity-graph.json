@@ -1,19 +1,19 @@
 {
-  "id": "platform-identity-graph",
-  "decision": "Landing zone identities receive granular Microsoft Graph read permissions — never broad directory access.",
-  "why": "Without these permissions, landing zone automation can't detect Entra ID users, groups and applications.",
-  "links": [
-    {
-      "id": "landing-zone-identity",
-      "note": "Receives User.Read.All, Group.Read.All, and Application.Read.All at landing zone creation time."
-    }
-  ],
-  "violations": [
-    "Landing zone identity granted write permissions to Microsoft Graph",
-    "Landing zone identity granted Directory.Read.All instead of granular read permissions."
-  ],
-  "files": [
-    "landing-zones/bicep/entra.bicep",
-    "landing-zones/bicep/modules/base/appRoleAssignedTo.bicep"
-  ]
+    "id": "platform-identity-graph",
+    "decision": "Landing zone identities receive granular Microsoft Graph read permissions — never broad directory access.",
+    "why": "Without them, applications cannot resolve tenant identities — user lookup and group-based authorization fail.",
+    "links": [
+        {
+            "id": "landing-zone-identity",
+            "note": "The single shared identity is what makes one permission grant sufficient to cover every workload in the landing zone."
+        }
+    ],
+    "violations": [
+        "Landing zone identity granted write permissions to Microsoft Graph",
+        "Landing zone identity granted Directory.Read.All instead of granular read permissions."
+    ],
+    "files": [
+        "landing-zones/bicep/entra.bicep",
+        "landing-zones/bicep/modules/base/appRoleAssignedTo.bicep"
+    ]
 }

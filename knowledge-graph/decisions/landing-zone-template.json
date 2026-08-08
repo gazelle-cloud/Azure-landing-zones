@@ -1,27 +1,23 @@
 {
   "id": "landing-zone-template",
-  "decision": "Landing zones provisioned from the same shared template, each landing zone has its own parameter file and workflow.",
-  "why": "Without per-zone parameter files and workflows, a team couldn't act on their landing zone without risking triggering another's redeployment.",
+  "decision": "Each landing zone has its own parameter file and dedicated trigger workflow.",
+  "why": "Acting on one landing zone would risk triggering another team's redeployment.",
   "links": [
     {
       "id": "landing-zone-platform-members",
-      "note": "Landing zone initial values come from joining the platform."
+      "note": "Without the platform member profile, the bicepparam file has no initial values to populate."
     },
     {
       "id": "deployment-logic-reusable-workflow",
-      "note": "Each landing zone has a dedicated workflow that passes parameters to the centralized template."
+      "note": "Without the reusable workflow, per landing-zone triggers cannot share centralized deployment logic."
     },
     {
       "id": "platform-identity-azure",
-      "note": "The platform identity is used to create and configure landing zone resources."
-    },
-    {
-      "id": "platform-identity-graph",
-      "note": "The landing zone identity receives Microsoft Graph permissions at landing zone creation time."
+      "note": "Without the app registration's credentials, the template cannot deploy landing zone resources."
     },
     {
       "id": "landing-zone-repo",
-      "note": "landing zone provisioning writes environment scoped variables (resource ID) to the application repo."
+      "note": "Without the application repo, environment-scoped variables have no destination after provisioning."
     }
   ],
   "violations": [

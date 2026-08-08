@@ -5,7 +5,7 @@
   "links": [
     {
       "id": "platform-test-environment",
-      "note": "Promotion gate targets oases-test for validation."
+      "note": "Without the test environment, the promotion gate has no target to validate against."
     }
   ],
   "violations": [

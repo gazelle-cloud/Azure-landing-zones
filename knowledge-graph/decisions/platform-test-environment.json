@@ -1,31 +1,23 @@
 {
   "id": "platform-test-environment",
-  "decision": "Every platform change passes through a parallel test environment before reaching production.",
-  "why": "Without a parallel hierarchy, platform changes would hit production directly, with failures landing on live landing zones.",
+  "decision": "Every platform capability exists in the test environment exactly as it does in production.",
+  "why": "If the copy differs from production, a change that passes there can still break production.",
   "links": [
     {
       "id": "deployment-logic-reusable-workflow",
-      "note": "Template workflow changes are validated here first."
+      "note": "Test and production stay identical because the same reusable workflows deploy both."
     },
     {
-      "id": "landing-zone-platform-members",
-      "note": "The platform member registration workflow is validated here before any platform change reaches production."
-    },
-    {
-      "id": "azure-policy-allowed-resources",
-      "note": "New whitelisted resource types are manually tested here before reaching production."
+      "id": "deployment-end-to-end",
+      "note": "Test is updated one capability at a time, because no capability's deployment touches another."
     },
     {
       "id": "platform-identity-azure",
-      "note": "Test has its own dedicated app registration, sourced from a GitHub variable."
+      "note": "Without its own dedicated app registration, the test environment cannot authenticate to deploy platform resources."
     },
     {
       "id": "platform-identity-graph",
-      "note": "Test identity holds the same Graph permissions as production."
-    },
-    {
-      "id": "platform-identity-github",
-      "note": "Test and production share the same GitHub App."
+      "note": "Without the same Graph permissions on the test identity, Graph-dependent workflows can't be validated here."
     }
   ],
   "violations": [

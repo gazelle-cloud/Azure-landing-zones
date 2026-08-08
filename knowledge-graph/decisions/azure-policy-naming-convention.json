@@ -1,15 +1,12 @@
 {
   "id": "azure-policy-naming-convention",
   "decision": "Azure Policy assignment names are prefixed by effect — [deny|config|allowed] — followed by the requirement name.",
-  "why": "Without a predictable pattern, teams can't find the right assignment without a portal lookup, and self-service breaks down.",
+  "why": "Without an effect prefix, reading an assignment name does not tell you whether it denies, configures, or allows.",
   "links": [
-    {
-      "id": "self-service-policy-exemptions",
-      "note": "Predictable names are what make exemptions self-service — teams can identify the correct assignment by name, no portal access required."
-    }
   ],
   "violations": [
-    "Effect prefix outside deny, config, or allowed."
+    "Effect prefix outside deny, config, or allowed.",
+    "Two policy names sharing their first 24 characters — both assignments resolve to one truncated name."
   ],
   "files": [
     "platform-management/policy/bicep/oases.bicep",

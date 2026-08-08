@@ -1,27 +1,23 @@
 {
   "id": "azure-policy-allowed-resources",
-  "decision": "Every resource type is denied until the platform has validated its security controls, telemetry, and integration pattern",
+  "decision": "Every resource type is denied until the platform has validated its security controls, telemetry, and integration pattern.",
   "why": "Without an approved list, the platform cannot guarantee that every resource follows its configuration rules.",
   "links": [
     {
       "id": "azure-policy-naming-convention",
-      "note": "Must use an Allowed-prefixed assignment for resource-type compliance."
+      "note": "The allowed prefix is defined by the naming convention — the assignment won't be discoverable without it."
     },
     {
       "id": "landing-zone-diagnostic-settings",
-      "note": "Every approved type must have a diagnostic settings definition."
+      "note": "A diagnostic settings policy must exist for the type — approval without one leaves telemetry uncovered."
     },
     {
       "id": "job-function-scoped-roles",
-      "note": "New resource type triggers review of whether function-scoped roles need new actions."
+      "note": "Some types expose non-standard RBAC actions beyond generic read — approval is incomplete without checking job-function role coverage."
     },
     {
-      "id": "self-service-policy-exemptions",
-      "note": "Hard deny becomes a bottleneck without a self-service exemption path."
-    },
-    {
-      "id": "azure-policy-custom-definition",
-      "note": "New resource type with no built-in Deny policy requires a custom definition before security coverage is complete."
+      "id": "azure-policy-hard-deny",
+      "note": "A type is approvable only once deny policies cover its misconfigurations — the allowlist assumes that coverage."
     },
     {
       "id": "azure-native-services-only",
@@ -29,11 +25,7 @@
     },
     {
       "id": "self-service-policy-exemptions-defender-for-cloud",
-      "note": "Approving a resource type requires reviewing Defender for Cloud paid-SKU recommendations — those with no free remediation path go on the exemption list."
-    },
-    {
-      "id": "landing-zone-getting-started",
-      "note": "Approval is incomplete until the template has a thin example module"
+      "note": "Defender for Cloud adds paid-SKU recommendations for some types — approval without reviewing them leaves unactionable noise on the dashboard."
     }
   ],
   "violations": [

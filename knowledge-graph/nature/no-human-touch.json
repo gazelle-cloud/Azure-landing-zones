@@ -10,7 +10,8 @@
     "platform-test-environment",
     "deployment-branch-gated-promotion",
     "platform-identity-azure",
-    "platform-identity-github"
+    "platform-identity-github",
+    "platform-break-glass"
   ],
   "violations": [
     "Configuration value set manually instead of sourced from the repo.",

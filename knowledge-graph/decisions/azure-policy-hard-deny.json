@@ -1,27 +1,15 @@
 {
   "id": "azure-policy-hard-deny",
-  "decision": "Security controls are enforced through hard deny policies — misconfiguration is blocked, not just reported.",
-  "why": "Without deny policies, resources can be deployed in a non-compliant state, allowing accidental deviations from the security baseline",
+  "decision": "Security controls are enforced through deny policies.",
+  "why": "Without deny policies, resources deploy in a non-compliant state, deviating from the security baseline.",
   "links": [
     {
       "id": "azure-policy-naming-convention",
-      "note": "All deploy as Deny-prefixed assignments."
-    },
-    {
-      "id": "self-service-policy-exemptions",
-      "note": "Hard denial only works if teams can unblock themselves."
+      "note": "Without the naming convention's deny prefix rule, deny policy assignments have no consistent identity."
     },
     {
       "id": "azure-policy-custom-definition",
-      "note": "Custom definitions close gaps where built-ins only offer Audit."
-    },
-    {
-      "id": "landing-zone-allowed-public-ip",
-      "note": "A platform-provided public IP exists for teams that need human access to the data plane."
-    },
-    {
-      "id": "landing-zone-getting-started",
-      "note": "Getting-started modules must comply with active deny policies"
+      "note": "Custom definitions provide the Deny effect where built-in policies don't — without them, deny coverage has gaps."
     }
   ],
   "violations": [

@@ -1,15 +1,11 @@
 {
   "id": "application-teams-own-the-cost",
-  "decision": "Each application has its own billing scope; every subscription it provisions bills to it.",
-  "why": "Without per-application billing scope, application teams are unable to independently track, manage, and be accountable for their own costs.",
+  "decision": "Every subscription an application provisions bills to that application's own invoice section.",
+  "why": "Without it, attribution falls back to tags — less precise, and allocation logic has to run.",
   "links": [
     {
       "id": "landing-zone-platform-members",
-      "note": "Joining the platform creates the Azure Invoice Section."
-    },
-    {
-      "id": "landing-zone-action-group",
-      "note": "Landing zone budget alerts are routed via the action group to the team that owns the spend."
+      "note": "The invoice section is created when the application joins the platform — billing has no scope before that."
     }
   ],
   "violations": [
@@ -17,6 +13,7 @@
   ],
   "files": [
     "githubVariables.json",
+    ".github/workflows/template-new-platform-members.yml",
     ".github/workflows/template-landing-zones.yml"
   ]
 }

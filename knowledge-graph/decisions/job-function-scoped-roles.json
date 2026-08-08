@@ -1,6 +1,6 @@
 {
   "id": "job-function-scoped-roles",
-  "decision": "Access is granted by job function, not by resource type — adding a new resource type never requires a new role.",
+  "decision": "Access is granted by job function, not by resource type — new resource types never require a new role.",
   "why": "Without job-function scoping, every new allowed resource type forces team re-onboarding.",
   "links": [
     {
@@ -8,12 +8,12 @@
       "note": "Joining the platform creates the Entra ID group that scopes engineer access — roles target the group."
     },
     {
-      "id": "deployment-config-in-repo",
-      "note": "The platform-wide engineers group name (APP_ENGINEERS_GROUP_NAME) is sourced from githubVariables.json"
-    },
-    {
       "id": "landing-zone-lifecycle",
       "note": "Reader on the 'Subscription Bank' is what allows engineers to discover subscriptions available for reuse."
+    },
+    {
+      "id": "platform-break-glass",
+      "note": "The wildcard violation holds only because break-glass names the single sanctioned exception."
     }
   ],
   "violations": [

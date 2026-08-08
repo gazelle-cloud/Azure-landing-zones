@@ -1,19 +1,15 @@
 {
   "id": "landing-zone-tags",
-  "decision": "Tags are configured automatically across every landing zone, driven by your platform member profile.",
-  "why": "Without automatic enforcement, tags drift — alerts route to stale contacts with no response.",
+  "decision": "Tag values on every landing zone must be sourced from the platform member profile.",
+  "why": "Hand-typed tags drift from the member profile, so a resource stops showing who actually owns it.",
   "links": [
     {
       "id": "landing-zone-automation",
-      "note": "Nightly tag remediation runs as a Container App Job."
+      "note": "Tag remediation has no runtime without the automation capability."
     },
     {
       "id": "landing-zone-platform-members",
       "note": "Engineer and owner emails come from the platform enrollment."
-    },
-    {
-      "id": "azure-policy-naming-convention",
-      "note": "Tags are enforced via Azure Policy at the subscription level, using a Config-prefixed assignment name."
     }
   ],
   "violations": [

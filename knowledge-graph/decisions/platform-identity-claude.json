@@ -2,12 +2,7 @@
   "id": "platform-identity-claude",
   "decision": "Agentic GitHub workflows authenticate via a Claude Pro OAuth token.",
   "why": "Without the token, every agentic workflow requires a paid API key.",
-  "links": [
-    {
-      "id": "knowledge",
-      "note": "Claude Pro token runs the knowledge validation CI step."
-    }
-  ],
+  "links": [],
   "violations": [
     "Agentic workflow step using ANTHROPIC_API_KEY instead of CLAUDE_CODE_OAUTH_TOKEN."
   ],

@@ -24,7 +24,6 @@
     "For links: only add one if the note would change how someone implements or reviews this decision. Drop it if the relationship is obvious from context alone.",
     "Present the complete draft to the user before writing any file.",
     "Write the file.",
-    "Run the static validation scripts: pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confim-knowledge-graph-schema.ps1, then pwsh -NoProfile -ExecutionPolicy Bypass -File .github/utils/confirm-knowledge-graph-integrity.ps1. CI runs semantic validation for changed decisions with .github/utils/confirm-knowledge-graph-semantic.ps1. Fix any errors before proceeding.",
     "Open a PR. CI runs static tests and LLM checks on changed decisions — the PR cannot merge until it passes."
   ],
   "files": [

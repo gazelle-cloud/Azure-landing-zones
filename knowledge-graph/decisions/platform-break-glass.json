@@ -1,0 +1,23 @@
+{
+  "id": "platform-break-glass",
+  "decision": "Break-glass is used only when automation cannot execute the change.",
+  "why": "An unrestricted role with no usage boundary becomes the fast path, and the repository stops being the record.",
+  "links": [
+    {
+      "id": "deployment-declarative-lifecycle",
+      "note": "Stack deny assignments override role actions — break-glass reaches platform resources only if excluded from them."
+    },
+    {
+      "id": "azure-policy-hard-deny",
+      "note": "Policy denies apply regardless of role actions — break-glass cannot deploy an unapproved resource type."
+    }
+  ],
+  "violations": [
+    "Break-glass used for a change that a pull request could have made."
+  ],
+  "files": [
+    "platform-management/access-control/parameters/accessControl.bicepparam",
+    "platform-management/access-control/bicep/accessControl.bicep",
+    ".github/workflows/template-landing-zones.yml"
+  ]
+}

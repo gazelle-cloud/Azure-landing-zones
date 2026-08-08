@@ -1,7 +1,7 @@
 {
   "id": "platform-exemptions-automation",
   "decision": "Platform automation Docker images are hosted outside the landing zones.",
-  "why": "Without an external image registry, each landing zone needs persistent image hosting infrastructure, adding always-on cost before any application workload exists.",
+  "why": "Without an external registry, each landing zone needs persistent image hosting — adding always-on cost before any workload exists.",
   "links": [
     {
       "id": "azure-native-services-only",

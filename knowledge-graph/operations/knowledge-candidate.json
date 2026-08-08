@@ -1,0 +1,24 @@
+{
+  "id": "knowledge-candidate",
+  "triggers": [
+    "knowledge that doesn't fit the graph",
+    "pattern across decisions",
+    "explanatory context without a dependency"
+  ],
+  "intent": "Observations worth preserving find a home without polluting the graph.",
+  "decisions": [
+    "graph",
+    "knowledge"
+  ],
+  "violations": [
+    "Creating the issue without user confirmation",
+    "Observation that is actually a missing decision or link"
+  ],
+  "steps": [
+    "Confirm the observation does not fit as a decision, link, or violation — if it does, use update-knowledge-base instead.",
+    "Draft the issue title and body: title names the observation; body states the insight and references related decision IDs.",
+    "Present the draft to the user for confirmation.",
+    "Create the issue with the knowledge-candidate label: gh issue create --repo gazelle-cloud/azure-landing-zones --title \"...\" --body \"...\" --label knowledge-candidate"
+  ],
+  "files": []
+}

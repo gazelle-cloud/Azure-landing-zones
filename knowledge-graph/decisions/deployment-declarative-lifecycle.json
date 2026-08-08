@@ -6,14 +6,10 @@
     {
       "id": "platform-test-environment",
       "note": "'deleteAll' in test verifies code produces the expected Azure state before promotion to prod."
-    },
-    {
-      "id": "landing-zone-lifecycle",
-      "note": "A subscription is guaranteed empty after deleteAll, which makes subscription reuse safe."
     }
   ],
   "violations": [
-    "Deployment Stack configured with detachAll removed resources persist with no cleanup path.",
+    "Deployment Stack configured with detachAll — removed resources persist with no cleanup path.",
     "Resources created directly in Azure are not managed by the Deployment Stack."
   ],
   "files": [

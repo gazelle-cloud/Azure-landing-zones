@@ -1,11 +1,11 @@
 {
   "id": "landing-zone-ownership",
-  "decision": "What the landing zone template declares, the platform owns and maintains; everything else in the subscription belongs to the application team.",
+  "decision": "The platform owns exactly what the landing zone template declares — nothing more.",
   "why": "Without a declared boundary, application teams cannot act in their own subscription without checking with the platform first.",
   "links": [
     {
       "id": "deployment-declarative-lifecycle",
-      "note": "Resources removed from Bicep are removed from Azure."
+      "note": "The ownership boundary relies on stack deletion to remove platform-declared resources when no longer defined in code."
     },
     {
       "id": "job-function-scoped-roles",

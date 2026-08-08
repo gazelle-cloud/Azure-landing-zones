@@ -1,12 +1,8 @@
 {
   "id": "landing-zone-platform-members",
-  "decision": "Each application is registered as a platform member — establishing the Entra ID group, billing scope, and GitHub repo that all its landing zones build on.",
+  "decision": "Joining the platform establishes the Entra ID group, billing scope, and GitHub repo.",
   "why": "Without a platform member profile, the platform has no application to provision landing zones for.",
   "links": [
-    {
-      "id": "landing-zone-lifecycle",
-      "note": "At landing zone creation, the subscription from the bank moves to application's invoice section."
-    },
     {
       "id": "landing-zone-repo",
       "note": "The IDs created during platform member registration (Entra group, invoice section) live as GitHub Variables on the application repo."

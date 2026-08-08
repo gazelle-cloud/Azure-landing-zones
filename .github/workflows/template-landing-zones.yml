@@ -170,6 +170,7 @@ jobs:
           $excludedPrincipals = @(
               "${{ vars.AZURE_PLATFORM_ENGINEER_GROUP_ID}}"
               "${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }}"
+              "${{ vars.BREAK_GLASS_GROUP_ID }}"
           ) -join ' '
 
           $deployment = az stack mg create `

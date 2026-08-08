@@ -1,35 +1,16 @@
 {
   "id": "landing-zone-resource-group",
   "decision": "Platform-managed landing zone resources live in a single dedicated resource group, separate from application resources.",
-  "why": "Without a single resource group, platform resources scatter across the subscription — no single place to see what the platform owns.",
+  "why": "Without a dedicated group, platform resources mix with application resources and teams cannot tell which are theirs.",
   "links": [
     {
-      "id": "landing-zone-identity",
-      "note": "Managed identity is provisioned inside this resource group and managed by Azure Deployment Stack."
-    },
-    {
-      "id": "deployment-declarative-lifecycle",
-      "note": "The Deployment Stack is configured so resources removed from Bicep are also removed from Azure."
-    },
-    {
-      "id": "landing-zone-monitoring",
-      "note": "Log Analytics workspace lives inside this resource group and managed by Azure Deployment Stack."
-    },
-    {
-      "id": "landing-zone-vnet",
-      "note": "VNet is provisioned inside this resource group and managed by platform Deployment Stack"
-    },
-    {
-      "id": "landing-zone-automation",
-      "note": "Container Apps environment and jobs are provisioned inside this resource group and managed by Azure Deployment Stack"
-    },
-    {
       "id": "landing-zone-ownership",
-      "note": "Subscription-scoped platform resources sit outside the resource group but within the Deployment Stack."
+      "note": "The template decides which resources are the platform's — those are the ones that go in this resource group."
     }
   ],
   "violations": [
-    "Provisioning a resource outside the main.bicep landing zone template"
+    "Platform resource deployed into an application-owned resource group.",
+    "Second platform-managed resource group created in a landing zone."
   ],
   "files": [
     "landing-zones/bicep/main.bicep"
