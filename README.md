@@ -15,7 +15,7 @@ An application team joins the platform, requests a landing zone, and gets back a
 
 A landing zone arrives with a `hello-world` app — verifying that GitHub runners can reach the data plane, federated identity is working, Microsoft Graph permissions are in place, and the Azure infrastructure holds together.
 
-## Gazelle nature
+## Gazelle foundations
 
 - **No fixed cost** — Every platform component is free; if it can't be, it must be consumption-based — never a flat cost.
 - **No human touch** — Big Bang brings the platform alive. After that, code is the only path to production — and the proof it can always be rebuilt from scratch.

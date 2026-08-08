@@ -27,7 +27,7 @@
     "Open a PR. CI runs static tests and LLM checks on changed decisions — the PR cannot merge until it passes."
   ],
   "files": [
-    "knowledge-graph/nature/",
+    "knowledge-graph/foundations/",
     "knowledge-graph/decisions/",
     "knowledge-graph/operations/"
   ]

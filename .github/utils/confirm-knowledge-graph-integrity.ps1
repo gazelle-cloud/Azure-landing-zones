@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 
 $root = Join-Path $PSScriptRoot '..' '..' 'knowledge-graph'
 $decisionRoot = Join-Path $root 'decisions'
-$guidingPrincipleRoot = Join-Path $root 'nature'
+$foundationRoot = Join-Path $root 'foundations'
 $operationRoot = Join-Path $root 'operations'
 $errors = [System.Collections.Generic.List[string]]::new()
 
@@ -72,14 +72,14 @@ function Get-IdSet {
     return $ids
 }
 
-foreach ($directory in @($decisionRoot, $guidingPrincipleRoot, $operationRoot)) {
+foreach ($directory in @($decisionRoot, $foundationRoot, $operationRoot)) {
     if (-not (Test-Path -Path $directory -PathType Container)) {
         throw "Knowledge graph directory not found: $directory"
     }
 }
 
 $decisionIds = Get-IdSet -Directory $decisionRoot -Kind 'decisions'
-$guidingPrincipleIds = Get-IdSet -Directory $guidingPrincipleRoot -Kind 'nature'
+$foundationIds = Get-IdSet -Directory $foundationRoot -Kind 'foundations'
 $operationIds = Get-IdSet -Directory $operationRoot -Kind 'operations'
 
 foreach ($file in Get-ChildItem -Path $operationRoot -Filter '*.json' | Sort-Object Name) {
@@ -100,8 +100,8 @@ foreach ($file in Get-ChildItem -Path $operationRoot -Filter '*.json' | Sort-Obj
     }
 }
 
-foreach ($file in Get-ChildItem -Path $guidingPrincipleRoot -Filter '*.json' | Sort-Object Name) {
-    $displayPath = "nature/$($file.Name)"
+foreach ($file in Get-ChildItem -Path $foundationRoot -Filter '*.json' | Sort-Object Name) {
+    $displayPath = "foundations/$($file.Name)"
     $document = Read-JsonFile -File $file -DisplayPath $displayPath
     if ($null -eq $document) {
         continue
@@ -123,8 +123,8 @@ foreach ($file in Get-ChildItem -Path $decisionRoot -Filter '*.json' | Sort-Obje
 
     foreach ($link in Get-ArrayValues -Value $document.links) {
         $linkId = $link.id
-        if (-not $decisionIds.Contains($linkId) -and -not $guidingPrincipleIds.Contains($linkId)) {
-            Add-Error -File $displayPath -Message "links[] -> '$linkId' not found in decisions or nature"
+        if (-not $decisionIds.Contains($linkId) -and -not $foundationIds.Contains($linkId)) {
+            Add-Error -File $displayPath -Message "links[] -> '$linkId' not found in decisions or foundations"
         }
     }
 }
