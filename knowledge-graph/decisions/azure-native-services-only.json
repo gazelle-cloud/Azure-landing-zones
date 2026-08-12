@@ -1,12 +1,12 @@
 {
-    "id": "azure-native-services-only",
-    "decision": "A service can be adopted only if it is reachable through Azure Resource Manager.",
-    "why": "If a service isn't manageable through ARM, the platform cannot guarantee service integrity.",
-    "links": [],
-    "violations": [
-        "Service adopted with no ARM resource representation — invisible to Policy, RBAC, and diagnostics."
-    ],
-    "files": [
-        "platform-management/policy/parameters/oases/allowedResources.json"
-    ]
+  "id": "azure-native-services-only",
+  "decision": "A service can be adopted only if it is reachable through Azure Resource Manager.",
+  "why": "If a service isn't manageable through ARM, the platform cannot guarantee service integrity.",
+  "links": [],
+  "violations": [
+    "Service adopted with no ARM resource representation — invisible to Policy, RBAC, and diagnostics."
+  ],
+  "files": [
+    "platform-management/policy/parameters/oases/allowedResources.json"
+  ]
 }

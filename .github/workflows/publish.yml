@@ -35,32 +35,12 @@ jobs:
           path: target
           token: ${{ steps.app-token.outputs.token }}
 
-      - name: Sanitize - githubVariables.json
+      - name: Sanitize - githubVariables.json and platform members
         working-directory: source
         run: |
-          jq '
-            .AzurePlatformVariables.organizationVariables.APP_GITHUB_AZUREPLATFORM_ID = "xxx" |
-            .AzurePlatformVariables.organizationVariables.APPLICATION_ENGINEERS_GROUP_ID = "xxx" |
-            .AzurePlatformVariables.organizationVariables.LANDING_ZONE_ALLOWED_PUBLIC_IP = "xxx" |
-            .AzurePlatformVariables.organizationVariables.GH_ORGANIZATION_DATABASE_ID = "xxx" |
-            .AzurePlatformVariables.repositoryVariables.AZURE_TENANT_ID = "xxx" |
-            .AzurePlatformVariables.repositoryVariables.BILLING_ACCOUNT_ID = "xxx" |
-            .AzurePlatformVariables.repositoryVariables.BILLING_PROFILE_NAME = "xxx" |
-            .AzurePlatformVariables.repositoryVariables.SUBSCRIPTION_BANK_INVOICE_SECTION_ID = "xxx" |
-            .AzurePlatformVariables.repositoryVariables.AZURE_PLATFORM_ENGINEER_EMAIL = "***@***.**" |
-            .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_CLIENT_ID = {"test":"xxx","prod":"xxx"} |
-            .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_PRINCIPAL_ID = {"test":"xxx","prod":"xxx"} |
-            .AzurePlatformVariables.environmentVariables.AZURE_PLATFORM_ENGINEER_GROUP_ID = {"test":"xxx","prod":"xxx"} |
-            .AzurePlatformVariables.environmentVariables.BREAK_GLASS_GROUP_ID = {"test":"xxx","prod":"xxx"} |
-            .NewRepoVariables.repositoryVariables.AZURE_TENANT_ID = "xxx"
-          ' githubVariables.json > tmp.json && mv tmp.json githubVariables.json
-
-      - name: Sanitize - platform member emails
-        working-directory: source
-        run: |
-          for f in platform-members/*.json; do
+          for f in githubVariables.json platform-members/*.json; do
             [ "$(basename "$f")" = "template.json" ] && continue
-            jq '.ownerEmail = "***@***.**" | .engineerEmail = "***@***.**"' "$f" > tmp.json && mv tmp.json "$f"
+            jq 'walk(if type == "string" then ("x" * length) else . end)' "$f" > tmp.json && mv tmp.json "$f"
           done
 
       - name: Sanitize - landing zone subscription IDs

@@ -95,21 +95,3 @@ jobs:
           $var = [PSCustomObject]@{ Name = "GH_ORGANIZATION_DATABASE_ID"; Value = $databaseId }
 
           Set-GitHubOrganizationVariables $var
-
-      - name: github labels
-        if: ${{ inputs.managementGroupHierarchy == 'prod' }}
-        env:
-          GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
-        shell: pwsh
-        run: |
-          $readJson = Get-Content ./githubVariables.json -Raw | ConvertFrom-Json -Depth 20
-          $labels = $readJson.labels
-
-          foreach ($item in $labels.PSObject.Properties) {
-            $name  = $item.Name
-            $color = $item.value.color
-            $desc  = $item.value.description
-
-            Write-Host "Creating label: $name"
-            gh label create "$name" --color "$color" --description "$desc" --force
-          }

@@ -50,72 +50,98 @@ jobs:
           fi
           echo "files=$files" >> $GITHUB_OUTPUT
 
-      - name: validate knowledge
+      # Assemble exactly what the model needs to judge — changed decision fields
+      # plus both rubric files — as one prompt. No file exploration required.
+      - name: build validation prompt
+        if: steps.changed.outputs.files != ''
+        run: |
+          {
+            echo "You are a CI check validating knowledge graph decision records."
+            echo "You are given the full input below — do not read any other files."
+            echo ""
+            echo "## Changed decisions"
+            echo '```json'
+            jq -s '[.[] | {id, decision, why, links}]' ${{ steps.changed.outputs.files }}
+            echo '```'
+            echo ""
+            echo "## Knowledge violations (judge decision/why against these)"
+            echo '```json'
+            jq '.violations' knowledge-graph/decisions/knowledge.json
+            echo '```'
+            echo ""
+            echo "## Graph violations (judge links against these)"
+            echo '```json'
+            jq '.violations' knowledge-graph/decisions/graph.json
+            echo '```'
+            echo ""
+            echo "Tasks:"
+            echo "1. Evaluate every entry one at a time, in order. Treat each entry as its own"
+            echo "   independent judgment — do not let an earlier verdict anchor a later one."
+            echo "2. For decision/why, check each field against every knowledge violation individually."
+            echo "3. For links, check against every graph violation individually."
+            echo "4. If a field does not CLEARLY and OBVIOUSLY satisfy every rule, mark it fail — do not"
+            echo "   default to pass on an uncertain or borderline field."
+            echo "5. Your entire response must be ONLY the table below."
+            echo "   Do not include analysis, reasoning steps, explanations, or commentary of any kind,"
+            echo "   before, after, or interleaved with the table. Do not use tools — the input above is complete."
+            echo "   ## knowledge graph validation"
+            echo "   | id | decision | why | links |"
+            echo "   |---|---|---|---|"
+            echo "   Write exactly 'pass' per cell if it satisfies every rule. Otherwise write ONLY the"
+            echo "   specific failure reason — no prefix, no cell left as bare 'pass' if it fails."
+          } > /tmp/validation_prompt.md
+
+      # Remove CLAUDE.md before the Claude step runs, so the session has no
+      # project config to auto-import — the prompt above is the whole payload.
+      - name: strip project config
+        if: steps.changed.outputs.files != ''
+        run: mv CLAUDE.md /tmp/CLAUDE.md.bak
+
+      - name: validate knowledge graph
+        id: validate
         if: steps.changed.outputs.files != ''
         uses: anthropics/claude-code-base-action@beta
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           model: claude-sonnet-4-6
-          allowed_tools: "View,Bash"
-          max_turns: 30
-          prompt: |
-            You are a CI check validating knowledge graph decision records.
+          prompt_file: /tmp/validation_prompt.md
+          disallowed_tools: "Task,Bash,Glob,Grep,LS,ExitPlanMode,Read,Edit,MultiEdit,Write,WebFetch,TodoWrite,WebSearch,BashOutput,KillBash"
+          system_prompt: "You are a strict CI validator. Answer directly in text, with no reasoning or commentary — only the table requested. Do not use tools — none are available."
+          max_turns: 1
+          claude_env: |
+            MAX_THINKING_TOKENS: 8000
 
-            1. Run this exact Bash command to load all entries at once:
-               jq -s '[.[] | {id, decision, why}]' ${{ steps.changed.outputs.files }}
-            2. Read knowledge-graph/decisions/knowledge.json for the `violations` list.
-            3. Use your judgment to evaluate each entry's `decision` and `why` against the violations — do not write a script to do this.
-            4. Use Bash to append a markdown table to $GITHUB_STEP_SUMMARY:
-               ## knowledge validation
-               | id | decision | why |
-               |---|---|---|
-               Write "pass" for passing fields, or the specific failure reason.
-            5. If any entry fails, use Bash to run: touch /tmp/knowledge_failed
+      - name: restore project config
+        if: always() && steps.changed.outputs.files != ''
+        run: mv /tmp/CLAUDE.md.bak CLAUDE.md
 
-      - name: check knowledge result
-        if: steps.changed.outputs.files != ''
-        continue-on-error: true
+      # The model has no tools, so it can't write GITHUB_STEP_SUMMARY itself —
+      # pull its final answer out of the execution log and publish/check it here.
+      - name: publish and check validation result
+        if: always() && steps.changed.outputs.files != ''
         run: |
-          if [ -f /tmp/knowledge_failed ]; then
-            echo "::error::one or more decisions failed knowledge validation — see step summary"
+          result=$(jq -r 'map(select(.type == "result")) | last | .result // empty' "${{ steps.validate.outputs.execution_file }}")
+          echo "$result"
+          if [ -z "$result" ]; then
+            echo "::error::validator produced no result — see execution log"
             exit 1
           fi
+          echo "$result" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: validate graph
-        if: always() && steps.changed.outputs.files != ''
-        uses: anthropics/claude-code-base-action@beta
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          model: claude-sonnet-4-6
-          allowed_tools: "View,Bash"
-          max_turns: 30
-          prompt: |
-            You are a CI check validating knowledge graph decision records.
-
-            1. Read knowledge-graph/decisions/graph.json — its `violations` array defines what to reject.
-            2. Read and evaluate the `links` field of each file:
-               ${{ steps.changed.outputs.files }}
-            3. Use Bash to append a markdown table to $GITHUB_STEP_SUMMARY:
-               ## graph validation
-               | id | links |
-               |---|---|
-               Write "pass" or the specific failure reason.
-            4. If any entry fails, use Bash to run: touch /tmp/graph_failed
-
-      - name: check graph result
-        if: always() && steps.changed.outputs.files != ''
-        run: |
-          if [ -f /tmp/graph_failed ]; then
-            echo "::error::one or more decisions failed graph validation — see step summary"
+          # Derive PASS/FAIL from the table itself — don't trust a model-written
+          # summary line to correctly aggregate across many rows.
+          rows=$(echo "$result" | grep '^|' | tail -n +3)
+          if [ -z "$rows" ]; then
+            echo "::error::no table rows found in validator output — see step summary"
             exit 1
           fi
-
-      - name: fail if any validation failed
-        if: always() && steps.changed.outputs.files != ''
-        run: |
-          failed=false
-          [ -f /tmp/knowledge_failed ] && failed=true
-          [ -f /tmp/graph_failed ] && failed=true
-          if [ "$failed" = "true" ]; then
+          bad=$(echo "$rows" | awk -F'|' '{
+            for (i=3;i<=5;i++) {
+              cell=$i; gsub(/^[ \t]+|[ \t]+$/,"",cell)
+              if (tolower(cell) != "pass") { print; break }
+            }
+          }')
+          if [ -n "$bad" ]; then
+            echo "::error::one or more decisions failed validation — see step summary"
             exit 1
           fi

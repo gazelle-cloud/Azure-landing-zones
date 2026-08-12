@@ -1,15 +1,6 @@
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cat knowledge-graph/**/*.json | jq -s '.'"
-          }
-        ]
-      }
-    ]
+  "env": {
+    "CLAUDE_CODE_USE_POWERSHELL_TOOL": "1"
   },
   "permissions": {
     "allow": [
@@ -17,15 +8,14 @@
       "Bash(gh pr create:*)",
       "Bash(git checkout:*)",
       "Bash(git add:*)",
+      "Bash(cd:*)",
+      "Bash(grep:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)",
       "Bash(az bicep build-params:*)",
       "Bash(az bicep build:*)",
       "Bash(mkdir:*)",
-      "Bash(rm:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
-      "Bash(gh workflow run:*)",
       "Bash(gh pr checks:*)",
       "Bash(gh deployment list:*)",
       "Read(*)",
@@ -34,8 +24,17 @@
       "Bash(az account management-group subscription show-sub-under-mg:*)",
       "WebFetch(domain:github.blog)",
       "mcp__azure__wellarchitectedframework",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "mcp__azure__pricing"
+      "mcp__azure__pricing",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ],
+    "deny": [
+      "mcp__claude_ai_Gmail",
+      "mcp__claude_ai_Google_Calendar",
+      "mcp__claude_ai_Google_Drive",
+      "NotebookEdit"
     ]
-  }
+  },
+  "disableBundledSkills": true,
+  "outputStyle": "default",
+  "spinnerTipsEnabled": false
 }

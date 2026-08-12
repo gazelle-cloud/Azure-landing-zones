@@ -1,0 +1,6 @@
+# Generated from knowledge-graph/<directory>/ by .github/utils/write-knowledge-graph.ps1.
+# eol=lf keeps the working copy byte-identical to what the generator writes, so the
+# -Check freshness gate compares content rather than line endings.
+knowledge-graph/foundations.md text eol=lf linguist-generated
+knowledge-graph/decisions.md text eol=lf linguist-generated
+knowledge-graph/operations.md text eol=lf linguist-generated
