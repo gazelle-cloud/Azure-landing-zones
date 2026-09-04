@@ -1,0 +1,21 @@
+{
+  "id": "oases",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "oases"
+  },
+  "rule": "A management group counts as oases when the platform establishes it.",
+  "anchor": "no-platform-ops",
+  "links": [
+    {
+      "target": "platform",
+      "relation": "depends-on",
+      "note": "The platform is what establishes oases, so there is nothing to establish one until Gazelle names a management group as the platform."
+    }
+  ],
+  "violations": [
+    "Test landing zones assumed to belong to the test management group hierarchy."
+  ],
+  "properties": {}
+}

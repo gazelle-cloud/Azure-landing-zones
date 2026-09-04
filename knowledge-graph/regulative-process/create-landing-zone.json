@@ -35,7 +35,11 @@
       "relation": "governed-by"
     },
     {
-      "target": "landing-zone-ipam",
+      "target": "oases-ipam",
+      "relation": "governed-by"
+    },
+    {
+      "target": "oases-placement",
       "relation": "governed-by"
     },
     {

@@ -12,7 +12,6 @@
   ],
   "links": [],
   "violations": [
-    "Application landing zone created in the platform's test environment.",
     "Capability present in production and absent from test."
   ],
   "files": [

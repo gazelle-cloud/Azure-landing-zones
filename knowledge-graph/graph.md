@@ -13,7 +13,7 @@
 | codebase |
 | source-of-truth |
 | platform |
-| oasis |
+| oases |
 | guardrail |
 | approved |
 | product-team |
@@ -155,18 +155,34 @@ A policy name counts as a guardrail in Gazelle when the platform assigns it.
 
 **Subject:** landing-zone (entity)
 
-An Azure subscription counts as a landing zone when the platform's register names it.
+An Azure subscription counts as a landing zone when the oases register names it.
 
 **Anchor:** no-human-touch
 
 **Links:**
 
 - depends-on → platform-member — The run deploys the landing zone in a named member's name, so there is no one to deploy it for until membership exists.
-- depends-on → platform — A landing zone holds its status in the platform's register, so there is nowhere for it to hold until Gazelle names a management group as the platform.
+- depends-on → oases — A landing zone holds its status in the oases register, so there is nowhere for it to hold until the platform establishes oases.
 
 **Violations:**
 
 - Subscription hand-built to resemble a landing zone.
+
+### oases
+
+**Subject:** oases (entity)
+
+A management group counts as oases when the platform establishes it.
+
+**Anchor:** no-platform-ops
+
+**Links:**
+
+- depends-on → platform — The platform is what establishes oases, so there is nothing to establish one until Gazelle names a management group as the platform.
+
+**Violations:**
+
+- Test landing zones assumed to belong to the test management group hierarchy.
 
 ### platform-member
 
@@ -202,7 +218,7 @@ A management group counts as the platform when Gazelle names it.
 - Platform capability hosted in a subscription rather than assigned at a management group.
 - Dedicated platform hierarchy or connectivity subscription introduced to hold a capability enterprise-scale would put there.
 - Management group presented as the platform that BigBang cannot rebuild from the repository.
-- Platform deciding on behalf of the landing zones its register names.
+- Platform deciding on behalf of the landing zones the oases register names.
 
 ## Regulative - entity
 
@@ -664,56 +680,6 @@ A landing zone must have a single managed identity, shared across all its workfl
 - `landing-zones/bicep/modules/identity.bicep`
 - `landing-zones/bicep/modules/base/appRoleAssignedTo.bicep`
 
-### landing-zone-ipam
-
-VNet address spaces must be allocated by querying live Azure, not by reading an assignment registry.
-
-**Why:** Without querying live state, address allocations drift and VNets cannot peer.
-
-**Anchor:** no-platform-ops
-
-**Implements:**
-
-- landing-zone
-
-**Violations:**
-
-- VNet with a manually assigned address space.
-- Allocation recorded in a registry file and trusted without a live check.
-
-**Files:**
-
-- `githubVariables.json`
-- `.github/workflows/template-calculate-vnet-address-space.yml`
-- `landing-zones/managementGroup-AppName-environment.bicepparam`
-
-### landing-zone-lifecycle
-
-A landing zone must draw its subscription from the Subscription Bank, and must return it there when sunset rather than cancelling it.
-
-**Why:** The Azure subscription limit counts cancelled subscriptions the same as active ones, so quota is not released by cancelling.
-
-**Anchor:** no-platform-ops
-
-**Implements:**
-
-- landing-zone
-
-**Links:**
-
-- depends-on → application-teams-own-the-cost — A reused subscription moves to the application's invoice section before provisioning completes.
-
-**Violations:**
-
-- New subscription created while the bank held an available empty one.
-- Sunset subscription cancelled rather than returned to the bank.
-
-**Files:**
-
-- `.github/workflows/template-landing-zones.yml`
-- `.github/workflows/template-destroy-landing-zone.yml`
-- `githubVariables.json`
-
 ### landing-zone-monitoring
 
 A landing zone must not share a Log Analytics Workspace with another landing zone.
@@ -833,6 +799,76 @@ Each landing zone must have its own parameter file and its own trigger workflow.
 
 - `landing-zones/managementGroup-AppName-environment.bicepparam`
 - `.github/workflows/template-lz-template.yml`
+- `.github/workflows/requestNew-Landing-Zone.yml`
+
+### oases-ipam
+
+VNet address spaces must be allocated by querying live Azure, not by reading an assignment registry.
+
+**Why:** Without querying live state, address allocations drift and VNets cannot peer.
+
+**Anchor:** no-platform-ops
+
+**Implements:**
+
+- oases
+
+**Violations:**
+
+- VNet with a manually assigned address space.
+- Allocation recorded in a registry file and trusted without a live check.
+
+**Files:**
+
+- `githubVariables.json`
+- `.github/workflows/template-calculate-vnet-address-space.yml`
+- `landing-zones/managementGroup-AppName-environment.bicepparam`
+
+### oases-lifecycle
+
+A landing zone must draw its subscription from the Subscription Bank, and must return it there when sunset rather than cancelling it.
+
+**Why:** The Azure subscription limit counts cancelled subscriptions the same as active ones, so quota is not released by cancelling.
+
+**Anchor:** no-platform-ops
+
+**Implements:**
+
+- oases
+
+**Links:**
+
+- depends-on → application-teams-own-the-cost — A reused subscription moves to the application's invoice section before provisioning completes.
+
+**Violations:**
+
+- New subscription created while the bank held an available empty one.
+- Sunset subscription cancelled rather than returned to the bank.
+
+**Files:**
+
+- `.github/workflows/template-landing-zones.yml`
+- `.github/workflows/template-destroy-landing-zone.yml`
+- `githubVariables.json`
+
+### oases-placement
+
+The platform must not restrict landing zone placement to the production environment.
+
+**Why:** Without it, early adopters cannot test new platform features.
+
+**Anchor:** no-platform-ops
+
+**Implements:**
+
+- oases
+
+**Violations:**
+
+- Placement restricted to the production management group hierarchy.
+
+**Files:**
+
 - `.github/workflows/requestNew-Landing-Zone.yml`
 
 ### platform-break-glass
@@ -990,7 +1026,6 @@ Every platform capability must exist in the test environment exactly as it exist
 
 **Violations:**
 
-- Application landing zone created in the platform's test environment.
 - Capability present in production and absent from test.
 
 **Files:**
@@ -1175,7 +1210,8 @@ A landing zone must be provisioned through requestNew-Landing-Zone, and for a re
 
 - depends-on → register-platform-member — Provisioning has no application to target until the member profile, group, and billing scope exist.
 - governed-by → application-teams-own-the-cost
-- governed-by → landing-zone-ipam
+- governed-by → oases-ipam
+- governed-by → oases-placement
 - governed-by → landing-zone-template
 - governed-by → deployment-branch-gated-promotion
 

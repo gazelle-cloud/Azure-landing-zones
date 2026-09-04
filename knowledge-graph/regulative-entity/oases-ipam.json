@@ -1,5 +1,5 @@
 {
-  "id": "landing-zone-ipam",
+  "id": "oases-ipam",
   "type": "regulative",
   "subject": {
     "type": "entity"
@@ -8,7 +8,7 @@
   "why": "Without querying live state, address allocations drift and VNets cannot peer.",
   "anchor": "no-platform-ops",
   "implements": [
-    "landing-zone"
+    "oases"
   ],
   "links": [],
   "violations": [
