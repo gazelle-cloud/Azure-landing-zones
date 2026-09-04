@@ -1,0 +1,59 @@
+{
+  "id": "update-landing-zone",
+  "type": "regulative",
+  "subject": {
+    "type": "process"
+  },
+  "decision": "A landing zone must be reshaped by editing its parameter file and merging a pull request, which redeploys the stack.",
+  "why": "An out-of-band edit is removed on the next deployment, because the stack deletes what the code no longer declares.",
+  "anchor": "no-platform-ops",
+  "implements": [
+    "landing-zone"
+  ],
+  "trigger": [
+    "temporary policy exemption",
+    "policy exclusion",
+    "update budget",
+    "cost alert"
+  ],
+  "steps": [
+    "Read the rules this process is governed by, to understand the constraints on tags, budget, and exemptions.",
+    "Verify the landing zone exists: the bicepparam file and the lz-oasis-{appName}-{env} workflow. If either is missing this is a create-landing-zone task.",
+    "Collect from the user the app and environment to manage, and which concern to change: cost, tags, or exemptions.",
+    "Cost: edit the single budget value. The budget drives one forecasted alert, so additional thresholds are out of scope.",
+    "Tags: edit subscriptionLevelTags and resourceLevelTags keys and placement. Keep ownerEmail and engineerEmail as readEnvironmentVariable references, and keep ownerEmail at subscription level.",
+    "Exemptions: ask whether the exemption is temporary or long-lived. Temporary triggers lz-flow-create-policy-exemption with an 8-hour expiry. Long-lived adds an entry to the exemptions array referencing a policy-assignment-reference.json key.",
+    "Present a complete draft of the bicepparam change before implementing.",
+    "Open a pull request. The merge redeploys the landing zone stack with deleteAll."
+  ],
+  "workflow": "lz-oasis-{appName}-{env}",
+  "links": [
+    {
+      "target": "create-landing-zone",
+      "relation": "depends-on",
+      "note": "There is no parameter file to edit until the landing zone has been provisioned."
+    },
+    {
+      "target": "azure-policy-reference",
+      "relation": "governed-by"
+    },
+    {
+      "target": "landing-zone-tags",
+      "relation": "governed-by"
+    },
+    {
+      "target": "deployment-declarative-lifecycle",
+      "relation": "governed-by"
+    }
+  ],
+  "violations": [
+    "Budget, tag, or exemption changed in the portal instead of the parameter file.",
+    "Exemption entry naming a literal ARM assignment ID."
+  ],
+  "files": [
+    "landing-zones/oases-prod/",
+    "landing-zones/oases-test/",
+    ".github/workflows/lz-flow-create-policy-exemption.yml"
+  ],
+  "properties": {}
+}

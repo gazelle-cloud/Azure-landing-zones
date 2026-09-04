@@ -1,0 +1,24 @@
+{
+  "id": "constitution",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "constitution"
+  },
+  "rule": "A JSON file counts as Gazelle's constitution when the knowledge graph holds it.",
+  "anchor": "no-human-touch",
+  "links": [
+    {
+      "target": "codebase",
+      "relation": "depends-on",
+      "note": "The graph holds a rule as files the codebase carries, so a rule held outside it would confer status that no rebuild reproduces."
+    }
+  ],
+  "violations": [
+    "Rule followed that no JSON file in the knowledge graph carries.",
+    "Foundation or regulative rule treated as advisory because it is not a constitutive one.",
+    "graph.md edited directly rather than the node it is generated from.",
+    "Constitution read as documentation of what the code already does."
+  ],
+  "properties": {}
+}

@@ -1,0 +1,23 @@
+{
+  "id": "azure-policy-naming-convention",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "A policy assignment name must begin with its effect prefix, deny, config, or allowed, followed by the requirement name.",
+  "why": "Without an effect prefix, reading an assignment name does not tell you whether it denies, configures, or allows.",
+  "anchor": "no-unapproved-resources",
+  "implements": [
+    "guardrail"
+  ],
+  "links": [],
+  "violations": [
+    "Effect prefix outside deny, config, or allowed.",
+    "Two policy names sharing their first 24 characters, so both assignments resolve to one truncated name."
+  ],
+  "files": [
+    "platform-management/policy/bicep/oases.bicep",
+    "platform-management/policy/bicep/modules/assignment.bicep"
+  ],
+  "properties": {}
+}

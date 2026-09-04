@@ -1,0 +1,24 @@
+{
+  "id": "self-service-policy-exemptions",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "An exemption must be granted through a merged pull request against the landing zone's parameter file.",
+  "why": "A deny policy without an exemption path gets worked around rather than enforced, as teams find other routes when blocked.",
+  "anchor": "no-unapproved-resources",
+  "implements": [
+    "guardrail"
+  ],
+  "links": [],
+  "violations": [
+    "Exemption applied in the portal rather than through a merged pull request.",
+    "Exemption description that does not name the reason for the exemption."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/base/policyExemption.bicep",
+    "landing-zones/bicep/modules/azurePolicy.bicep",
+    "landing-zones/managementGroup-AppName-environment.bicepparam"
+  ],
+  "properties": {}
+}

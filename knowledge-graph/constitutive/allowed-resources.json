@@ -1,0 +1,22 @@
+{
+  "id": "allowed-resources",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "approved"
+  },
+  "rule": "An Azure resource counts as approved in Gazelle when the allowed-resources list names it.",
+  "anchor": "no-unapproved-resources",
+  "links": [
+    {
+      "target": "guardrail",
+      "relation": "depends-on",
+      "note": "The list confers approval only as the roll of the Allowed Resources guardrail, so it names nothing until the platform assigns that guardrail."
+    }
+  ],
+  "violations": [
+    "Resource deployed because nothing denied it rather than because the allowed-resources list names it.",
+    "Resource treated as approved because it already exists in the estate."
+  ],
+  "properties": {}
+}

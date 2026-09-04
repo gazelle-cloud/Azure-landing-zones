@@ -1,0 +1,34 @@
+{
+  "id": "azure-policy-allowed-resources",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "A resource type must appear on the allowed list before it deploys; the absence of a deny never grants it.",
+  "why": "Without an exhaustive list, a type reaches production because nobody wrote a rule against it.",
+  "anchor": "no-unapproved-resources",
+  "implements": [
+    "allowed-resources"
+  ],
+  "links": [
+    {
+      "target": "azure-native-services-only",
+      "relation": "depends-on",
+      "note": "ARM reachability is the prerequisite for listing, so types outside ARM are ineligible."
+    },
+    {
+      "target": "azure-policy-hard-deny",
+      "relation": "depends-on",
+      "note": "A type is listable once deny policies cover its misconfigurations, which the list assumes."
+    }
+  ],
+  "violations": [
+    "Resource type deployed because no policy denied it rather than because the list permitted it.",
+    "Entry added to the allowed resources file before its deny policies and diagnostic settings exist."
+  ],
+  "files": [
+    "platform-management/policy/parameters/oases/allowedResources.json",
+    "platform-management/policy/bicep/oases.bicep"
+  ],
+  "properties": {}
+}

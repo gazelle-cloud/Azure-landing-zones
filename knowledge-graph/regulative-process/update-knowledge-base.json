@@ -1,0 +1,44 @@
+{
+  "id": "update-knowledge-base",
+  "type": "regulative",
+  "subject": {
+    "type": "process"
+  },
+  "decision": "A knowledge graph entry must be drafted and presented before any file is written, and must reach main through a pull request.",
+  "why": "An entry written without review enters the graph unchallenged, and the graph is what every later change is read against.",
+  "anchor": "no-human-touch",
+  "implements": [
+    "constitution"
+  ],
+  "trigger": [
+    "add a decision",
+    "update a decision",
+    "add an operation",
+    "update an operation",
+    "refine reasoning",
+    "add a link",
+    "update knowledge graph"
+  ],
+  "steps": [
+    "Identify whether this is a new entry or an update to an existing one. For an update, read the existing file first.",
+    "Determine the type: vocabulary, constitutive, or regulative. Constitutive states what counts as something; regulative states what has to happen inside that.",
+    "Draft the entry. The id matches the filename, the subject names a vocabulary term, the anchor names a foundation, and the why states the consequence of ignoring the rule rather than restating it.",
+    "For links: add one where the source is incomplete without the target, and let the note say which source behaviour relies on which target constraint, fact, or output. Drop it if the relationship is obvious from context alone.",
+    "For a regulative rule, name the constitutive rules it upholds in implements[]. An empty array is legal where the rule serves its foundation directly.",
+    "Present the complete draft before writing any file.",
+    "Write the file.",
+    "Open a pull request."
+  ],
+  "links": [],
+  "violations": [
+    "File written before a draft was presented.",
+    "Link added in both directions between two entries.",
+    "Violation that restates the rule instead of describing a detectable breach."
+  ],
+  "files": [
+    "knowledge-graph/vocabulary/",
+    "knowledge-graph/constitutive/",
+    "knowledge-graph/regulative/"
+  ],
+  "properties": {}
+}

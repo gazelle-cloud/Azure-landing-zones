@@ -1,0 +1,30 @@
+{
+  "id": "landing-zone-github-runners",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "Every landing zone must have its own private GitHub runners provisioned inside its VNet.",
+  "why": "Public runners have no network path to the PaaS data plane once public access is denied.",
+  "anchor": "no-platform-ops",
+  "implements": [
+    "landing-zone"
+  ],
+  "links": [
+    {
+      "target": "platform-identity-github",
+      "relation": "depends-on",
+      "note": "Runner registration needs the GitHub App, as no other identity can register runners to a repo."
+    }
+  ],
+  "violations": [
+    "Application team using a separate VNet for runner integration.",
+    "Runner label implying capability differences instead of network accessibility."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/base/virtualNetwork.bicep",
+    ".github/utils/create-landingzone-gh-runners.ps1",
+    ".github/workflows/template-landing-zones.yml"
+  ],
+  "properties": {}
+}

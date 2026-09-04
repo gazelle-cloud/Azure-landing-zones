@@ -1,0 +1,50 @@
+[
+  {
+    "id": "gazelle",
+    "type": "term"
+  },
+  {
+    "id": "constitution",
+    "type": "term"
+  },
+  {
+    "id": "codebase",
+    "type": "term"
+  },
+  {
+    "id": "source-of-truth",
+    "type": "term"
+  },
+  {
+    "id": "platform",
+    "type": "term"
+  },
+  {
+    "id": "oasis",
+    "type": "term"
+  },
+  {
+    "id": "guardrail",
+    "type": "term"
+  },
+  {
+    "id": "approved",
+    "type": "term"
+  },
+  {
+    "id": "product-team",
+    "type": "term"
+  },
+  {
+    "id": "azure-subscription",
+    "type": "term"
+  },
+  {
+    "id": "landing-zone",
+    "type": "term"
+  },
+  {
+    "id": "platform-member",
+    "type": "term"
+  }
+]

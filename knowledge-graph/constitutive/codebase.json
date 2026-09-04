@@ -1,0 +1,22 @@
+{
+  "id": "codebase",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "source-of-truth"
+  },
+  "rule": "A codebase counts as the source of truth for Gazelle when BigBang establishes it.",
+  "anchor": "no-human-touch",
+  "links": [
+    {
+      "target": "gazelle",
+      "relation": "depends-on",
+      "note": "There is nothing for a codebase to be the source of truth for until BigBang builds a tenant Gazelle says is one."
+    }
+  ],
+  "violations": [
+    "Resource kept because it exists in Azure after the codebase stopped declaring it.",
+    "Azure state treated as source of truth because no one has rebuilt the tenant to check."
+  ],
+  "properties": {}
+}

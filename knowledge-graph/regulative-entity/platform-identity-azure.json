@@ -1,0 +1,28 @@
+{
+  "id": "platform-identity-azure",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "The platform must authenticate through an app registration rather than a managed identity.",
+  "why": "The platform has no subscription of its own in which to host a managed identity.",
+  "anchor": "no-human-touch",
+  "implements": [
+    "platform"
+  ],
+  "links": [
+    {
+      "target": "deployment-config-in-repo",
+      "relation": "depends-on",
+      "note": "The registration has a distinct client ID per environment, and each appears as a committed variable."
+    }
+  ],
+  "violations": [
+    "Platform app registration shared with non-platform workloads."
+  ],
+  "files": [
+    "githubVariables.json",
+    "landing-zones/bicep/modules/identity.bicep"
+  ],
+  "properties": {}
+}

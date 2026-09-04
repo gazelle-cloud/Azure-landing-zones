@@ -1,0 +1,22 @@
+{
+  "id": "guardrail",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "guardrail"
+  },
+  "rule": "A policy name counts as a guardrail in Gazelle when the platform assigns it.",
+  "anchor": "no-unapproved-resources",
+  "links": [
+    {
+      "target": "platform",
+      "relation": "depends-on",
+      "note": "The platform is what assigns a guardrail, so there is nothing to assign it until Gazelle names a management group as the platform."
+    }
+  ],
+  "violations": [
+    "Policy name treated as a guardrail that the platform never assigned.",
+    "Exemption granted against something that is not an assigned guardrail."
+  ],
+  "properties": {}
+}

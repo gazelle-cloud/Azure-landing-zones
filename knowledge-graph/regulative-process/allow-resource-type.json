@@ -1,0 +1,61 @@
+{
+  "id": "allow-resource-type",
+  "type": "regulative",
+  "subject": {
+    "type": "process"
+  },
+  "decision": "A resource type must clear deny coverage, diagnostic settings, and job-function role review before it joins the allowed list.",
+  "why": "A type listed ahead of its controls is available to every landing zone with nothing enforcing how it is configured.",
+  "anchor": "no-unapproved-resources",
+  "implements": [
+    "allowed-resources"
+  ],
+  "trigger": [
+    "allow resource type",
+    "approve resource type",
+    "add resource to allowed list"
+  ],
+  "steps": [
+    "Read the rules this process is governed by.",
+    "Add the resource type to allowedResources.json.",
+    "Find the built-in diagnostic settings policy and add it to diagnosticSettings.bicepparam.",
+    "For each file in oases/, find built-in policies with the required effect and add matching entries.",
+    "For each gap where no built-in provides the required effect, author a custom definition and register it in policyDefinitions.bicepparam.",
+    "Check defenderForCloudExemptions.jsonc for paid-SKU recommendations specific to this resource type.",
+    "Check accessControl.bicepparam for custom role actions needed by this resource type.",
+    "Present a complete draft of all changes before implementing."
+  ],
+  "workflow": "platform-Azure-Policy",
+  "links": [
+    {
+      "target": "azure-policy-hard-deny",
+      "relation": "governed-by"
+    },
+    {
+      "target": "landing-zone-diagnostic-settings",
+      "relation": "governed-by"
+    },
+    {
+      "target": "azure-policy-custom-definition",
+      "relation": "governed-by"
+    },
+    {
+      "target": "self-service-policy-exemptions-defender-for-cloud",
+      "relation": "governed-by"
+    },
+    {
+      "target": "job-function-scoped-roles",
+      "relation": "governed-by"
+    }
+  ],
+  "violations": [
+    "Entry added to allowedResources.json before its deny policies were reviewed.",
+    "Resource type listed with no diagnostic settings definition."
+  ],
+  "files": [
+    "platform-management/policy/parameters/oases/",
+    "platform-management/policy/parameters/diagnosticSettings.bicepparam",
+    "platform-management/policy/parameters/customDefinitions/"
+  ],
+  "properties": {}
+}

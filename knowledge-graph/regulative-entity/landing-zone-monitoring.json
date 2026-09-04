@@ -1,0 +1,29 @@
+{
+  "id": "landing-zone-monitoring",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "A landing zone must not share a Log Analytics Workspace with another landing zone.",
+  "why": "A shared workspace merges ingestion costs across landing zones, which breaks the cost ownership model.",
+  "anchor": "no-platform-ops",
+  "implements": [
+    "landing-zone"
+  ],
+  "links": [
+    {
+      "target": "landing-zone-diagnostic-settings",
+      "relation": "depends-on",
+      "note": "Without diagnostic settings the workspace is provisioned with no telemetry pipeline to fill it."
+    }
+  ],
+  "violations": [
+    "Centralized Log Analytics workspace for general purpose logs."
+  ],
+  "files": [
+    "landing-zones/bicep/modules/monitor.bicep",
+    "landing-zones/bicep/modules/base/logAnalyticsWorkspace.bicep",
+    "landing-zones/bicep/modules/base/ActivityLogAlerts.bicep"
+  ],
+  "properties": {}
+}

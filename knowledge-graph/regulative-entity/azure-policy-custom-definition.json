@@ -1,0 +1,29 @@
+{
+  "id": "azure-policy-custom-definition",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "Every Deny or DeployIfNotExists gap with no built-in policy must be closed by a custom definition.",
+  "why": "Without custom policies, Audit-only coverage looks like enforcement but the violation still occurs.",
+  "anchor": "no-unapproved-resources",
+  "implements": [
+    "guardrail"
+  ],
+  "links": [
+    {
+      "target": "azure-policy-naming-convention",
+      "relation": "depends-on",
+      "note": "The effect a custom definition carries determines the prefix its assignment takes."
+    }
+  ],
+  "violations": [
+    "Resource type listed with a known Deny gap and no custom definition to close it."
+  ],
+  "files": [
+    "platform-management/policy/bicep/customPolicyDefinitions.bicep",
+    "platform-management/policy/parameters/customDefinitions/policyDefinitions.bicepparam",
+    "platform-management/policy/parameters/customDefinitions/*.json"
+  ],
+  "properties": {}
+}

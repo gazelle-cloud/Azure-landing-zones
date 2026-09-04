@@ -1,0 +1,30 @@
+{
+  "id": "landing-zone-diagnostic-settings",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "Diagnostic settings must be defined by the platform; a landing zone declares none of its own.",
+  "why": "Without a platform definition, each landing zone routes logs differently and some resources emit none.",
+  "anchor": "no-platform-ops",
+  "implements": [
+    "guardrail"
+  ],
+  "links": [
+    {
+      "target": "landing-zone-automation",
+      "relation": "depends-on",
+      "note": "Resources that already exist are brought into line when the remediation job runs in the landing zone."
+    }
+  ],
+  "violations": [
+    "Resource type added to allowedResources.json without a diagnostic settings definition.",
+    "Landing zone declaring its own diagnostic setting."
+  ],
+  "files": [
+    "platform-management/policy/parameters/diagnosticSettings.bicepparam",
+    "platform-management/policy/bicep/configDiagnosticSettings.bicep",
+    "landing-zones/bicep/modules/azurePolicy.bicep"
+  ],
+  "properties": {}
+}

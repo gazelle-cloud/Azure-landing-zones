@@ -1,0 +1,23 @@
+{
+  "id": "azure-policy-hard-deny",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "A security control must be carried by a policy assignment that denies the violation at deployment time, never by an Audit effect.",
+  "why": "Without deny policies, resources deploy in a non-compliant state, deviating from the security baseline.",
+  "anchor": "no-unapproved-resources",
+  "implements": [
+    "guardrail"
+  ],
+  "links": [],
+  "violations": [
+    "Control carried by an Audit effect and reported as enforced.",
+    "Resource deployed with public network access, local authentication, or TLS below 1.2 because no assignment denied it."
+  ],
+  "files": [
+    "platform-management/policy/parameters/oases/*.json",
+    "platform-management/policy/bicep/oases.bicep"
+  ],
+  "properties": {}
+}

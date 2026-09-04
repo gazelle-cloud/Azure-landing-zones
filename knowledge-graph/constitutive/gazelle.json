@@ -1,0 +1,17 @@
+{
+  "id": "gazelle",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "gazelle"
+  },
+  "rule": "An Azure tenant counts as Gazelle when BigBang builds it and Gazelle says what it is.",
+  "anchor": "no-human-touch",
+  "links": [],
+  "violations": [
+    "Azure tenant presented as Gazelle that BigBang did not build.",
+    "Status held by a platform, landing zone, or platform member that Gazelle never conferred.",
+    "Gazelle read as a description of the tenant rather than what makes it one."
+  ],
+  "properties": {}
+}

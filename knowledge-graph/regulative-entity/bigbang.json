@@ -1,0 +1,28 @@
+{
+  "id": "bigbang",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "BigBang must be able to rebuild the platform from the repository alone.",
+  "why": "Without a rebuild path the platform's real state lives in Azure rather than in code, and nothing proves the two agree.",
+  "anchor": "no-human-touch",
+  "implements": [
+    "codebase"
+  ],
+  "links": [
+    {
+      "target": "deployment-config-in-repo",
+      "relation": "depends-on",
+      "note": "BigBang recreates GitHub environments, so every value it needs is already committed to the repo."
+    }
+  ],
+  "violations": [
+    "Platform state that survives because nobody has torn it down.",
+    "Initialization step performed by hand and not represented in the BigBang workflow."
+  ],
+  "files": [
+    ".github/workflows/platform-BigBang.yml"
+  ],
+  "properties": {}
+}

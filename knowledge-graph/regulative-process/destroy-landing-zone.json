@@ -1,0 +1,45 @@
+{
+  "id": "destroy-landing-zone",
+  "type": "regulative",
+  "subject": {
+    "type": "process"
+  },
+  "decision": "A landing zone must be decommissioned through lz-flow-destroy-landing-zone, which returns its subscription to the bank.",
+  "why": "Deleting resources by hand cancels the subscription instead of returning it, and the quota is not released.",
+  "anchor": "no-platform-ops",
+  "implements": [
+    "landing-zone"
+  ],
+  "trigger": [
+    "destroy landing zone",
+    "decommission landing zone",
+    "sunset environment"
+  ],
+  "steps": [
+    "Read the rules this process is governed by, to understand what is being destroyed and what constraints apply.",
+    "Collect from the user: subscription ID of the landing zone to decommission.",
+    "Verify the bicepparam file and the lz-oasis-{appName}-{env} workflow both exist. Stop if either is missing.",
+    "Present what will be permanently destroyed: deployment stack, resource groups, role assignments, budget, Defender settings. Confirm the subscription returns to the bank. Wait for explicit confirmation.",
+    "Trigger lz-flow-destroy-landing-zone via workflow_dispatch with the subscription ID. Leave the file deletions to the workflow."
+  ],
+  "workflow": "lz-flow-destroy-landing-zone",
+  "links": [
+    {
+      "target": "deployment-declarative-lifecycle",
+      "relation": "governed-by"
+    },
+    {
+      "target": "application-teams-own-the-cost",
+      "relation": "governed-by"
+    }
+  ],
+  "violations": [
+    "Landing zone resources deleted by hand instead of through the workflow.",
+    "Subscription cancelled rather than returned to the bank."
+  ],
+  "files": [
+    "landing-zones/oases-prod/",
+    ".github/workflows/"
+  ],
+  "properties": {}
+}

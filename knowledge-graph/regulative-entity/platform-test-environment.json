@@ -1,0 +1,26 @@
+{
+  "id": "platform-test-environment",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "Every platform capability must exist in the test environment exactly as it exists in production.",
+  "why": "If the copy differs from production, a change that passes there can still break production.",
+  "anchor": "no-human-touch",
+  "implements": [
+    "platform"
+  ],
+  "links": [],
+  "violations": [
+    "Application landing zone created in the platform's test environment.",
+    "Capability present in production and absent from test."
+  ],
+  "files": [
+    ".github/workflows/platform-Azure-Policy.yml",
+    ".github/workflows/platform-access-control.yml",
+    ".github/workflows/platform-Management-Groups.yml",
+    ".github/workflows/platform-automation.yml",
+    ".github/workflows/platform-BigBang.yml"
+  ],
+  "properties": {}
+}

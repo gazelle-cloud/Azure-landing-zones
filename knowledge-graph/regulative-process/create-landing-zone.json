@@ -1,0 +1,59 @@
+{
+  "id": "create-landing-zone",
+  "type": "regulative",
+  "subject": {
+    "type": "process"
+  },
+  "decision": "A landing zone must be provisioned through requestNew-Landing-Zone, and for a registered platform member.",
+  "why": "Provisioning outside the workflow leaves the subscription unaccounted for in the bank and off the application invoice section.",
+  "anchor": "no-platform-ops",
+  "implements": [
+    "landing-zone"
+  ],
+  "trigger": [
+    "create landing zone",
+    "provision environment",
+    "new environment",
+    "add azure subscription"
+  ],
+  "steps": [
+    "Confirm the application file exists under platform-members/. If not, register-platform-member completes first.",
+    "Collect from the user: application name, environment (test or prod), management group name (oases-prod or oases-test), and budget (optional, default 100).",
+    "Auto-select the subscription ID: az account management-group subscription show-sub-under-mg --name subscription-bank --query \"[0].name\" -o tsv",
+    "Confirm the values with the user, including the auto-selected subscription ID, then trigger the workflow, which raises a pull request.",
+    "A platform engineer reviews and approves the pull request, and that approval triggers the automation to complete provisioning."
+  ],
+  "workflow": "requestNew-Landing-Zone",
+  "links": [
+    {
+      "target": "register-platform-member",
+      "relation": "depends-on",
+      "note": "Provisioning has no application to target until the member profile, group, and billing scope exist."
+    },
+    {
+      "target": "application-teams-own-the-cost",
+      "relation": "governed-by"
+    },
+    {
+      "target": "landing-zone-ipam",
+      "relation": "governed-by"
+    },
+    {
+      "target": "landing-zone-template",
+      "relation": "governed-by"
+    },
+    {
+      "target": "deployment-branch-gated-promotion",
+      "relation": "governed-by"
+    }
+  ],
+  "violations": [
+    "Landing zone provisioned for an application with no platform member file.",
+    "Subscription created new while the bank held an empty one."
+  ],
+  "files": [
+    "platform-members/",
+    ".github/workflows/requestNew-Landing-Zone.yml"
+  ],
+  "properties": {}
+}

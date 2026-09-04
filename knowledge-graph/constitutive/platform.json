@@ -1,0 +1,24 @@
+{
+  "id": "platform",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "platform"
+  },
+  "rule": "A management group counts as the platform when Gazelle names it.",
+  "anchor": "no-human-touch",
+  "links": [
+    {
+      "target": "gazelle",
+      "relation": "depends-on",
+      "note": "The authority the platform holds is Gazelle's, so there is nothing for a name to carry until BigBang builds a tenant Gazelle says is one."
+    }
+  ],
+  "violations": [
+    "Platform capability hosted in a subscription rather than assigned at a management group.",
+    "Dedicated platform hierarchy or connectivity subscription introduced to hold a capability enterprise-scale would put there.",
+    "Management group presented as the platform that BigBang cannot rebuild from the repository.",
+    "Platform deciding on behalf of the landing zones its register names."
+  ],
+  "properties": {}
+}

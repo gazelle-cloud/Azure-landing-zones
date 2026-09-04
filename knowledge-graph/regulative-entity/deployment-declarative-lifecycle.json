@@ -1,0 +1,25 @@
+{
+  "id": "deployment-declarative-lifecycle",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "A deployment stack must be configured with deleteAll, so what its code stops declaring is removed from Azure.",
+  "why": "Without this, resources removed from the stack's code persist in Azure and the code stops being the source of truth.",
+  "anchor": "no-human-touch",
+  "implements": [
+    "codebase"
+  ],
+  "links": [],
+  "violations": [
+    "Deployment Stack configured with detachAll, leaving removed resources with no cleanup path.",
+    "Resource created directly in Azure and left outside the stack."
+  ],
+  "files": [
+    ".github/workflows/template-landing-zones.yml",
+    ".github/workflows/template-access-control.yml",
+    ".github/workflows/template-Azure-Policy.yml",
+    ".github/workflows/template-Management-Groups.yml"
+  ],
+  "properties": {}
+}

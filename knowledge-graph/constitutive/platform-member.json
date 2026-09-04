@@ -1,0 +1,22 @@
+{
+  "id": "platform-member",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "platform-member"
+  },
+  "rule": "A product team counts as a platform member in Gazelle when the member register names it.",
+  "anchor": "no-platform-ops",
+  "links": [
+    {
+      "target": "gazelle",
+      "relation": "depends-on",
+      "note": "Membership is a status held in Gazelle, so there is nowhere for it to hold until the graph binds a tenant."
+    }
+  ],
+  "violations": [
+    "Product team provisioning a landing zone with no entry in the member register.",
+    "Membership treated as held because a repo, Entra group, or invoice section exists for the team."
+  ],
+  "properties": {}
+}
