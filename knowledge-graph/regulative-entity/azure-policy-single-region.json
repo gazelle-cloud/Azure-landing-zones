@@ -1,0 +1,29 @@
+{
+  "id": "azure-policy-single-region",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "Gazelle's single region must be sourced from GitHub variables.",
+  "why": "Without a committed variable, the regional boundary can drift between environments or be changed outside the repository.",
+  "anchor": "no-human-touch",
+  "implements": [
+    "single-region"
+  ],
+  "links": [
+    {
+      "target": "deployment-config-in-repo",
+      "relation": "depends-on",
+      "note": "The single region relies on committed deployment configuration so BigBang can reproduce the same regional boundary."
+    }
+  ],
+  "violations": [
+    "Single region hardcoded in the policy template instead of read from a GitHub variable."
+  ],
+  "files": [
+    "githubVariables.json",
+    ".github/workflows/template-Azure-Policy.yml",
+    "platform-management/policy/bicep/oases.bicep"
+  ],
+  "properties": {}
+}

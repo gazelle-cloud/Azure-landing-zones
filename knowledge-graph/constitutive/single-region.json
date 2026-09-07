@@ -1,0 +1,25 @@
+{
+  "id": "single-region",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "single-region"
+  },
+  "rule": "An Azure region counts as Gazelle's single region when Azure Policy names it.",
+  "anchor": "no-human-touch",
+  "evidence": [
+    "platform-management/policy/bicep/oases.bicep",
+    "githubVariables.json"
+  ],
+  "links": [
+    {
+      "target": "guardrail",
+      "relation": "depends-on",
+      "note": "The single region is named through an Azure Policy guardrail, so it holds no platform status until the platform assigns that guardrail."
+    }
+  ],
+  "violations": [
+    "Allowing multi-region at platform level."
+  ],
+  "properties": {}
+}

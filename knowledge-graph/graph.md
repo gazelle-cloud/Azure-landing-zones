@@ -20,6 +20,7 @@
 | azure-subscription |
 | landing-zone |
 | platform-member |
+| single-region |
 
 ### Relations
 
@@ -264,6 +265,27 @@ A management group counts as the platform when Gazelle names it.
 - Management group presented as the platform that BigBang cannot rebuild from the repository.
 - Platform deciding on behalf of the landing zones the oases register names.
 
+### single-region
+
+**Subject:** single-region (entity)
+
+An Azure region counts as Gazelle's single region when Azure Policy names it.
+
+**Anchor:** no-human-touch
+
+**Evidence:**
+
+- `platform-management/policy/bicep/oases.bicep`
+- `githubVariables.json`
+
+**Links:**
+
+- depends-on → guardrail — The single region is named through an Azure Policy guardrail, so it holds no platform status until the platform assigns that guardrail.
+
+**Violations:**
+
+- Allowing multi-region at platform level.
+
 ## Regulative - entity
 
 ### application-teams-own-the-cost
@@ -432,6 +454,32 @@ An exemption must resolve its assignment ID through the platform-generated refer
 - `.github/workflows/lz-flow-create-policy-exemption.yml`
 - `landing-zones/*/policy-assignment-reference.json`
 - `.github/utils/get-policyAssignmentsReference.ps1`
+
+### azure-policy-single-region
+
+Gazelle's single region must be sourced from GitHub variables.
+
+**Why:** Without a committed variable, the regional boundary can drift between environments or be changed outside the repository.
+
+**Anchor:** no-human-touch
+
+**Implements:**
+
+- single-region
+
+**Links:**
+
+- depends-on → deployment-config-in-repo — The single region relies on committed deployment configuration so BigBang can reproduce the same regional boundary.
+
+**Violations:**
+
+- Single region hardcoded in the policy template instead of read from a GitHub variable.
+
+**Files:**
+
+- `githubVariables.json`
+- `.github/workflows/template-Azure-Policy.yml`
+- `platform-management/policy/bicep/oases.bicep`
 
 ### bigbang
 
