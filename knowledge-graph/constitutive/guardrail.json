@@ -7,6 +7,10 @@
   },
   "rule": "A policy name counts as a guardrail in Gazelle when the platform assigns it.",
   "anchor": "no-unapproved-resources",
+  "evidence": [
+    "platform-management/policy/bicep/oases.bicep",
+    "platform-management/policy/parameters/oases/*.json"
+  ],
   "links": [
     {
       "target": "platform",

@@ -7,6 +7,9 @@
   },
   "rule": "A codebase counts as the source of truth for Gazelle when BigBang establishes it.",
   "anchor": "no-human-touch",
+  "evidence": [
+    ".github/workflows/platform-BigBang.yml"
+  ],
   "links": [
     {
       "target": "gazelle",

@@ -7,6 +7,13 @@
   },
   "rule": "A JSON file counts as Gazelle's constitution when the knowledge graph holds it.",
   "anchor": "no-human-touch",
+  "evidence": [
+    "knowledge-graph/foundations/*.json",
+    "knowledge-graph/constitutive/*.json",
+    "knowledge-graph/regulative-entity/*.json",
+    "knowledge-graph/regulative-process/*.json",
+    "knowledge-graph/vocabulary/*.json"
+  ],
   "links": [
     {
       "target": "codebase",

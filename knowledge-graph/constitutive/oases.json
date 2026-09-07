@@ -7,6 +7,9 @@
   },
   "rule": "A management group counts as oases when the platform establishes it.",
   "anchor": "no-platform-ops",
+  "evidence": [
+    "platform-management/management-groups/bicep/managementGroups.bicep"
+  ],
   "links": [
     {
       "target": "platform",

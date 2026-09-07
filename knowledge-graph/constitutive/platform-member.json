@@ -7,6 +7,9 @@
   },
   "rule": "A product team counts as a platform member in Gazelle when the member register names it.",
   "anchor": "no-platform-ops",
+  "evidence": [
+    "platform-members/<AppName>.json"
+  ],
   "links": [
     {
       "target": "gazelle",

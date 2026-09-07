@@ -75,6 +75,10 @@ An Azure resource counts as approved in Gazelle when the allowed-resources list 
 
 **Anchor:** no-unapproved-resources
 
+**Evidence:**
+
+- `platform-management/policy/parameters/oases/allowedResources.json`
+
 **Links:**
 
 - depends-on → guardrail — The list confers approval only as the roll of the Allowed Resources guardrail, so it names nothing until the platform assigns that guardrail.
@@ -92,6 +96,10 @@ A codebase counts as the source of truth for Gazelle when BigBang establishes it
 
 **Anchor:** no-human-touch
 
+**Evidence:**
+
+- `.github/workflows/platform-BigBang.yml`
+
 **Links:**
 
 - depends-on → gazelle — There is nothing for a codebase to be the source of truth for until BigBang builds a tenant Gazelle says is one.
@@ -108,6 +116,14 @@ A codebase counts as the source of truth for Gazelle when BigBang establishes it
 A JSON file counts as Gazelle's constitution when the knowledge graph holds it.
 
 **Anchor:** no-human-touch
+
+**Evidence:**
+
+- `knowledge-graph/foundations/*.json`
+- `knowledge-graph/constitutive/*.json`
+- `knowledge-graph/regulative-entity/*.json`
+- `knowledge-graph/regulative-process/*.json`
+- `knowledge-graph/vocabulary/*.json`
 
 **Links:**
 
@@ -128,6 +144,11 @@ An Azure tenant counts as Gazelle when BigBang builds it and Gazelle says what i
 
 **Anchor:** no-human-touch
 
+**Evidence:**
+
+- `.github/workflows/platform-BigBang.yml`
+- `githubVariables.json`
+
 **Violations:**
 
 - Azure tenant presented as Gazelle that BigBang did not build.
@@ -141,6 +162,11 @@ An Azure tenant counts as Gazelle when BigBang builds it and Gazelle says what i
 A policy name counts as a guardrail in Gazelle when the platform assigns it.
 
 **Anchor:** no-unapproved-resources
+
+**Evidence:**
+
+- `platform-management/policy/bicep/oases.bicep`
+- `platform-management/policy/parameters/oases/*.json`
 
 **Links:**
 
@@ -159,6 +185,10 @@ An Azure subscription counts as a landing zone when the oases register names it.
 
 **Anchor:** no-human-touch
 
+**Evidence:**
+
+- `landing-zones/oases-<env>/oases-<appName>-<env>.bicepparam`
+
 **Links:**
 
 - depends-on → platform-member — The run deploys the landing zone in a named member's name, so there is no one to deploy it for until membership exists.
@@ -176,6 +206,10 @@ A management group counts as oases when the platform establishes it.
 
 **Anchor:** no-platform-ops
 
+**Evidence:**
+
+- `platform-management/management-groups/bicep/managementGroups.bicep`
+
 **Links:**
 
 - depends-on → platform — The platform is what establishes oases, so there is nothing to establish one until Gazelle names a management group as the platform.
@@ -191,6 +225,10 @@ A management group counts as oases when the platform establishes it.
 A product team counts as a platform member in Gazelle when the member register names it.
 
 **Anchor:** no-platform-ops
+
+**Evidence:**
+
+- `platform-members/<AppName>.json`
 
 **Links:**
 
@@ -208,6 +246,12 @@ A product team counts as a platform member in Gazelle when the member register n
 A management group counts as the platform when Gazelle names it.
 
 **Anchor:** no-human-touch
+
+**Evidence:**
+
+- `githubVariables.json`
+- `.github/workflows/template-Management-Groups.yml`
+- `platform-management/management-groups/bicep/managementGroups.bicep`
 
 **Links:**
 

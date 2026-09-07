@@ -7,6 +7,9 @@
   },
   "rule": "An Azure resource counts as approved in Gazelle when the allowed-resources list names it.",
   "anchor": "no-unapproved-resources",
+  "evidence": [
+    "platform-management/policy/parameters/oases/allowedResources.json"
+  ],
   "links": [
     {
       "target": "guardrail",

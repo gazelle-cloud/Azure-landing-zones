@@ -7,6 +7,9 @@
   },
   "rule": "An Azure subscription counts as a landing zone when the oases register names it.",
   "anchor": "no-human-touch",
+  "evidence": [
+    "landing-zones/oases-<env>/oases-<appName>-<env>.bicepparam"
+  ],
   "links": [
     {
       "target": "platform-member",

@@ -7,6 +7,11 @@
   },
   "rule": "A management group counts as the platform when Gazelle names it.",
   "anchor": "no-human-touch",
+  "evidence": [
+    "githubVariables.json",
+    ".github/workflows/template-Management-Groups.yml",
+    "platform-management/management-groups/bicep/managementGroups.bicep"
+  ],
   "links": [
     {
       "target": "gazelle",

@@ -48,6 +48,7 @@ $monolith = @{
                 rule       = 'Paragraph'
                 why        = 'Inline'
                 anchor     = 'Inline'
+                evidence   = 'CodeList'
                 links      = 'RelationList'
                 violations = 'List'
                 files      = 'CodeList'

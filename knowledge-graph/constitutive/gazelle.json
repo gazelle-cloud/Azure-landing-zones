@@ -7,6 +7,10 @@
   },
   "rule": "An Azure tenant counts as Gazelle when BigBang builds it and Gazelle says what it is.",
   "anchor": "no-human-touch",
+  "evidence": [
+    ".github/workflows/platform-BigBang.yml",
+    "githubVariables.json"
+  ],
   "links": [],
   "violations": [
     "Azure tenant presented as Gazelle that BigBang did not build.",
