@@ -17,6 +17,16 @@
       "target": "gazelle",
       "relation": "depends-on",
       "note": "The authority the platform holds is Gazelle's, so there is nothing for a name to carry until BigBang builds a tenant Gazelle says is one."
+    },
+    {
+      "target": "platform-azure-identity",
+      "relation": "depends-on",
+      "note": "The platform is deployed through the platform Azure identity, so Gazelle cannot name a management group as the platform without an identity able to deploy it."
+    },
+    {
+      "target": "platform-github-identity",
+      "relation": "depends-on",
+      "note": "The platform configures Gazelle repositories and environments through the platform GitHub identity, so no platform can be reproduced from the repository without an identity able to configure GitHub."
     }
   ],
   "violations": [

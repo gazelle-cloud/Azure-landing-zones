@@ -13,6 +13,8 @@
 | codebase |
 | source-of-truth |
 | platform |
+| platform-azure-identity |
+| platform-github-identity |
 | oases |
 | guardrail |
 | approved |
@@ -247,6 +249,50 @@ A management group counts as oases when the platform establishes it.
 
 - Test landing zones assumed to belong to the test management group hierarchy.
 
+### platform-azure-identity
+
+**Subject:** platform-azure-identity (entity)
+
+An Entra ID app registration counts as the platform Azure identity when Gazelle names it in configuration files.
+
+**Anchor:** no-human-touch
+
+**Evidence:**
+
+- `githubVariables.json`
+
+**Links:**
+
+- depends-on → gazelle — The app registration exists inside the Gazelle tenant, so no Entra ID app registration can carry platform Azure identity status until Gazelle exists.
+
+**Violations:**
+
+- Platform deployment authenticates through a managed identity.
+- Platform Azure identity is configured outside Gazelle configuration files.
+- Platform Azure identity is shared with non-platform workloads.
+
+### platform-github-identity
+
+**Subject:** platform-github-identity (entity)
+
+A GitHub App counts as the platform GitHub identity when Gazelle names it in configuration files.
+
+**Anchor:** no-human-touch
+
+**Evidence:**
+
+- `githubVariables.json`
+
+**Links:**
+
+- depends-on → gazelle — The GitHub App carries platform authority for Gazelle repositories, so no GitHub App can carry platform GitHub identity status until Gazelle exists.
+
+**Violations:**
+
+- Platform GitHub identity is configured outside Gazelle configuration files.
+- Platform GitHub identity is shared with non-platform workloads.
+- Workflow authenticates to GitHub with GITHUB_TOKEN where the platform GitHub identity is required.
+
 ### platform-member
 
 **Subject:** platform-member (entity)
@@ -285,6 +331,8 @@ A management group counts as the platform when Gazelle names it.
 **Links:**
 
 - depends-on → gazelle — The authority the platform holds is Gazelle's, so there is nothing for a name to carry until BigBang builds a tenant Gazelle says is one.
+- depends-on → platform-azure-identity — The platform is deployed through the platform Azure identity, so Gazelle cannot name a management group as the platform without an identity able to deploy it.
+- depends-on → platform-github-identity — The platform configures Gazelle repositories and environments through the platform GitHub identity, so no platform can be reproduced from the repository without an identity able to configure GitHub.
 
 **Violations:**
 
@@ -920,7 +968,7 @@ Each landing zone must have its own parameter file and its own trigger workflow.
 **Links:**
 
 - depends-on → deployment-logic-reusable-workflow — Per landing zone triggers share centralized deployment logic through the reusable workflow.
-- depends-on → platform-identity-azure — The app registration's credentials are what let the template deploy landing zone resources.
+- depends-on → platform-azure-identity — The platform Azure identity's credentials are what let the template deploy landing zone resources.
 
 **Violations:**
 
@@ -1056,31 +1104,6 @@ Platform automation Docker images must be hosted outside the landing zones.
 - `landing-zones/bicep/modules/landingzone-automation.bicep`
 - `landing-zones/bicep/modules/base/jobs-cron.bicep`
 
-### platform-identity-azure
-
-The platform must authenticate through an app registration rather than a managed identity.
-
-**Why:** The platform has no subscription of its own in which to host a managed identity.
-
-**Anchor:** no-human-touch
-
-**Implements:**
-
-- platform
-
-**Links:**
-
-- depends-on → deployment-config-in-repo — The registration has a distinct client ID per environment, and each appears as a committed variable.
-
-**Violations:**
-
-- Platform app registration shared with non-platform workloads.
-
-**Files:**
-
-- `githubVariables.json`
-- `landing-zones/bicep/modules/identity.bicep`
-
 ### platform-identity-claude
 
 Agentic workflows must authenticate with the Claude Pro OAuth token.
@@ -1099,7 +1122,7 @@ Agentic workflows must authenticate with the Claude Pro OAuth token.
 
 ### platform-identity-github
 
-Platform and landing zone workflows must authenticate to GitHub through the shared GitHub App.
+Platform and landing zone workflows must authenticate to GitHub through the platform GitHub identity.
 
 **Why:** Without a shared GitHub App, the platform has no mechanism to provision and configure application repos and environments.
 
@@ -1107,7 +1130,7 @@ Platform and landing zone workflows must authenticate to GitHub through the shar
 
 **Implements:**
 
-- platform
+- platform-github-identity
 
 **Violations:**
 

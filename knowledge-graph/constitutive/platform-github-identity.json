@@ -1,0 +1,26 @@
+{
+  "id": "platform-github-identity",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "platform-github-identity"
+  },
+  "rule": "A GitHub App counts as the platform GitHub identity when Gazelle names it in configuration files.",
+  "anchor": "no-human-touch",
+  "evidence": [
+    "githubVariables.json"
+  ],
+  "links": [
+    {
+      "target": "gazelle",
+      "relation": "depends-on",
+      "note": "The GitHub App carries platform authority for Gazelle repositories, so no GitHub App can carry platform GitHub identity status until Gazelle exists."
+    }
+  ],
+  "violations": [
+    "Platform GitHub identity is configured outside Gazelle configuration files.",
+    "Platform GitHub identity is shared with non-platform workloads.",
+    "Workflow authenticates to GitHub with GITHUB_TOKEN where the platform GitHub identity is required."
+  ],
+  "properties": {}
+}

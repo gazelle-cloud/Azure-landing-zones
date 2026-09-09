@@ -1,0 +1,26 @@
+{
+  "id": "platform-azure-identity",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "platform-azure-identity"
+  },
+  "rule": "An Entra ID app registration counts as the platform Azure identity when Gazelle names it in configuration files.",
+  "anchor": "no-human-touch",
+  "evidence": [
+    "githubVariables.json"
+  ],
+  "links": [
+    {
+      "target": "gazelle",
+      "relation": "depends-on",
+      "note": "The app registration exists inside the Gazelle tenant, so no Entra ID app registration can carry platform Azure identity status until Gazelle exists."
+    }
+  ],
+  "violations": [
+    "Platform deployment authenticates through a managed identity.",
+    "Platform Azure identity is configured outside Gazelle configuration files.",
+    "Platform Azure identity is shared with non-platform workloads."
+  ],
+  "properties": {}
+}

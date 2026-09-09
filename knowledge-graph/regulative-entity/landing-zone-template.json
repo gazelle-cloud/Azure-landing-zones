@@ -17,9 +17,9 @@
       "note": "Per landing zone triggers share centralized deployment logic through the reusable workflow."
     },
     {
-      "target": "platform-identity-azure",
+      "target": "platform-azure-identity",
       "relation": "depends-on",
-      "note": "The app registration's credentials are what let the template deploy landing zone resources."
+      "note": "The platform Azure identity's credentials are what let the template deploy landing zone resources."
     }
   ],
   "violations": [

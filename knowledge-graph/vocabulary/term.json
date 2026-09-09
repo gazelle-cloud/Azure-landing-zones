@@ -20,6 +20,14 @@
     "type": "term"
   },
   {
+    "id": "platform-azure-identity",
+    "type": "term"
+  },
+  {
+    "id": "platform-github-identity",
+    "type": "term"
+  },
+  {
     "id": "oases",
     "type": "term"
   },
