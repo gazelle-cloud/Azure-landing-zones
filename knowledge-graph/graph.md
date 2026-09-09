@@ -21,6 +21,11 @@
 | landing-zone |
 | platform-member |
 | single-region |
+| single-tenant |
+| strong-transport |
+| strong-authentication |
+| secure-network |
+| monitored |
 
 ### Relations
 
@@ -199,6 +204,29 @@ An Azure subscription counts as a landing zone when the oases register names it.
 
 - Subscription hand-built to resemble a landing zone.
 
+### monitored
+
+**Subject:** monitored (entity)
+
+An Azure resource counts as monitored in Gazelle when Azure Policy names it.
+
+**Anchor:** no-unapproved-resources
+
+**Evidence:**
+
+- `platform-management/policy/bicep/configDiagnosticSettings.bicep`
+- `platform-management/policy/parameters/diagnosticSettings.bicepparam`
+
+**Links:**
+
+- depends-on → guardrail — A resource is named as monitored through diagnostic settings guardrails, so the status holds only where the platform assigns those guardrails.
+
+**Violations:**
+
+- Resource emits no diagnostic logs to the landing zone workspace.
+- Azure Policy does not deploy diagnostic settings when they are missing.
+- Landing zone declares its own diagnostic setting.
+
 ### oases
 
 **Subject:** oases (entity)
@@ -265,6 +293,28 @@ A management group counts as the platform when Gazelle names it.
 - Management group presented as the platform that BigBang cannot rebuild from the repository.
 - Platform deciding on behalf of the landing zones the oases register names.
 
+### secure-network
+
+**Subject:** secure-network (entity)
+
+An Azure resource counts as secure-network in Gazelle when Azure Policy names it.
+
+**Anchor:** no-platform-ops
+
+**Evidence:**
+
+- `platform-management/policy/bicep/oases.bicep`
+- `platform-management/policy/parameters/oases/denyPublicNetworkAccess.json`
+
+**Links:**
+
+- depends-on → guardrail — A resource is named as secure-network through the Deny Public Network Access guardrail, so the status holds only where the platform assigns that guardrail.
+
+**Violations:**
+
+- Resource is accessible over an unrestricted public network.
+- Resource requires a private endpoint.
+
 ### single-region
 
 **Subject:** single-region (entity)
@@ -285,6 +335,71 @@ An Azure region counts as Gazelle's single region when Azure Policy names it.
 **Violations:**
 
 - Allowing multi-region at platform level.
+
+### single-tenant
+
+**Subject:** single-tenant (entity)
+
+An Azure resource counts as single-tenant in Gazelle when Azure Policy names it.
+
+**Anchor:** no-unapproved-resources
+
+**Evidence:**
+
+- `platform-management/policy/bicep/oases.bicep`
+- `platform-management/policy/parameters/oases/denyCrossTenantReplication.json`
+
+**Links:**
+
+- depends-on → guardrail — A resource is named as single-tenant through the Deny Cross Tenant Replication guardrail, so the status holds only where the platform assigns that guardrail.
+
+**Violations:**
+
+- Resource treated as single-tenant because it belongs to the tenant rather than because Azure Policy denied cross-tenant replication.
+- Cross-tenant replication allowed on a resource that Gazelle treats as single-tenant.
+
+### strong-authentication
+
+**Subject:** strong-authentication (entity)
+
+An Azure resource counts as strong-authentication in Gazelle when Azure Policy names it.
+
+**Anchor:** no-unapproved-resources
+
+**Evidence:**
+
+- `platform-management/policy/bicep/oases.bicep`
+- `platform-management/policy/parameters/oases/denyLocalAuthentication.json`
+
+**Links:**
+
+- depends-on → guardrail — A resource is named as strong-authentication through the Deny Local Authentication Methods guardrail, so the status holds only where the platform assigns that guardrail.
+
+**Violations:**
+
+- SAS tokens, access keys, or other local authentication methods allowed.
+
+### strong-transport
+
+**Subject:** strong-transport (entity)
+
+An Azure resource counts as strong-transport in Gazelle when Azure Policy names it.
+
+**Anchor:** no-unapproved-resources
+
+**Evidence:**
+
+- `platform-management/policy/bicep/oases.bicep`
+- `platform-management/policy/parameters/oases/denyWeakTLS.json`
+
+**Links:**
+
+- depends-on → guardrail — A resource is named as strong-transport through the Deny Weak TLS guardrail, so the status holds only where the platform assigns that guardrail.
+
+**Violations:**
+
+- Resource treated as strong-transport because it supports TLS rather than because Azure Policy denied weak transport settings.
+- TLS below 1.2 or non-HTTPS transport allowed on a resource Gazelle treats as strong-transport.
 
 ## Regulative - entity
 
@@ -331,38 +446,11 @@ Only a service reachable through Azure Resource Manager may be adopted.
 
 - `platform-management/policy/parameters/oases/allowedResources.json`
 
-### azure-policy-allowed-resources
-
-A resource type must appear on the allowed list before it deploys; the absence of a deny never grants it.
-
-**Why:** Without an exhaustive list, a type reaches production because nobody wrote a rule against it.
-
-**Anchor:** no-unapproved-resources
-
-**Implements:**
-
-- allowed-resources
-
-**Links:**
-
-- depends-on → azure-native-services-only — ARM reachability is the prerequisite for listing, so types outside ARM are ineligible.
-- depends-on → azure-policy-hard-deny — A type is listable once deny policies cover its misconfigurations, which the list assumes.
-
-**Violations:**
-
-- Resource type deployed because no policy denied it rather than because the list permitted it.
-- Entry added to the allowed resources file before its deny policies and diagnostic settings exist.
-
-**Files:**
-
-- `platform-management/policy/parameters/oases/allowedResources.json`
-- `platform-management/policy/bicep/oases.bicep`
-
 ### azure-policy-custom-definition
 
-Every Deny or DeployIfNotExists gap with no built-in policy must be closed by a custom definition.
+A guardrail gap must be closed by a custom Azure Policy definition when no built-in policy can enforce the institutional fact.
 
-**Why:** Without custom policies, Audit-only coverage looks like enforcement but the violation still occurs.
+**Why:** Without custom definitions, a resource type can appear to satisfy a guardrail while the Azure Policy assignment cannot enforce the status the knowledge graph names.
 
 **Anchor:** no-unapproved-resources
 
@@ -372,11 +460,11 @@ Every Deny or DeployIfNotExists gap with no built-in policy must be closed by a 
 
 **Links:**
 
-- depends-on → azure-policy-naming-convention — The effect a custom definition carries determines the prefix its assignment takes.
+- depends-on → azure-policy-effect-declaration — The effect a custom definition carries determines the effect its guardrail must declare.
 
 **Violations:**
 
-- Resource type listed with a known Deny gap and no custom definition to close it.
+- Resource type listed with a known guardrail gap and no custom definition to close it.
 
 **Files:**
 
@@ -384,33 +472,11 @@ Every Deny or DeployIfNotExists gap with no built-in policy must be closed by a 
 - `platform-management/policy/parameters/customDefinitions/policyDefinitions.bicepparam`
 - `platform-management/policy/parameters/customDefinitions/*.json`
 
-### azure-policy-hard-deny
+### azure-policy-effect-declaration
 
-A security control must be carried by a policy assignment that denies the violation at deployment time, never by an Audit effect.
+A guardrail must declare exactly one effect: deny, config, or allowed.
 
-**Why:** Without deny policies, resources deploy in a non-compliant state, deviating from the security baseline.
-
-**Anchor:** no-unapproved-resources
-
-**Implements:**
-
-- guardrail
-
-**Violations:**
-
-- Control carried by an Audit effect and reported as enforced.
-- Resource deployed with public network access, local authentication, or TLS below 1.2 because no assignment denied it.
-
-**Files:**
-
-- `platform-management/policy/parameters/oases/*.json`
-- `platform-management/policy/bicep/oases.bicep`
-
-### azure-policy-naming-convention
-
-A policy assignment name must begin with its effect prefix, deny, config, or allowed, followed by the requirement name.
-
-**Why:** Without an effect prefix, reading an assignment name does not tell you whether it denies, configures, or allows.
+**Why:** Without a declared effect, a guardrail does not state whether it blocks, configures, or permits.
 
 **Anchor:** no-unapproved-resources
 
@@ -420,8 +486,9 @@ A policy assignment name must begin with its effect prefix, deny, config, or all
 
 **Violations:**
 
-- Effect prefix outside deny, config, or allowed.
-- Two policy names sharing their first 24 characters, so both assignments resolve to one truncated name.
+- Guardrail declared without an effect.
+- Guardrail declaring more than one effect.
+- Guardrail effect outside deny, config, or allowed.
 
 **Files:**
 
@@ -442,7 +509,7 @@ An exemption must resolve its assignment ID through the platform-generated refer
 
 **Links:**
 
-- depends-on → azure-policy-naming-convention — The reference file is indexed by assignment name, so the name stays stable across redeployments.
+- depends-on → azure-policy-effect-declaration — The reference file is indexed by assignment name, so the name stays stable across redeployments.
 
 **Violations:**
 
@@ -671,33 +738,6 @@ Automation jobs must run inside the landing zone's own subscription.
 - `landing-zones/bicep/modules/base/jobs-cron.bicep`
 - `landing-zones/bicep/modules/base/managedEnvironments.bicep`
 
-### landing-zone-diagnostic-settings
-
-Diagnostic settings must be defined by the platform; a landing zone declares none of its own.
-
-**Why:** Without a platform definition, each landing zone routes logs differently and some resources emit none.
-
-**Anchor:** no-platform-ops
-
-**Implements:**
-
-- guardrail
-
-**Links:**
-
-- depends-on → landing-zone-automation — Resources that already exist are brought into line when the remediation job runs in the landing zone.
-
-**Violations:**
-
-- Resource type added to allowedResources.json without a diagnostic settings definition.
-- Landing zone declaring its own diagnostic setting.
-
-**Files:**
-
-- `platform-management/policy/parameters/diagnosticSettings.bicepparam`
-- `platform-management/policy/bicep/configDiagnosticSettings.bicep`
-- `landing-zones/bicep/modules/azurePolicy.bicep`
-
 ### landing-zone-getting-started
 
 An application repo must be seeded with deployable pipelines and modules from the template at creation.
@@ -786,7 +826,7 @@ A landing zone must not share a Log Analytics Workspace with another landing zon
 
 **Links:**
 
-- depends-on → landing-zone-diagnostic-settings — Without diagnostic settings the workspace is provisioned with no telemetry pipeline to fill it.
+- depends-on → monitored — Without diagnostic settings the workspace is provisioned with no telemetry pipeline to fill it.
 
 **Violations:**
 
@@ -978,7 +1018,7 @@ Break-glass must be used only where automation cannot execute the change.
 **Links:**
 
 - depends-on → deployment-declarative-lifecycle — Stack deny assignments override role actions, so break-glass reaches platform resources by being excluded from them.
-- depends-on → azure-policy-hard-deny — Policy denies apply regardless of role actions, so break-glass cannot deploy an unapproved resource type.
+- depends-on → guardrail — Policy denies apply regardless of role actions, so break-glass cannot deploy an unapproved resource type.
 
 **Violations:**
 
@@ -1252,8 +1292,11 @@ A resource type must clear deny coverage, diagnostic settings, and job-function 
 
 **Links:**
 
-- governed-by → azure-policy-hard-deny
-- governed-by → landing-zone-diagnostic-settings
+- governed-by → strong-authentication
+- governed-by → strong-transport
+- governed-by → single-tenant
+- governed-by → secure-network
+- governed-by → monitored
 - governed-by → azure-policy-custom-definition
 - governed-by → self-service-policy-exemptions-defender-for-cloud
 - governed-by → job-function-scoped-roles

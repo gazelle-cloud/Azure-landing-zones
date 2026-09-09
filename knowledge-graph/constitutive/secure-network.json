@@ -1,0 +1,26 @@
+{
+  "id": "secure-network",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "secure-network"
+  },
+  "rule": "An Azure resource counts as secure-network in Gazelle when Azure Policy names it.",
+  "anchor": "no-platform-ops",
+  "evidence": [
+    "platform-management/policy/bicep/oases.bicep",
+    "platform-management/policy/parameters/oases/denyPublicNetworkAccess.json"
+  ],
+  "links": [
+    {
+      "target": "guardrail",
+      "relation": "depends-on",
+      "note": "A resource is named as secure-network through the Deny Public Network Access guardrail, so the status holds only where the platform assigns that guardrail."
+    }
+  ],
+  "violations": [
+    "Resource is accessible over an unrestricted public network.",
+    "Resource requires a private endpoint."
+  ],
+  "properties": {}
+}

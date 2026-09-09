@@ -28,11 +28,23 @@
   "workflow": "platform-Azure-Policy",
   "links": [
     {
-      "target": "azure-policy-hard-deny",
+      "target": "strong-authentication",
       "relation": "governed-by"
     },
     {
-      "target": "landing-zone-diagnostic-settings",
+      "target": "strong-transport",
+      "relation": "governed-by"
+    },
+    {
+      "target": "single-tenant",
+      "relation": "governed-by"
+    },
+    {
+      "target": "secure-network",
+      "relation": "governed-by"
+    },
+    {
+      "target": "monitored",
       "relation": "governed-by"
     },
     {

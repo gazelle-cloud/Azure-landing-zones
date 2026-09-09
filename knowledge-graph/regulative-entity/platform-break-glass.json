@@ -17,7 +17,7 @@
       "note": "Stack deny assignments override role actions, so break-glass reaches platform resources by being excluded from them."
     },
     {
-      "target": "azure-policy-hard-deny",
+      "target": "guardrail",
       "relation": "depends-on",
       "note": "Policy denies apply regardless of role actions, so break-glass cannot deploy an unapproved resource type."
     }

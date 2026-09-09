@@ -12,7 +12,7 @@
   ],
   "links": [
     {
-      "target": "landing-zone-diagnostic-settings",
+      "target": "monitored",
       "relation": "depends-on",
       "note": "Without diagnostic settings the workspace is provisioned with no telemetry pipeline to fill it."
     }

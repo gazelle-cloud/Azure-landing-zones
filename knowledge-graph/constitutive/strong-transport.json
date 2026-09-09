@@ -1,0 +1,26 @@
+{
+  "id": "strong-transport",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "strong-transport"
+  },
+  "rule": "An Azure resource counts as strong-transport in Gazelle when Azure Policy names it.",
+  "anchor": "no-unapproved-resources",
+  "evidence": [
+    "platform-management/policy/bicep/oases.bicep",
+    "platform-management/policy/parameters/oases/denyWeakTLS.json"
+  ],
+  "links": [
+    {
+      "target": "guardrail",
+      "relation": "depends-on",
+      "note": "A resource is named as strong-transport through the Deny Weak TLS guardrail, so the status holds only where the platform assigns that guardrail."
+    }
+  ],
+  "violations": [
+    "Resource treated as strong-transport because it supports TLS rather than because Azure Policy denied weak transport settings.",
+    "TLS below 1.2 or non-HTTPS transport allowed on a resource Gazelle treats as strong-transport."
+  ],
+  "properties": {}
+}

@@ -1,0 +1,27 @@
+{
+  "id": "monitored",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "monitored"
+  },
+  "rule": "An Azure resource counts as monitored in Gazelle when Azure Policy names it.",
+  "anchor": "no-unapproved-resources",
+  "evidence": [
+    "platform-management/policy/bicep/configDiagnosticSettings.bicep",
+    "platform-management/policy/parameters/diagnosticSettings.bicepparam"
+  ],
+  "links": [
+    {
+      "target": "guardrail",
+      "relation": "depends-on",
+      "note": "A resource is named as monitored through diagnostic settings guardrails, so the status holds only where the platform assigns those guardrails."
+    }
+  ],
+  "violations": [
+    "Resource emits no diagnostic logs to the landing zone workspace.",
+    "Azure Policy does not deploy diagnostic settings when they are missing.",
+    "Landing zone declares its own diagnostic setting."
+  ],
+  "properties": {}
+}

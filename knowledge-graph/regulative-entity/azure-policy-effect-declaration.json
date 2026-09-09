@@ -1,0 +1,24 @@
+{
+  "id": "azure-policy-effect-declaration",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "A guardrail must declare exactly one effect: deny, config, or allowed.",
+  "why": "Without a declared effect, a guardrail does not state whether it blocks, configures, or permits.",
+  "anchor": "no-unapproved-resources",
+  "implements": [
+    "guardrail"
+  ],
+  "links": [],
+  "violations": [
+    "Guardrail declared without an effect.",
+    "Guardrail declaring more than one effect.",
+    "Guardrail effect outside deny, config, or allowed."
+  ],
+  "files": [
+    "platform-management/policy/bicep/oases.bicep",
+    "platform-management/policy/bicep/modules/assignment.bicep"
+  ],
+  "properties": {}
+}

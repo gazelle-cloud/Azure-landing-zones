@@ -1,0 +1,26 @@
+{
+  "id": "single-tenant",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "single-tenant"
+  },
+  "rule": "An Azure resource counts as single-tenant in Gazelle when Azure Policy names it.",
+  "anchor": "no-unapproved-resources",
+  "evidence": [
+    "platform-management/policy/bicep/oases.bicep",
+    "platform-management/policy/parameters/oases/denyCrossTenantReplication.json"
+  ],
+  "links": [
+    {
+      "target": "guardrail",
+      "relation": "depends-on",
+      "note": "A resource is named as single-tenant through the Deny Cross Tenant Replication guardrail, so the status holds only where the platform assigns that guardrail."
+    }
+  ],
+  "violations": [
+    "Resource treated as single-tenant because it belongs to the tenant rather than because Azure Policy denied cross-tenant replication.",
+    "Cross-tenant replication allowed on a resource that Gazelle treats as single-tenant."
+  ],
+  "properties": {}
+}

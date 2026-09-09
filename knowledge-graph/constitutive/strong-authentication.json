@@ -1,0 +1,25 @@
+{
+  "id": "strong-authentication",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "strong-authentication"
+  },
+  "rule": "An Azure resource counts as strong-authentication in Gazelle when Azure Policy names it.",
+  "anchor": "no-unapproved-resources",
+  "evidence": [
+    "platform-management/policy/bicep/oases.bicep",
+    "platform-management/policy/parameters/oases/denyLocalAuthentication.json"
+  ],
+  "links": [
+    {
+      "target": "guardrail",
+      "relation": "depends-on",
+      "note": "A resource is named as strong-authentication through the Deny Local Authentication Methods guardrail, so the status holds only where the platform assigns that guardrail."
+    }
+  ],
+  "violations": [
+    "SAS tokens, access keys, or other local authentication methods allowed."
+  ],
+  "properties": {}
+}

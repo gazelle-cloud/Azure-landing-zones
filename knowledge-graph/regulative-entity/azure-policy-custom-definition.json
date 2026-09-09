@@ -4,21 +4,21 @@
   "subject": {
     "type": "entity"
   },
-  "decision": "Every Deny or DeployIfNotExists gap with no built-in policy must be closed by a custom definition.",
-  "why": "Without custom policies, Audit-only coverage looks like enforcement but the violation still occurs.",
+  "decision": "A guardrail gap must be closed by a custom Azure Policy definition when no built-in policy can enforce the institutional fact.",
+  "why": "Without custom definitions, a resource type can appear to satisfy a guardrail while the Azure Policy assignment cannot enforce the status the knowledge graph names.",
   "anchor": "no-unapproved-resources",
   "implements": [
     "guardrail"
   ],
   "links": [
     {
-      "target": "azure-policy-naming-convention",
+      "target": "azure-policy-effect-declaration",
       "relation": "depends-on",
-      "note": "The effect a custom definition carries determines the prefix its assignment takes."
+      "note": "The effect a custom definition carries determines the effect its guardrail must declare."
     }
   ],
   "violations": [
-    "Resource type listed with a known Deny gap and no custom definition to close it."
+    "Resource type listed with a known guardrail gap and no custom definition to close it."
   ],
   "files": [
     "platform-management/policy/bicep/customPolicyDefinitions.bicep",

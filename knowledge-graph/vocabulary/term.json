@@ -50,5 +50,25 @@
   {
     "id": "single-region",
     "type": "term"
+  },
+  {
+    "id": "single-tenant",
+    "type": "term"
+  },
+  {
+    "id": "strong-transport",
+    "type": "term"
+  },
+  {
+    "id": "strong-authentication",
+    "type": "term"
+  },
+  {
+    "id": "secure-network",
+    "type": "term"
+  },
+  {
+    "id": "monitored",
+    "type": "term"
   }
 ]

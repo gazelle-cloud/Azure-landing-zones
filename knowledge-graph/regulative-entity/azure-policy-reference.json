@@ -12,7 +12,7 @@
   ],
   "links": [
     {
-      "target": "azure-policy-naming-convention",
+      "target": "azure-policy-effect-declaration",
       "relation": "depends-on",
       "note": "The reference file is indexed by assignment name, so the name stays stable across redeployments."
     }
