@@ -20,6 +20,10 @@
     "type": "term"
   },
   {
+    "id": "platform-test-environment",
+    "type": "term"
+  },
+  {
     "id": "platform-azure-identity",
     "type": "term"
   },

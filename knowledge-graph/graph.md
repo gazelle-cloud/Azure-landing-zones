@@ -13,6 +13,7 @@
 | codebase |
 | source-of-truth |
 | platform |
+| platform-test-environment |
 | platform-azure-identity |
 | platform-github-identity |
 | oases |
@@ -111,6 +112,7 @@ A codebase counts as the source of truth for Gazelle when BigBang establishes it
 **Links:**
 
 - depends-on → gazelle — There is nothing for a codebase to be the source of truth for until BigBang builds a tenant Gazelle says is one.
+- depends-on → platform-test-environment — The codebase's source-of-truth status is proven through the test environment, where its declared platform configuration is validated before production.
 
 **Violations:**
 
@@ -313,6 +315,26 @@ A product team counts as a platform member in Gazelle when the member register n
 
 - Product team provisioning a landing zone with no entry in the member register.
 - Membership treated as held because a repo, Entra group, or invoice section exists for the team.
+
+### platform-test-environment
+
+**Subject:** platform-test-environment (entity)
+
+A management group counts as the platform-test-environment when Gazelle names it in configuration files.
+
+**Anchor:** no-human-touch
+
+**Evidence:**
+
+- `githubVariables.json`
+
+**Links:**
+
+- depends-on → gazelle — The test environment is a status Gazelle confers through repository configuration, so no management group has that status until Gazelle names it.
+
+**Violations:**
+
+- Management group treated as the platform-test-environment without being named in Gazelle configuration files.
 
 ### platform
 
@@ -1166,30 +1188,6 @@ A landing zone identity must hold granular Microsoft Graph read permissions and 
 
 - `landing-zones/bicep/entra.bicep`
 - `landing-zones/bicep/modules/base/appRoleAssignedTo.bicep`
-
-### platform-test-environment
-
-Every platform capability must exist in the test environment exactly as it exists in production.
-
-**Why:** If the copy differs from production, a change that passes there can still break production.
-
-**Anchor:** no-human-touch
-
-**Implements:**
-
-- platform
-
-**Violations:**
-
-- Capability present in production and absent from test.
-
-**Files:**
-
-- `.github/workflows/platform-Azure-Policy.yml`
-- `.github/workflows/platform-access-control.yml`
-- `.github/workflows/platform-Management-Groups.yml`
-- `.github/workflows/platform-automation.yml`
-- `.github/workflows/platform-BigBang.yml`
 
 ### self-service-policy-exemptions-defender-for-cloud
 

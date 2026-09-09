@@ -15,6 +15,11 @@
       "target": "gazelle",
       "relation": "depends-on",
       "note": "There is nothing for a codebase to be the source of truth for until BigBang builds a tenant Gazelle says is one."
+    },
+    {
+      "target": "platform-test-environment",
+      "relation": "depends-on",
+      "note": "The codebase's source-of-truth status is proven through the test environment, where its declared platform configuration is validated before production."
     }
   ],
   "violations": [
