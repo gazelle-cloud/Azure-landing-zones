@@ -5,7 +5,7 @@
     "type": "entity",
     "term": "secure-network"
   },
-  "rule": "An Azure resource counts as secure-network in Gazelle when Azure Policy names it.",
+  "rule": "An Azure resource counts as secure-network in Gazelle when Azure Policy denies its public network access.",
   "anchor": "no-platform-ops",
   "evidence": [
     "platform-management/policy/bicep/oases.bicep",
@@ -19,8 +19,8 @@
     }
   ],
   "violations": [
-    "Resource is accessible over an unrestricted public network.",
-    "Resource requires a private endpoint."
+    "Private Endpoint or Private Link used or recommended as part of secure-network compliance.",
+    "Service Endpoint treated as an insecure network connection."
   ],
   "properties": {}
 }

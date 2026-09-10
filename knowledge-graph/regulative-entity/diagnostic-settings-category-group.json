@@ -1,0 +1,21 @@
+{
+  "id": "diagnostic-settings-category-group",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "Diagnostic settings must enable logs by category group.",
+  "why": "Without category-group logging, diagnostic coverage depends on manually maintained category lists and can miss newly added log categories.",
+  "anchor": "no-unapproved-resources",
+  "implements": [
+    "monitored"
+  ],
+  "violations": [
+    "Diagnostic settings enable individual log categories instead of a category group."
+  ],
+  "files": [
+    "platform-management/policy/bicep/configDiagnosticSettings.bicep",
+    "platform-management/policy/parameters/diagnosticSettings.bicepparam"
+  ],
+  "properties": {}
+}
