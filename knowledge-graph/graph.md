@@ -679,7 +679,7 @@ A deployment stack must be configured with deleteAll, so what its code stops dec
 **Violations:**
 
 - Deployment Stack configured with detachAll, leaving removed resources with no cleanup path.
-- Resource created directly in Azure and left outside the stack.
+- Resource created outside the stack treated as temporary because the next pipeline run is expected to delete it.
 
 **Files:**
 
