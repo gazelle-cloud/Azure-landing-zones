@@ -367,7 +367,7 @@ A management group counts as the platform when Gazelle names it.
 
 **Subject:** secure-network (entity)
 
-An Azure resource counts as secure-network in Gazelle when Azure Policy names it.
+An Azure resource counts as secure-network in Gazelle when Azure Policy denies its public network access.
 
 **Anchor:** no-platform-ops
 
@@ -382,8 +382,8 @@ An Azure resource counts as secure-network in Gazelle when Azure Policy names it
 
 **Violations:**
 
-- Resource is accessible over an unrestricted public network.
-- Resource requires a private endpoint.
+- Private Endpoint or Private Link used or recommended as part of secure-network compliance.
+- Service Endpoint treated as an insecure network connection.
 
 ### single-region
 
@@ -711,6 +711,50 @@ Deployment logic must live in a reusable workflow; an environment workflow suppl
 - `.github/workflows/template-access-control.yml`
 - `.github/workflows/template-Management-Groups.yml`
 - `.github/workflows/template-lz-template.yml`
+
+### diagnostic-settings-category-group
+
+Diagnostic settings must enable logs by category group.
+
+**Why:** Without category-group logging, diagnostic coverage depends on manually maintained category lists and can miss newly added log categories.
+
+**Anchor:** no-unapproved-resources
+
+**Implements:**
+
+- monitored
+
+**Violations:**
+
+- Diagnostic settings enable individual log categories instead of a category group.
+
+**Files:**
+
+- `platform-management/policy/bicep/configDiagnosticSettings.bicep`
+- `platform-management/policy/parameters/diagnosticSettings.bicepparam`
+
+### diagnostic-settings-parameter-contract
+
+The main diagnostic initiative must define shared defaults; parameter files may override only policy-specific values.
+
+**Why:** Without a single owner for shared defaults, diagnostic behavior can drift when parameter files repeat or replace values inconsistently.
+
+**Anchor:** no-human-touch
+
+**Implements:**
+
+- monitored
+
+**Violations:**
+
+- A shared diagnostic default is hardcoded in a parameter file instead of the main initiative.
+- A parameter file passes an outer-initiative parameter that the child policy does not declare.
+- A policy-specific value is omitted or overridden without review.
+
+**Files:**
+
+- `platform-management/policy/bicep/configDiagnosticSettings.bicep`
+- `platform-management/policy/parameters/diagnosticSettings.bicepparam`
 
 ### job-function-scoped-roles
 
@@ -1619,3 +1663,42 @@ A landing zone must be reshaped by editing its parameter file and merging a pull
 - `landing-zones/oases-prod/`
 - `landing-zones/oases-test/`
 - `.github/workflows/lz-flow-create-policy-exemption.yml`
+
+### validate-codebase-rules
+
+Every pull request must be validated against the knowledge graph rules, with findings posted as an advisory comment and never as a merge block.
+
+**Why:** Without automated validation, rule violations reach the codebase unchallenged and the graph stops describing what the code actually does.
+
+**Anchor:** no-human-touch
+
+**Implements:**
+
+- constitution
+
+**Trigger:**
+
+- validate codebase rules
+- pr rules check
+- constitution validation
+
+**Steps:**
+
+1. On pull_request opened or synchronize, check out the repo at the PR head with full history.
+2. Collect the full diff (git diff origin/<base>...HEAD) and the full content of every non-deleted changed file. Cap total injected content at 50 KB; truncate with a note beyond that.
+3. Run claude -p with the diff and file contents from the repo root so CLAUDE.md context loads automatically. Ask Claude to check every rule in all three layers - foundations, constitutive, regulative - and return a verdict for every single one, including rules that do not apply.
+4. Ask Claude to return JSON: {"result": "PASS"|"FAIL", "summary": {"what": "...", "why": "..."}, "foundations": [...], "constitutive": [...], "regulative": [...]}, where each layer array holds one entry per rule with rule id, pass/fail status, a one-line note, and violation/evidence text when failed.
+5. Parse the JSON output. Render each layer as a section: failed rules listed with violation and evidence, passed rules collapsed under a details toggle. result is FAIL if any rule in any layer has status fail.
+6. Post the formatted findings as a pull request comment, prefixed with the what/why summary and suffixed with model, token count, and cost in EUR.
+
+**Links:**
+
+- governed-by → platform-identity-claude
+
+**Violations:**
+
+- Validation configured as a required status check, blocking merge on findings.
+
+**Files:**
+
+- `.github/workflows/pr-validate-codebase-rules.yml`

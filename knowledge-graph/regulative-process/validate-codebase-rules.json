@@ -16,11 +16,12 @@
     "constitution validation"
   ],
   "steps": [
-    "On pull_request opened, synchronize, or reopened, check out the repo at the PR head with full history.",
+    "On pull_request opened or synchronize, check out the repo at the PR head with full history.",
     "Collect the full diff (git diff origin/<base>...HEAD) and the full content of every non-deleted changed file. Cap total injected content at 50 KB; truncate with a note beyond that.",
-    "Run claude -p with the diff and file contents from the repo root so CLAUDE.md context loads automatically. Ask Claude to return JSON: {\"result\": \"PASS\" | \"FAIL\", \"violations\": [{\"rule\": \"<id>\", \"violation\": \"<matched violation text>\", \"evidence\": \"<file and content>\"}]}.",
-    "Parse the JSON output. If result is FAIL, format each violation as a bullet citing the rule id, the violation text, and the evidence.",
-    "Post the formatted findings as a pull request comment. If result is PASS, post a single passing confirmation."
+    "Run claude -p with the diff and file contents from the repo root so CLAUDE.md context loads automatically. Ask Claude to check every rule in all three layers - foundations, constitutive, regulative - and return a verdict for every single one, including rules that do not apply.",
+    "Ask Claude to return JSON: {\"result\": \"PASS\"|\"FAIL\", \"summary\": {\"what\": \"...\", \"why\": \"...\"}, \"foundations\": [...], \"constitutive\": [...], \"regulative\": [...]}, where each layer array holds one entry per rule with rule id, pass/fail status, a one-line note, and violation/evidence text when failed.",
+    "Parse the JSON output. Render each layer as a section: failed rules listed with violation and evidence, passed rules collapsed under a details toggle. result is FAIL if any rule in any layer has status fail.",
+    "Post the formatted findings as a pull request comment, prefixed with the what/why summary and suffixed with model, token count, and cost in EUR."
   ],
   "links": [
     {
