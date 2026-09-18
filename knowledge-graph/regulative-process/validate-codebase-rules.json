@@ -20,8 +20,7 @@
     "Collect the full diff (git diff origin/<base>...HEAD) and the full content of every non-deleted changed file. Cap total injected content at 50 KB; truncate with a note beyond that.",
     "Run claude -p with the diff and file contents from the repo root so CLAUDE.md context loads automatically. Ask Claude to return JSON: {\"result\": \"PASS\" | \"FAIL\", \"violations\": [{\"rule\": \"<id>\", \"violation\": \"<matched violation text>\", \"evidence\": \"<file and content>\"}]}.",
     "Parse the JSON output. If result is FAIL, format each violation as a bullet citing the rule id, the violation text, and the evidence.",
-    "Post the formatted findings as a pull request comment. If result is PASS, post a single passing confirmation.",
-    "Exit 0 regardless of result — this check is advisory and must not block merge."
+    "Post the formatted findings as a pull request comment. If result is PASS, post a single passing confirmation."
   ],
   "links": [
     {
@@ -30,9 +29,7 @@
     }
   ],
   "violations": [
-    "Workflow authenticating with ANTHROPIC_API_KEY instead of CLAUDE_CODE_OAUTH_TOKEN.",
-    "Validation configured as a required status check, blocking merge on findings.",
-    "Claude invoked outside the repo root, losing CLAUDE.md context and the knowledge graph."
+    "Validation configured as a required status check, blocking merge on findings."
   ],
   "files": [
     ".github/workflows/pr-validate-codebase-rules.yml"
