@@ -3,18 +3,26 @@ name: eval - pr validate codebase rules
 on:
   workflow_dispatch:
     inputs:
-      fixture:
-        description: 'Fixture to run against the validator'
-        required: true
-        type: choice
-        default: clean-pass
-        options:
-          - clean-pass
-          - bidirectional-link
-          - restated-violation
-          - mismatched-link-note
-          - resource-without-controls
-          - all
+      clean_pass:
+        description: 'clean-pass'
+        type: boolean
+        default: true
+      bidirectional_link:
+        description: 'bidirectional-link'
+        type: boolean
+        default: false
+      restated_violation:
+        description: 'restated-violation'
+        type: boolean
+        default: false
+      mismatched_link_note:
+        description: 'mismatched-link-note'
+        type: boolean
+        default: false
+      resource_without_controls:
+        description: 'resource-without-controls'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -33,17 +41,32 @@ jobs:
       - name: run fixtures
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          FIXTURE_INPUT: ${{ inputs.fixture }}
+          RUN_CLEAN_PASS: ${{ inputs.clean_pass }}
+          RUN_BIDIRECTIONAL_LINK: ${{ inputs.bidirectional_link }}
+          RUN_RESTATED_VIOLATION: ${{ inputs.restated_violation }}
+          RUN_MISMATCHED_LINK_NOTE: ${{ inputs.mismatched_link_note }}
+          RUN_RESOURCE_WITHOUT_CONTROLS: ${{ inputs.resource_without_controls }}
         run: |
           set +e
           rm -f /tmp/eval-summary.csv
-          if [ "$FIXTURE_INPUT" = "all" ]; then
-            FIXTURES="clean-pass bidirectional-link restated-violation mismatched-link-note resource-without-controls"
-          else
-            FIXTURES="$FIXTURE_INPUT"
+
+          FIXTURES=""
+          [ "$RUN_CLEAN_PASS" = "true" ] && FIXTURES="$FIXTURES clean-pass"
+          [ "$RUN_BIDIRECTIONAL_LINK" = "true" ] && FIXTURES="$FIXTURES bidirectional-link"
+          [ "$RUN_RESTATED_VIOLATION" = "true" ] && FIXTURES="$FIXTURES restated-violation"
+          [ "$RUN_MISMATCHED_LINK_NOTE" = "true" ] && FIXTURES="$FIXTURES mismatched-link-note"
+          [ "$RUN_RESOURCE_WITHOUT_CONTROLS" = "true" ] && FIXTURES="$FIXTURES resource-without-controls"
+
+          if [ -z "$FIXTURES" ]; then
+            echo "No fixtures selected — check at least one box on the Run workflow panel."
+            exit 1
           fi
 
           OVERALL=0
+          TOTAL_COST=0
+          TOTAL_INPUT=0
+          TOTAL_OUTPUT=0
+          MODEL=""
           for FIXTURE in $FIXTURES; do
             echo "::group::$FIXTURE"
             DIR=".github/eval/pr-validate-codebase-rules/$FIXTURE"
@@ -58,21 +81,40 @@ jobs:
 
             RAW=$(claude -p "$(cat /tmp/prompt.txt)" --output-format json 2>/dev/null)
             OUTPUT=$(echo "$RAW" | jq -r '.result // ""')
+            COST=$(echo "$RAW" | jq -r '.total_cost_usd // .cost_usd // 0')
+            IN_TOKENS=$(echo "$RAW" | jq -r '(.usage.input_tokens // 0) + (.usage.cache_read_input_tokens // 0) + (.usage.cache_creation_input_tokens // 0)')
+            OUT_TOKENS=$(echo "$RAW" | jq -r '.usage.output_tokens // 0')
+            RUN_MODEL=$(echo "$RAW" | jq -r '.model // .model_id // ""')
+            [ -n "$RUN_MODEL" ] && MODEL="$RUN_MODEL"
 
             bash .github/scripts/check-eval-fixture.sh "$DIR/expected.json" "$OUTPUT" "$FIXTURE"
-            OVERALL=$((OVERALL + $?))
+            STATUS=$?
+            OVERALL=$((OVERALL + STATUS))
+
+            TOTAL_COST=$(awk -v a="$TOTAL_COST" -v b="$COST" 'BEGIN{printf "%.6f", a+b}')
+            TOTAL_INPUT=$((TOTAL_INPUT + IN_TOKENS))
+            TOTAL_OUTPUT=$((TOTAL_OUTPUT + OUT_TOKENS))
+
+            echo "$FIXTURE,$([ "$STATUS" = "0" ] && echo PASS || echo FAIL),$COST,$IN_TOKENS,$OUT_TOKENS" >> /tmp/eval-summary.csv
             echo "::endgroup::"
           done
 
           git checkout -- .
 
+          TOTAL_TOKENS=$((TOTAL_INPUT + TOTAL_OUTPUT))
+          TOTAL_COST_EUR=$(awk -v u="$TOTAL_COST" 'BEGIN{printf "%.4f", u*0.92}')
+
           {
-            echo "| fixture | result |"
-            echo "|---|---|"
-            while IFS=, read -r name status; do
+            echo "| fixture | result | tokens | cost |"
+            echo "|---|---|---|---|"
+            while IFS=, read -r name status cost intok outtok; do
               ICON=$([ "$status" = "PASS" ] && echo ✅ || echo ❌)
-              echo "| $name | $ICON $status |"
+              TOK=$((intok + outtok))
+              COST_EUR=$(awk -v u="$cost" 'BEGIN{printf "%.4f", u*0.92}')
+              echo "| $name | $ICON $status | $TOK | €$COST_EUR |"
             done < /tmp/eval-summary.csv
+            echo ""
+            echo "**Model:** \`$MODEL\` · **Total tokens:** $TOTAL_TOKENS ($TOTAL_INPUT in · $TOTAL_OUTPUT out) · **Total cost:** €$TOTAL_COST_EUR"
           } >> "$GITHUB_STEP_SUMMARY"
 
           exit $OVERALL
