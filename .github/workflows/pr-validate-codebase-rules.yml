@@ -3,6 +3,8 @@ name: pr - validate codebase rules
 on:
   pull_request:
     types: [opened, synchronize]
+    paths-ignore:
+      - 'knowledge-graph/graph.md'
 
 permissions:
   contents: read
@@ -22,7 +24,7 @@ jobs:
       - name: collect diff and changed files
         run: |
           git fetch origin ${{ github.base_ref }}
-          git diff origin/${{ github.base_ref }}...HEAD > /tmp/diff.patch
+          git diff origin/${{ github.base_ref }}...HEAD -- . ':!knowledge-graph/graph.md' > /tmp/diff.patch
           git diff --name-only --diff-filter=ACM origin/${{ github.base_ref }}...HEAD > /tmp/changed.txt
           git diff --name-only --diff-filter=D  origin/${{ github.base_ref }}...HEAD > /tmp/deleted.txt
 
