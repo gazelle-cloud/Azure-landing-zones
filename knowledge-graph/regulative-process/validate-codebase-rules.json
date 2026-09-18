@@ -1,0 +1,41 @@
+{
+  "id": "validate-codebase-rules",
+  "type": "regulative",
+  "subject": {
+    "type": "process"
+  },
+  "decision": "Every pull request must be validated against the knowledge graph rules, with findings posted as an advisory comment and never as a merge block.",
+  "why": "Without automated validation, rule violations reach the codebase unchallenged and the graph stops describing what the code actually does.",
+  "anchor": "no-human-touch",
+  "implements": [
+    "constitution"
+  ],
+  "trigger": [
+    "validate codebase rules",
+    "pr rules check",
+    "constitution validation"
+  ],
+  "steps": [
+    "On pull_request opened, synchronize, or reopened, check out the repo at the PR head with full history.",
+    "Collect the full diff (git diff origin/<base>...HEAD) and the full content of every non-deleted changed file. Cap total injected content at 50 KB; truncate with a note beyond that.",
+    "Run claude -p with the diff and file contents from the repo root so CLAUDE.md context loads automatically. Ask Claude to return JSON: {\"result\": \"PASS\" | \"FAIL\", \"violations\": [{\"rule\": \"<id>\", \"violation\": \"<matched violation text>\", \"evidence\": \"<file and content>\"}]}.",
+    "Parse the JSON output. If result is FAIL, format each violation as a bullet citing the rule id, the violation text, and the evidence.",
+    "Post the formatted findings as a pull request comment. If result is PASS, post a single passing confirmation.",
+    "Exit 0 regardless of result — this check is advisory and must not block merge."
+  ],
+  "links": [
+    {
+      "target": "platform-identity-claude",
+      "relation": "governed-by"
+    }
+  ],
+  "violations": [
+    "Workflow authenticating with ANTHROPIC_API_KEY instead of CLAUDE_CODE_OAUTH_TOKEN.",
+    "Validation configured as a required status check, blocking merge on findings.",
+    "Claude invoked outside the repo root, losing CLAUDE.md context and the knowledge graph."
+  ],
+  "files": [
+    ".github/workflows/pr-validate-codebase-rules.yml"
+  ],
+  "properties": {}
+}
