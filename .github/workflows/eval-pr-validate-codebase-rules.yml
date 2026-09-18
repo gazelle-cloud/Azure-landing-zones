@@ -1,0 +1,78 @@
+name: eval - pr validate codebase rules
+
+on:
+  workflow_dispatch:
+    inputs:
+      fixture:
+        description: 'Fixture to run against the validator'
+        required: true
+        type: choice
+        default: clean-pass
+        options:
+          - clean-pass
+          - bidirectional-link
+          - restated-violation
+          - mismatched-link-note
+          - resource-without-controls
+          - all
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: install claude
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: run fixtures
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          FIXTURE_INPUT: ${{ inputs.fixture }}
+        run: |
+          set +e
+          rm -f /tmp/eval-summary.csv
+          if [ "$FIXTURE_INPUT" = "all" ]; then
+            FIXTURES="clean-pass bidirectional-link restated-violation mismatched-link-note resource-without-controls"
+          else
+            FIXTURES="$FIXTURE_INPUT"
+          fi
+
+          OVERALL=0
+          for FIXTURE in $FIXTURES; do
+            echo "::group::$FIXTURE"
+            DIR=".github/eval/pr-validate-codebase-rules/$FIXTURE"
+
+            git checkout -- .
+            git apply "$DIR/diff.patch"
+
+            git diff > /tmp/diff.patch
+            git diff --name-only --diff-filter=ACM > /tmp/changed.txt
+            git diff --name-only --diff-filter=D  > /tmp/deleted.txt
+            bash .github/scripts/build-validation-prompt.sh /tmp/diff.patch /tmp/changed.txt /tmp/deleted.txt > /tmp/prompt.txt
+
+            RAW=$(claude -p "$(cat /tmp/prompt.txt)" --output-format json 2>/dev/null)
+            OUTPUT=$(echo "$RAW" | jq -r '.result // ""')
+
+            bash .github/scripts/check-eval-fixture.sh "$DIR/expected.json" "$OUTPUT" "$FIXTURE"
+            OVERALL=$((OVERALL + $?))
+            echo "::endgroup::"
+          done
+
+          git checkout -- .
+
+          {
+            echo "| fixture | result |"
+            echo "|---|---|"
+            while IFS=, read -r name status; do
+              ICON=$([ "$status" = "PASS" ] && echo ✅ || echo ❌)
+              echo "| $name | $ICON $status |"
+            done < /tmp/eval-summary.csv
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit $OVERALL

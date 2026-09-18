@@ -1,0 +1,19 @@
+diff --git a/knowledge-graph/constitutive/gazelle.json b/knowledge-graph/constitutive/gazelle.json
+index 0000000..0000000 100644
+--- a/knowledge-graph/constitutive/gazelle.json
++++ b/knowledge-graph/constitutive/gazelle.json
+@@ -11,7 +11,13 @@
+     ".github/workflows/platform-BigBang.yml",
+     "githubVariables.json"
+   ],
+-  "links": [],
++  "links": [
++    {
++      "target": "platform-azure-identity",
++      "relation": "depends-on",
++      "note": "Gazelle's authority is exercised through the platform Azure identity, so gazelle cannot deploy anything until that identity exists."
++    }
++  ],
+   "violations": [
+     "Azure tenant presented as Gazelle that BigBang did not build.",
+     "Status held by a platform, landing zone, or platform member that Gazelle never conferred.",
