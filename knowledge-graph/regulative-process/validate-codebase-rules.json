@@ -30,7 +30,8 @@
     }
   ],
   "violations": [
-    "Validation configured as a required status check, blocking merge on findings."
+    "Validation configured as a required status check, blocking merge on findings.",
+    "graph.md included in the injected file content."
   ],
   "files": [
     ".github/workflows/pr-validate-codebase-rules.yml"

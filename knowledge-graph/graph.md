@@ -1698,6 +1698,7 @@ Every pull request must be validated against the knowledge graph rules, with fin
 **Violations:**
 
 - Validation configured as a required status check, blocking merge on findings.
+- graph.md included in the injected file content.
 
 **Files:**
 
