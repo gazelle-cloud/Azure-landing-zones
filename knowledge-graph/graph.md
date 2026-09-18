@@ -840,7 +840,7 @@ Automation jobs must run inside the landing zone's own subscription.
 
 **Links:**
 
-- depends-on → platform-identity-graph — Jobs query Entra ID, so the Graph read permissions are what make that call possible.
+- depends-on → platform-identity-graph — OIDC federation is scoped to the landing zone repo and environment.
 
 **Violations:**
 
@@ -914,7 +914,7 @@ A landing zone must have a single managed identity, shared across all its workfl
 
 **Links:**
 
-- depends-on → landing-zone-repo — OIDC federation is scoped to the landing zone repo and environment.
+- depends-on → landing-zone-repo — Jobs query Entra ID, so the Graph read permissions are what make that call possible.
 
 **Violations:**
 
