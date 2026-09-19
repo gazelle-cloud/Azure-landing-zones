@@ -90,6 +90,18 @@ jobs:
               return s;
             }
 
+            function renderUncovered(uncovered) {
+              let s = '\n\n**Uncovered functionality**';
+              if (!uncovered || uncovered.length === 0) {
+                return s + '\n\nNone found — everything in this diff is named by an existing graph node.';
+              }
+              s += '\n' + uncovered.map(u =>
+                `- 🆕 ${u.description}\n  > ${u.evidence}`
+              ).join('\n');
+              s += '\n\nNext step for each: `update-knowledge-base` if it fits the graph as a rule or link, otherwise `knowledge-candidate`.';
+              return s;
+            }
+
             let body;
             if (!result) {
               body = `### ⚠️ Codebase Rules Validation — inconclusive\n\nCould not parse output.\n\`\`\`\n${raw.slice(0, 2000)}\n\`\`\``;
@@ -99,12 +111,14 @@ jobs:
               body += renderLayer('Foundations', result.foundations);
               body += renderLayer('Constitutive', result.constitutive);
               body += renderLayer('Regulative', result.regulative);
+              body += renderUncovered(result.uncovered);
             } else {
               body = `### ⚠️ Codebase Rules Validation — advisory findings\n\n> These findings are advisory only and do not block merge.`;
               body += renderSummary(result.summary);
               body += renderLayer('Foundations', result.foundations);
               body += renderLayer('Constitutive', result.constitutive);
               body += renderLayer('Regulative', result.regulative);
+              body += renderUncovered(result.uncovered);
             }
 
             const costUsd = parseFloat(process.env.COST_USD || '0');

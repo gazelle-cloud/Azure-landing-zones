@@ -16,7 +16,7 @@ Do NOT return a single object. Do NOT wrap the array in another object. Do NOT a
 Example for ${COUNT}=2: [ { ...pr1... }, { ...pr2... } ]
 
 Each array element has this shape:
-{"result":"PASS"|"FAIL","summary":{"what":"<2-3 sentences>","why":"<2-3 sentences>"},"foundations":[{"rule":"<id>","status":"pass"|"fail","note":"<one line>","violation":"<omit if pass>","evidence":"<omit if pass>"}],"constitutive":[...],"regulative":[...]}
+{"result":"PASS"|"FAIL","summary":{"what":"<2-3 sentences>","why":"<2-3 sentences>"},"foundations":[{"rule":"<id>","status":"pass"|"fail","note":"<one line>","violation":"<omit if pass>","evidence":"<omit if pass>"}],"constitutive":[...],"regulative":[...],"uncovered":[{"description":"<new functionality/capability introduced>","evidence":"<file and line>"}]}
 
 For EACH pull request, independently check every rule in all three layers:
 - Layer 1 — Foundations (no-fixed-cost, no-human-touch, no-platform-ops, no-unapproved-resources)
@@ -25,6 +25,8 @@ For EACH pull request, independently check every rule in all three layers:
 
 Do not skip rules that seem irrelevant — mark them pass with a note.
 Every rule must appear in each element's layer arrays. result is FAIL if any rule has status fail.
+
+Also, separately for EACH pull request: identify any functionality, capability, or resource type the diff introduces that no vocabulary, constitutive, or regulative node names — regardless of whether it violates an existing rule. This applies to any file type (graph JSON, scripts, bicep, yml, etc.). uncovered never affects result; return an empty array if nothing is uncovered.
 
 EOF
 

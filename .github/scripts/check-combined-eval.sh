@@ -92,6 +92,18 @@ for i in "${!EXPECTED_FILES[@]}"; do
     fi
   done
 
+  mapfile -t MUST_UNCOVER < <(jq -r '.must_uncover[]? // empty' "$EXPECTED_FILE")
+  for KEYWORD in "${MUST_UNCOVER[@]}"; do
+    MATCHES=$(echo "$ACTUAL_JSON" | jq -r --arg k "$KEYWORD" \
+      '[.uncovered[]? | ((.description // "") + " " + (.evidence // ""))] | map(select(. | test($k; "i"))) | length' \
+      2>/dev/null || echo "0")
+    [ -z "$MATCHES" ] && MATCHES="0"
+    if [ "$MATCHES" = "0" ]; then
+      echo "  x $FIXTURE: expected an uncovered finding matching '$KEYWORD', none found"
+      PASS=0
+    fi
+  done
+
   # Build short evidence: what was verified
   EVIDENCE="result=${EXPECTED_RESULT}"
   if [ ${#MUST_FAIL[@]} -gt 0 ]; then
@@ -101,6 +113,10 @@ for i in "${!EXPECTED_FILES[@]}"; do
   if [ ${#MUST_PASS[@]} -gt 0 ]; then
     RULES=$(printf '%s ' "${MUST_PASS[@]}" | sed 's/ $//')
     EVIDENCE="${EVIDENCE} · must_pass:${RULES// /+}"
+  fi
+  if [ ${#MUST_UNCOVER[@]} -gt 0 ]; then
+    RULES=$(printf '%s ' "${MUST_UNCOVER[@]}" | sed 's/ $//')
+    EVIDENCE="${EVIDENCE} · must_uncover:${RULES// /+}"
   fi
 
   if [ "$PASS" = "1" ]; then

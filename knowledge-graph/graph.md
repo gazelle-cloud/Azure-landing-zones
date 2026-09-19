@@ -840,7 +840,7 @@ Automation jobs must run inside the landing zone's own subscription.
 
 **Links:**
 
-- depends-on → platform-identity-graph — OIDC federation is scoped to the landing zone repo and environment.
+- depends-on → platform-identity-graph — Jobs query Entra ID, so the Graph read permissions are what make that call possible.
 
 **Violations:**
 
@@ -914,7 +914,7 @@ A landing zone must have a single managed identity, shared across all its workfl
 
 **Links:**
 
-- depends-on → landing-zone-repo — Jobs query Entra ID, so the Graph read permissions are what make that call possible.
+- depends-on → landing-zone-repo — OIDC federation is scoped to the landing zone repo and environment.
 
 **Violations:**
 
@@ -1666,7 +1666,7 @@ A landing zone must be reshaped by editing its parameter file and merging a pull
 
 ### validate-codebase-rules
 
-Every pull request must be validated against the knowledge graph rules, with findings posted as an advisory comment and never as a merge block.
+Every pull request must be validated against the knowledge graph rules and checked for functionality the graph doesn't yet name, with findings posted as an advisory comment and never as a merge block.
 
 **Why:** Without automated validation, rule violations reach the codebase unchallenged and the graph stops describing what the code actually does.
 
@@ -1687,19 +1687,27 @@ Every pull request must be validated against the knowledge graph rules, with fin
 1. On pull_request opened or synchronize, check out the repo at the PR head with full history.
 2. Collect the full diff (git diff origin/<base>...HEAD) and the full content of every non-deleted changed file. Cap total injected content at 50 KB; truncate with a note beyond that.
 3. Run claude -p with the diff and file contents from the repo root so CLAUDE.md context loads automatically. Ask Claude to check every rule in all three layers - foundations, constitutive, regulative - and return a verdict for every single one, including rules that do not apply.
-4. Ask Claude to return JSON: {"result": "PASS"|"FAIL", "summary": {"what": "...", "why": "..."}, "foundations": [...], "constitutive": [...], "regulative": [...]}, where each layer array holds one entry per rule with rule id, pass/fail status, a one-line note, and violation/evidence text when failed.
-5. Parse the JSON output. Render each layer as a section: failed rules listed with violation and evidence, passed rules collapsed under a details toggle. result is FAIL if any rule in any layer has status fail.
-6. Post the formatted findings as a pull request comment, prefixed with the what/why summary and suffixed with model, token count, and cost in EUR.
+4. Ask Claude to separately identify any functionality, capability, or resource type the diff introduces that no vocabulary, constitutive, or regulative node names - regardless of whether it violates an existing rule.
+5. Ask Claude to return JSON: {"result": "PASS"|"FAIL", "summary": {"what": "...", "why": "..."}, "foundations": [...], "constitutive": [...], "regulative": [...], "uncovered": [...]}, where uncovered holds one entry per gap found, each with a description of the new functionality and the evidence (file/line) that introduced it.
+6. Parse the JSON output. Render each layer as a section: failed rules listed with violation and evidence, passed rules collapsed under a details toggle. Render uncovered findings as their own section, each pointing to update-knowledge-base or knowledge-candidate as the next step. result is FAIL if any rule in any layer has status fail; uncovered findings never affect result.
+7. Post the formatted findings as a pull request comment, prefixed with the what/why summary and suffixed with model, token count, and cost in EUR.
 
 **Links:**
 
 - governed-by → platform-identity-claude
+- depends-on → update-knowledge-base — An uncovered-functionality finding has no closure path until update-knowledge-base exists to add the missing entry.
+- depends-on → knowledge-candidate — An uncovered-functionality finding that doesn't fit as a rule, link, or violation has no closure path until knowledge-candidate exists to record it.
 
 **Violations:**
 
 - Validation configured as a required status check, blocking merge on findings.
 - graph.md included in the injected file content.
+- New platform functionality merged with no corresponding graph entry and no update-knowledge-base or knowledge-candidate follow-up.
 
 **Files:**
 
 - `.github/workflows/pr-validate-codebase-rules.yml`
+- `.github/workflows/eval-pr-validate-codebase-rules.yml`
+- `.github/eval/`
+- `.github/scripts/build-combined-eval-prompt.sh`
+- `.github/scripts/check-combined-eval.sh`
