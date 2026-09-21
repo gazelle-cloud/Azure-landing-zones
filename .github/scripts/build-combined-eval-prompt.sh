@@ -24,9 +24,9 @@ For EACH pull request, independently check every rule in all three layers:
 - Layer 3 — Regulative rules (every regulative-entity and regulative-process rule)
 
 Do not skip rules that seem irrelevant — mark them pass with a note.
-Every rule must appear in each element's layer arrays. result is FAIL if any rule has status fail.
+Every rule must appear in each element's layer arrays.
 
-Also, separately for EACH pull request: identify any functionality, capability, or resource type the diff introduces that no vocabulary, constitutive, or regulative node names — regardless of whether it violates an existing rule. This applies to any file type (graph JSON, scripts, bicep, yml, etc.). uncovered never affects result; return an empty array if nothing is uncovered.
+Also, separately for EACH pull request: identify any functionality, capability, or resource type the diff introduces that no vocabulary, constitutive, or regulative node names — regardless of whether it violates an existing rule. This applies to any file type (graph JSON, scripts, bicep, yml, etc.). result is FAIL if any rule has status fail or uncovered contains one or more entries; return an empty uncovered array if nothing is uncovered.
 
 EOF
 

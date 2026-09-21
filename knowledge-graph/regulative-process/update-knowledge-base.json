@@ -4,7 +4,7 @@
   "subject": {
     "type": "process"
   },
-  "decision": "A knowledge graph entry must be drafted and presented before any file is written, and must reach main through a pull request.",
+  "decision": "A knowledge graph entry must be drafted and presented before any file is written.",
   "why": "An entry written without review enters the graph unchallenged, and the graph is what every later change is read against.",
   "anchor": "no-human-touch",
   "implements": [
@@ -33,7 +33,8 @@
   "violations": [
     "File written before a draft was presented.",
     "Link added in both directions between two entries.",
-    "Violation that restates the rule instead of describing a detectable breach."
+    "Violation that restates the rule instead of describing a detectable breach.",
+    "A decision field combining two different concerns into one rule."
   ],
   "files": [
     "knowledge-graph/vocabulary/",

@@ -1,0 +1,24 @@
+{
+  "id": "functionality-named-in-graph",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "Functionality the codebase carries must be named by a knowledge graph node.",
+  "why": "Functionality the graph doesn't name is functionality the constitution can't govern, and the graph stops describing what the code actually does.",
+  "anchor": "no-human-touch",
+  "implements": [
+    "constitution"
+  ],
+  "links": [
+    {
+      "target": "update-knowledge-base",
+      "relation": "depends-on",
+      "note": "An uncovered-functionality finding has no closure path until update-knowledge-base exists to add the missing entry."
+    }
+  ],
+  "violations": [
+    "New platform functionality merged with no corresponding graph entry."
+  ],
+  "properties": {}
+}

@@ -4,7 +4,7 @@
   "subject": {
     "type": "process"
   },
-  "decision": "A landing zone must be provisioned through requestNew-Landing-Zone, and for a registered platform member.",
+  "decision": "A landing zone must be provisioned through requestNew-Landing-Zone workflow.",
   "why": "Provisioning outside the workflow leaves the subscription unaccounted for in the bank and off the application invoice section.",
   "anchor": "no-platform-ops",
   "implements": [

@@ -756,6 +756,53 @@ The main diagnostic initiative must define shared defaults; parameter files may 
 - `platform-management/policy/bicep/configDiagnosticSettings.bicep`
 - `platform-management/policy/parameters/diagnosticSettings.bicepparam`
 
+### functionality-named-in-graph
+
+Functionality the codebase carries must be named by a knowledge graph node.
+
+**Why:** Functionality the graph doesn't name is functionality the constitution can't govern, and the graph stops describing what the code actually does.
+
+**Anchor:** no-human-touch
+
+**Implements:**
+
+- constitution
+
+**Links:**
+
+- depends-on → update-knowledge-base — An uncovered-functionality finding has no closure path until update-knowledge-base exists to add the missing entry.
+
+**Violations:**
+
+- New platform functionality merged with no corresponding graph entry.
+
+### graph-tested-against-evals
+
+The knowledge graph must be tested against a fixed eval set at least weekly.
+
+**Why:** An untested graph change can silently break how a rule is interpreted, and nothing would show that until a PR is wrongly passed or wrongly failed.
+
+**Anchor:** no-human-touch
+
+**Implements:**
+
+- constitution
+
+**Links:**
+
+- depends-on → validate-codebase-rules — The eval fixtures exercise the graph through the exact prompt validate-codebase-rules runs, so there's nothing to grade a verdict against until that process defines what one looks like.
+
+**Violations:**
+
+- Eval workflow not scheduled to run at least weekly.
+
+**Files:**
+
+- `.github/eval/`
+- `.github/workflows/eval-pr-validate-codebase-rules.yml`
+- `.github/scripts/build-combined-eval-prompt.sh`
+- `.github/scripts/check-combined-eval.sh`
+
 ### job-function-scoped-roles
 
 A role must be scoped to a job function and assigned to the application's Entra ID group, never to an individual or a resource type.
@@ -1379,7 +1426,7 @@ A resource type must clear deny coverage, diagnostic settings, and job-function 
 
 ### create-landing-zone
 
-A landing zone must be provisioned through requestNew-Landing-Zone, and for a registered platform member.
+A landing zone must be provisioned through requestNew-Landing-Zone workflow.
 
 **Why:** Provisioning outside the workflow leaves the subscription unaccounted for in the bank and off the application invoice section.
 
@@ -1571,7 +1618,7 @@ An application must be registered through requestNew-Platform-Members before any
 
 ### update-knowledge-base
 
-A knowledge graph entry must be drafted and presented before any file is written, and must reach main through a pull request.
+A knowledge graph entry must be drafted and presented before any file is written.
 
 **Why:** An entry written without review enters the graph unchallenged, and the graph is what every later change is read against.
 
@@ -1607,6 +1654,7 @@ A knowledge graph entry must be drafted and presented before any file is written
 - File written before a draft was presented.
 - Link added in both directions between two entries.
 - Violation that restates the rule instead of describing a detectable breach.
+- A decision field combining two different concerns into one rule.
 
 **Files:**
 
@@ -1666,7 +1714,7 @@ A landing zone must be reshaped by editing its parameter file and merging a pull
 
 ### validate-codebase-rules
 
-Every pull request must be validated against the knowledge graph rules and checked for functionality the graph doesn't yet name, with findings posted as an advisory comment and never as a merge block.
+Every pull request must be validated against the knowledge graph rules and checked for functionality the graph doesn't yet name.
 
 **Why:** Without automated validation, rule violations reach the codebase unchallenged and the graph stops describing what the code actually does.
 
@@ -1689,25 +1737,19 @@ Every pull request must be validated against the knowledge graph rules and check
 3. Run claude -p with the diff and file contents from the repo root so CLAUDE.md context loads automatically. Ask Claude to check every rule in all three layers - foundations, constitutive, regulative - and return a verdict for every single one, including rules that do not apply.
 4. Ask Claude to separately identify any functionality, capability, or resource type the diff introduces that no vocabulary, constitutive, or regulative node names - regardless of whether it violates an existing rule.
 5. Ask Claude to return JSON: {"result": "PASS"|"FAIL", "summary": {"what": "...", "why": "..."}, "foundations": [...], "constitutive": [...], "regulative": [...], "uncovered": [...]}, where uncovered holds one entry per gap found, each with a description of the new functionality and the evidence (file/line) that introduced it.
-6. Parse the JSON output. Render each layer as a section: failed rules listed with violation and evidence, passed rules collapsed under a details toggle. Render uncovered findings as their own section, each pointing to update-knowledge-base or knowledge-candidate as the next step. result is FAIL if any rule in any layer has status fail; uncovered findings never affect result.
+6. Parse the JSON output. Render each layer as a section: failed rules listed with violation and evidence, passed rules collapsed under a details toggle. Render uncovered findings as their own section. result is FAIL if any rule in any layer has status fail or uncovered contains one or more entries, and a FAIL result must fail the workflow job so GitHub Actions visibly reports advisory findings.
 7. Post the formatted findings as a pull request comment, prefixed with the what/why summary and suffixed with model, token count, and cost in EUR.
 
 **Links:**
 
 - governed-by → platform-identity-claude
-- depends-on → update-knowledge-base — An uncovered-functionality finding has no closure path until update-knowledge-base exists to add the missing entry.
-- depends-on → knowledge-candidate — An uncovered-functionality finding that doesn't fit as a rule, link, or violation has no closure path until knowledge-candidate exists to record it.
+- governed-by → functionality-named-in-graph
 
 **Violations:**
 
 - Validation configured as a required status check, blocking merge on findings.
 - graph.md included in the injected file content.
-- New platform functionality merged with no corresponding graph entry and no update-knowledge-base or knowledge-candidate follow-up.
 
 **Files:**
 
 - `.github/workflows/pr-validate-codebase-rules.yml`
-- `.github/workflows/eval-pr-validate-codebase-rules.yml`
-- `.github/eval/`
-- `.github/scripts/build-combined-eval-prompt.sh`
-- `.github/scripts/check-combined-eval.sh`

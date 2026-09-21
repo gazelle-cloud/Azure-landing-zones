@@ -1,0 +1,30 @@
+{
+  "id": "graph-tested-against-evals",
+  "type": "regulative",
+  "subject": {
+    "type": "entity"
+  },
+  "decision": "The knowledge graph must be tested against a fixed eval set at least weekly.",
+  "why": "An untested graph change can silently break how a rule is interpreted, and nothing would show that until a PR is wrongly passed or wrongly failed.",
+  "anchor": "no-human-touch",
+  "implements": [
+    "constitution"
+  ],
+  "links": [
+    {
+      "target": "validate-codebase-rules",
+      "relation": "depends-on",
+      "note": "The eval fixtures exercise the graph through the exact prompt validate-codebase-rules runs, so there's nothing to grade a verdict against until that process defines what one looks like."
+    }
+  ],
+  "violations": [
+    "Eval workflow not scheduled to run at least weekly."
+  ],
+  "files": [
+    ".github/eval/",
+    ".github/workflows/eval-pr-validate-codebase-rules.yml",
+    ".github/scripts/build-combined-eval-prompt.sh",
+    ".github/scripts/check-combined-eval.sh"
+  ],
+  "properties": {}
+}

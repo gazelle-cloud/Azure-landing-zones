@@ -20,7 +20,7 @@ DELETED_FILE="${3:-/tmp/deleted.txt}"
   echo "Return only a JSON object with this exact shape:"
   echo '{"result":"PASS"|"FAIL","summary":{"what":"<2-3 sentences: what files and behaviour changed>","why":"<2-3 sentences: inferred intent or reason behind the change>"},"foundations":[{"rule":"<id>","status":"pass"|"fail","note":"<one line>","violation":"<matched violation text, omit if pass>","evidence":"<file and content, omit if pass>"}],"constitutive":[...],"regulative":[...],"uncovered":[{"description":"<the new functionality/capability introduced>","evidence":"<file and line>"}]}'
   echo ""
-  echo "Every rule must appear in its layer array. result is FAIL if any rule has status fail. uncovered never affects result; return an empty array if nothing is uncovered."
+  echo "Every rule must appear in its layer array. result is FAIL if any rule has status fail or uncovered contains one or more entries; return an empty uncovered array if nothing is uncovered."
   echo "summary.what describes what the diff does; summary.why states the inferred reason, based on the change itself, not the PR title."
   echo ""
   echo "## Diff"

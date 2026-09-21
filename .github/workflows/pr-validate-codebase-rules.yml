@@ -98,7 +98,6 @@ jobs:
               s += '\n' + uncovered.map(u =>
                 `- 🆕 ${u.description}\n  > ${u.evidence}`
               ).join('\n');
-              s += '\n\nNext step for each: `update-knowledge-base` if it fits the graph as a rule or link, otherwise `knowledge-candidate`.';
               return s;
             }
 
@@ -143,3 +142,7 @@ jobs:
               issue_number: context.issue.number,
               body
             });
+
+            if (result && result.result === 'FAIL') {
+              core.setFailed('Codebase rules validation found violations — see the PR comment. This check is advisory and does not block merge.');
+            }
