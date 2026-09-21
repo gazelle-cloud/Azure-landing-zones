@@ -32,15 +32,13 @@ jobs:
           TOTAL_OUTPUT=0
           MODEL=""
 
-          FIXTURE_DIRS=""
-          EXPECTED_FILES=""
-          for DIR in .github/eval/*/; do
-            DIR="${DIR%/}"
-            FIXTURE_DIRS="$FIXTURE_DIRS $DIR"
-            EXPECTED_FILES="$EXPECTED_FILES $DIR/expected.json"
+          mapfile -t FIXTURE_DIRS < <(find .github/eval -mindepth 2 -maxdepth 2 -type d -exec test -f {}/diff.patch \; -print | sort)
+          EXPECTED_FILES=()
+          for DIR in "${FIXTURE_DIRS[@]}"; do
+            EXPECTED_FILES+=("$DIR/expected.json")
           done
 
-          bash .github/scripts/build-combined-eval-prompt.sh $FIXTURE_DIRS > /tmp/combined-prompt.txt
+          bash .github/scripts/build-combined-eval-prompt.sh "${FIXTURE_DIRS[@]}" > /tmp/combined-prompt.txt
 
           RAW=$(claude -p "$(cat /tmp/combined-prompt.txt)" --output-format json 2>/dev/null)
           OUTPUT=$(echo "$RAW" | jq -r '.result // ""')
@@ -51,7 +49,7 @@ jobs:
           [ -n "$RUN_MODEL" ] && MODEL="$RUN_MODEL"
 
           echo "$OUTPUT" > /tmp/combined-output.txt
-          bash .github/scripts/check-combined-eval.sh /tmp/combined-output.txt $EXPECTED_FILES
+          bash .github/scripts/check-combined-eval.sh /tmp/combined-output.txt "${EXPECTED_FILES[@]}"
           OVERALL=$?
 
           TOTAL_TOKENS=$((IN_TOKENS + OUT_TOKENS))
