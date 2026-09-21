@@ -590,7 +590,7 @@ An exemption must resolve its assignment ID through the platform-generated refer
 
 - `.github/workflows/lz-flow-create-policy-exemption.yml`
 - `landing-zones/*/policy-assignment-reference.json`
-- `.github/utils/get-policyAssignmentsReference.ps1`
+- `.github/scripts/get-policyAssignmentsReference.ps1`
 
 ### azure-policy-single-region
 
@@ -944,7 +944,7 @@ Every landing zone must have its own private GitHub runners provisioned inside i
 **Files:**
 
 - `landing-zones/bicep/modules/base/virtualNetwork.bicep`
-- `.github/utils/create-landingzone-gh-runners.ps1`
+- `.github/scripts/create-landingzone-gh-runners.ps1`
 - `.github/workflows/template-landing-zones.yml`
 
 ### landing-zone-identity

@@ -23,7 +23,7 @@
   ],
   "files": [
     "landing-zones/bicep/modules/base/virtualNetwork.bicep",
-    ".github/utils/create-landingzone-gh-runners.ps1",
+    ".github/scripts/create-landingzone-gh-runners.ps1",
     ".github/workflows/template-landing-zones.yml"
   ],
   "properties": {}

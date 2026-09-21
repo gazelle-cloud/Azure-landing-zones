@@ -45,7 +45,7 @@ jobs:
         id: calculate
         shell: pwsh
         run: |
-          import-module -name ./.github/utils/ipmgmt -verbose
+          import-module -name ./.github/scripts/ipmgmt -verbose
 
           $getVnets = az graph query --graph-query @"
           resources

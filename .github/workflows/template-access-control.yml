@@ -45,8 +45,8 @@ jobs:
           GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
         shell: pwsh
         run: |
-          . ./.github/utils/set-githubVariables.ps1
-          . ./.github/utils/write-stackSummary.ps1
+          . ./.github/scripts/set-githubVariables.ps1
+          . ./.github/scripts/write-stackSummary.ps1
 
           $deployment = az stack mg create `
               --name 'accessControl' `

@@ -34,13 +34,13 @@ jobs:
       - name: check graph freshness
         id: check
         shell: pwsh
-        run: ./.github/utils/write-knowledge-graph.ps1 -Check
+        run: ./.github/scripts/write-knowledge-graph.ps1 -Check
         continue-on-error: true
 
       - name: regenerate graph
         if: steps.check.outcome == 'failure'
         shell: pwsh
-        run: ./.github/utils/write-knowledge-graph.ps1
+        run: ./.github/scripts/write-knowledge-graph.ps1
 
       - name: commit and push
         if: steps.check.outcome == 'failure'

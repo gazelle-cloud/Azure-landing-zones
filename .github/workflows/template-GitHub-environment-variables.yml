@@ -46,7 +46,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
         shell: pwsh
         run: |
-          . ./.github/utils/set-githubVariables.ps1
+          . ./.github/scripts/set-githubVariables.ps1
 
           $GitHubVariables = (Get-Content ./githubVariables.json -Raw | ConvertFrom-Json -Depth 20).AzurePlatformVariables
 
@@ -84,7 +84,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
         shell: pwsh
         run: |
-          . ./.github/utils/set-githubVariables.ps1
+          . ./.github/scripts/set-githubVariables.ps1
 
           $query = gh api graphql -f query='query($login:String!){ organization(login:$login){ login databaseId id } }' -f login=${{ env.GITHUB_ORGANIZATION_NAME}}
 

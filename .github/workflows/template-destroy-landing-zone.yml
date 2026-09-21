@@ -116,7 +116,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.github-token.outputs.token }}
         run: |
-          ./.github/utils/destroy-landingzone-gh-runners.ps1 `
+          ./.github/scripts/destroy-landingzone-gh-runners.ps1 `
             -GitHubRunnersName '${{ env.LANDING_ZONE_NAME }}' `
             -GitHubOrganizationName '${{ github.repository_owner }}'
 
@@ -126,7 +126,7 @@ jobs:
           PR_TITLE_PREFIX: "destroy landingzone:"
           GH_TOKEN: ${{ steps.github-token.outputs.token }}
         run: |
-          ./.github/utils/destroy-landingzone.ps1 `
+          ./.github/scripts/destroy-landingzone.ps1 `
             -subscriptionId '${{ env.SUBSCRIPTION_ID }}' `
             -PlatformObjectId '${{ vars.AZURE_PLATFORM_PRINCIPAL_ID }}' `
             -TenantId '${{ vars.AZURE_TENANT_ID }}'

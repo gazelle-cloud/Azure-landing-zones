@@ -24,7 +24,7 @@
   "files": [
     ".github/workflows/lz-flow-create-policy-exemption.yml",
     "landing-zones/*/policy-assignment-reference.json",
-    ".github/utils/get-policyAssignmentsReference.ps1"
+    ".github/scripts/get-policyAssignmentsReference.ps1"
   ],
   "properties": {}
 }

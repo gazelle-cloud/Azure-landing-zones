@@ -154,8 +154,8 @@ jobs:
           GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
         shell: pwsh
         run: |
-          . ./.github/utils/set-githubVariables.ps1
-          . ./.github/utils/write-stackSummary.ps1
+          . ./.github/scripts/set-githubVariables.ps1
+          . ./.github/scripts/write-stackSummary.ps1
 
           $excludedActions = @(
               "Microsoft.Insights/diagnosticSettings/write"
@@ -211,7 +211,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.github-token.outputs.token }}
         shell: pwsh
         run: |
-          . ./.github/utils/set-githubVariables.ps1
+          . ./.github/scripts/set-githubVariables.ps1
 
           az account set --subscription ${{ env.SUBSCRIPTION_ID}}
 
@@ -234,7 +234,7 @@ jobs:
           GITHUB_ORGANIZATION_NAME: ${{ github.repository_owner }}
           PRIVATE_RUNNERS_NAME: "${{ inputs.managementGroupScope }}-${{ env.APP_NAME }}-${{ env.LZ_ENVIRONMENT}}"
         run: |
-          ./.github/utils/create-landingzone-gh-runners.ps1 `
+          ./.github/scripts/create-landingzone-gh-runners.ps1 `
             -githubNetworkId "${{ env.gh_network_id }}" `
             -GitHubRunnersName "${{ env.PRIVATE_RUNNERS_NAME }}" `
             -GitHubOrganizationName "${{ env.GITHUB_ORGANIZATION_NAME }}"

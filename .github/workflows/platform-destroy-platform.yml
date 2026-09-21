@@ -64,7 +64,7 @@ jobs:
       - name: powershell scripts
         shell: pwsh
         run: |
-          ./.github/utils/destroy-platform.ps1 `
+          ./.github/scripts/destroy-platform.ps1 `
             -ChildManagementGroupName 'oases-${{ env.MANAGEMENT_GROUP_HIERARCHY }}' `
             -TopLevelManagementGroupName ${{ env.TOP_LEVEL_MANAGEMENT_GROUP_NAME }} `
             -actionOnUnmanage '${{  env.ACTION_ON_UNMANAGE }}'`
