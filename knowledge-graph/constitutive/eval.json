@@ -1,0 +1,29 @@
+{
+  "id": "eval",
+  "type": "constitutive",
+  "subject": {
+    "type": "entity",
+    "term": "eval"
+  },
+  "rule": "A test case counts as an eval in Gazelle when it references a specific knowledge graph node and a failure scenario is defined.",
+  "anchor": "no-human-touch",
+  "evidence": [
+    ".github/eval/PR-validator/"
+  ],
+  "links": [
+    {
+      "target": "constitution",
+      "relation": "depends-on",
+      "note": "An eval references a knowledge graph node, so there is nothing to reference until the constitution holds it."
+    },
+    {
+      "target": "validate-codebase-rules",
+      "relation": "depends-on",
+      "note": "An eval exercises the validator, so there is no process to grade the scenario against until validate-codebase-rules defines it."
+    }
+  ],
+  "violations": [
+    "Eval directory with no defined failure scenario."
+  ],
+  "properties": {}
+}

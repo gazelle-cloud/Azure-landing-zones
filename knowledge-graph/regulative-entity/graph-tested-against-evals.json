@@ -8,7 +8,8 @@
   "why": "An untested graph change can silently break how a rule is interpreted, and nothing would show that until a PR is wrongly passed or wrongly failed.",
   "anchor": "no-human-touch",
   "implements": [
-    "constitution"
+    "constitution",
+    "eval"
   ],
   "links": [
     {

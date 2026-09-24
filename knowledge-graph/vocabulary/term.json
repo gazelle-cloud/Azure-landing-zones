@@ -82,5 +82,9 @@
   {
     "id": "monitored",
     "type": "term"
+  },
+  {
+    "id": "eval",
+    "type": "term"
   }
 ]

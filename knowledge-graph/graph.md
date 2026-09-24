@@ -29,6 +29,7 @@
 | strong-authentication |
 | secure-network |
 | monitored |
+| eval |
 
 ### Relations
 
@@ -145,6 +146,27 @@ A JSON file counts as Gazelle's constitution when the knowledge graph holds it.
 - Foundation or regulative rule treated as advisory because it is not a constitutive one.
 - graph.md edited directly rather than the node it is generated from.
 - Constitution read as documentation of what the code already does.
+
+### eval
+
+**Subject:** eval (entity)
+
+A test case counts as an eval in Gazelle when it references a specific knowledge graph node and a failure scenario is defined.
+
+**Anchor:** no-human-touch
+
+**Evidence:**
+
+- `.github/eval/PR-validator/`
+
+**Links:**
+
+- depends-on → constitution — An eval references a knowledge graph node, so there is nothing to reference until the constitution holds it.
+- depends-on → validate-codebase-rules — An eval exercises the validator, so there is no process to grade the scenario against until validate-codebase-rules defines it.
+
+**Violations:**
+
+- Eval directory with no defined failure scenario.
 
 ### gazelle
 
@@ -787,6 +809,7 @@ The knowledge graph must be tested against a fixed eval set at least weekly.
 **Implements:**
 
 - constitution
+- eval
 
 **Links:**
 
