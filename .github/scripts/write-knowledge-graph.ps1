@@ -5,7 +5,7 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
-$root = Join-Path $PSScriptRoot '..' '..' 'knowledge-graph'
+$root = Join-Path $PSScriptRoot '..' '..' 'constitution'
 
 # The graph renders as one artifact, in reading order: what the words mean, what
 # the platform values, what counts as what, and what has to happen inside that.
@@ -63,7 +63,7 @@ $monolith = @{
                 decision   = 'Paragraph'
                 why        = 'Inline'
                 anchor     = 'Inline'
-                implements = 'List'
+                implements = 'Inline'
                 links      = 'RelationList'
                 violations = 'List'
                 files      = 'CodeList'
@@ -78,7 +78,7 @@ $monolith = @{
                 decision   = 'Paragraph'
                 why        = 'Inline'
                 anchor     = 'Inline'
-                implements = 'List'
+                implements = 'Inline'
                 trigger    = 'List'
                 workflow   = 'Inline'
                 steps      = 'Steps'
@@ -305,7 +305,7 @@ function Format-Monolith {
         [Parameter(Mandatory)] [array] $Sections
     )
 
-    $sources = ($Sections | ForEach-Object { "knowledge-graph/$($_.Directory)/" }) -join ', '
+    $sources = ($Sections | ForEach-Object { "constitution/$($_.Directory)/" }) -join ', '
 
     $lines = [System.Collections.Generic.List[string]]::new()
     $lines.Add("<!-- GENERATED FROM $sources - DO NOT EDIT -->")
@@ -335,13 +335,13 @@ $content = Format-Monolith -Title $monolith.Title -Sections $monolith.Sections
 if ($Check) {
     if (-not (Test-Path -Path $outputPath -PathType Leaf)) {
         [Console]::Error.WriteLine('FAIL: knowledge graph artifact')
-        [Console]::Error.WriteLine("  knowledge-graph/$($monolith.Name) is missing - run write-knowledge-graph.ps1")
+        [Console]::Error.WriteLine("  constitution/$($monolith.Name) is missing - run write-knowledge-graph.ps1")
         exit 2
     }
 
     if ([System.IO.File]::ReadAllText($outputPath, $encoding) -ne $content) {
         [Console]::Error.WriteLine('FAIL: knowledge graph artifact')
-        [Console]::Error.WriteLine("  knowledge-graph/$($monolith.Name) is stale - run write-knowledge-graph.ps1")
+        [Console]::Error.WriteLine("  constitution/$($monolith.Name) is stale - run write-knowledge-graph.ps1")
         exit 2
     }
 
@@ -350,6 +350,6 @@ if ($Check) {
 }
 
 [System.IO.File]::WriteAllText($outputPath, $content, $encoding)
-Write-Output "OK: wrote knowledge-graph/$($monolith.Name)"
+Write-Output "OK: wrote constitution/$($monolith.Name)"
 
 exit 0

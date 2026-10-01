@@ -1,0 +1,20 @@
+{
+    "id": "azure-policy-deny-cross-tenant-data-replication",
+    "type": "regulative",
+    "subject": {
+        "type": "entity"
+    },
+    "decision": "Azure Policy must deny cross-tenant data replication.",
+    "why": "Without this, data can leave the tenant over Microsoft's backbone without crossing a network boundary the platform can observe.",
+    "anchor": "no-unapproved-resources",
+    "implements": "allowed-resources",
+    "links": [],
+    "violations": [
+        "A data replication capability is approved before the platform can prove replicated data remains inside the Gazelle tenant."
+    ],
+    "files": [
+        "platform-management/policy/bicep/oases.bicep",
+        "platform-management/policy/parameters/oases/denyCrossTenantReplication.json"
+    ],
+    "properties": {}
+}

@@ -1,14 +1,9 @@
 [
     // network
     "storageaccountshoulduseaprivatelinkconnectionmonitoringeffect",
-    "storageaccountshoulduseaprivatelinkconnectionexaromonitoringeffect",
     "storageaccountsshouldrestrictnetworkaccessusingvirtualnetworkrulesmonitoringeffect",
-    "storageaccountsshouldrestrictnetworkaccessusingvirtualnetworkrulesexaromonitoringeffect",
-    "storageaccountsshouldrestrictnetworkaccessusingvirtualnetworkrulesexdatabricksmonitoringeffect",
     "networkwatchershouldbeenabledmonitoringeffect",
-    "storageaccountshoulduseaprivatelinkconnectionexdatabricksmonitoringeffect",
     // identity
-    "storageAccountsShouldPreventSharedKeyAccessExDataBricks",
     "userbacrulesmonitoring",
     "identityDesignateMoreThanOneOwnerMonitoring",
     "identitydesignatelessthanownersmonitoring",

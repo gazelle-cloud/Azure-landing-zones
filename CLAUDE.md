@@ -6,11 +6,11 @@ Gazelle sets the rules and writes down why. Teams build in Azure, ship through G
 
 | Directory | Path pattern | Content |
 |---|---|---|
-| vocabulary | `knowledge-graph/vocabulary/term.json`, `relation.json` | The terms the graph names and the relations its links carry |
-| foundations | `knowledge-graph/foundations/<id>.json` | Non-negotiable platform values |
-| constitutive | `knowledge-graph/constitutive/<id>.json` | What counts as what — breaking one produces something that is not Gazelle |
-| regulative (entity) | `knowledge-graph/regulative-entity/<id>.json` | What has to hold true of a thing inside those boundaries |
-| regulative (process) | `knowledge-graph/regulative-process/<id>.json` | What has to happen to do something; one carrying `steps` is an operation |
+| vocabulary | `constitution/vocabulary/term.json`, `relation.json` | The terms the graph names and the relations its links carry |
+| foundations | `constitution/foundations/<id>.json` | Non-negotiable platform values |
+| constitutive | `constitution/constitutive/<id>.json` | What counts as what — breaking one produces something that is not Gazelle |
+| regulative (entity) | `constitution/regulative-entity/<id>.json` | What has to hold true of a thing inside those boundaries |
+| regulative (process) | `constitution/regulative-process/<id>.json` | What has to happen to do something; one carrying `steps` is an operation |
 | github | `.github/workflows/<name>.yml` | GitHub Actions workflows — platform triggers, reusable templates, per-landing-zone generated workflows, and self-service flows |
 | platform members | `platform-members/<AppName>.json` | One file per registered application; binds Entra ID group, GitHub repo, and billing scope |
 | landing zones | `landing-zones/oases-<env>/oases-<appName>-<env>.bicepparam` | Per-landing-zone parameter file; the file an application team edits to manage their landing zone |
@@ -31,7 +31,7 @@ serves (`anchor`), and names the constitutive rules it upholds (`implements`).
 Its `subject.type` restates the directory it sits in; it names no vocabulary
 term.
 
-@knowledge-graph/graph.md
+@constitution/graph.md
 
 # Claude instructions
 

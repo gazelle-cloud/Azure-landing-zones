@@ -1,0 +1,18 @@
+{
+    "id": "bigbang",
+    "type": "constitutive",
+    "subject": {
+        "type": "entity",
+        "term": "bigbang"
+    },
+    "rule": "A GitHub Actions workflow counts as BigBang when Gazelle names its workflow definition.",
+    "anchor": "no-human-touch",
+    "evidence": [
+        ".github/workflows/platform-BigBang.yml"
+    ],
+    "links": [],
+    "violations": [
+        "BigBang succeeds only because existing platform state was left in place from a previous run."
+    ],
+    "properties": {}
+}

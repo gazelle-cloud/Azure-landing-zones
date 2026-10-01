@@ -1,7 +1,7 @@
-diff --git a/knowledge-graph/constitutive/gazelle.json b/knowledge-graph/constitutive/gazelle.json
+diff --git a/constitution/constitutive/gazelle.json b/constitution/constitutive/gazelle.json
 index 0000000..0000000 100644
---- a/knowledge-graph/constitutive/gazelle.json
-+++ b/knowledge-graph/constitutive/gazelle.json
+--- a/constitution/constitutive/gazelle.json
++++ b/constitution/constitutive/gazelle.json
 @@ -11,7 +11,13 @@
      ".github/workflows/platform-BigBang.yml",
      "githubVariables.json"

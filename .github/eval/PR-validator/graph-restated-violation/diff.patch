@@ -1,7 +1,7 @@
-diff --git a/knowledge-graph/regulative-entity/azure-native-services-only.json b/knowledge-graph/regulative-entity/azure-native-services-only.json
+diff --git a/constitution/regulative-entity/azure-native-services-only.json b/constitution/regulative-entity/azure-native-services-only.json
 index 0000000..0000000 100644
---- a/knowledge-graph/regulative-entity/azure-native-services-only.json
-+++ b/knowledge-graph/regulative-entity/azure-native-services-only.json
+--- a/constitution/regulative-entity/azure-native-services-only.json
++++ b/constitution/regulative-entity/azure-native-services-only.json
 @@ -12,7 +12,8 @@
    ],
    "links": [],

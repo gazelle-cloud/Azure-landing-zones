@@ -35,7 +35,7 @@ TOTAL=0
 CAP=51200
 while IFS= read -r file; do
   [ -f "$file" ] || continue
-  [ "$file" = "knowledge-graph/graph.md" ] && continue
+  [ "$file" = "constitution/graph.md" ] && continue
   SIZE=$(wc -c < "$file")
   TOTAL=$((TOTAL + SIZE))
   if [ $TOTAL -gt $CAP ]; then
