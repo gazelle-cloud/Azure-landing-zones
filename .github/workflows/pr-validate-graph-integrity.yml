@@ -1,0 +1,25 @@
+name: pr - validate graph integrity
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'constitution/vocabulary/**'
+      - 'constitution/foundations/**'
+      - 'constitution/constitutive/**'
+      - 'constitution/regulative-entity/**'
+      - 'constitution/regulative-process/**'
+      - 'constitution/graph.md'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: check graph freshness
+        shell: pwsh
+        run: ./.github/scripts/write-knowledge-graph.ps1 -Check

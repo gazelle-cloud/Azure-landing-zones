@@ -19,7 +19,7 @@
     "Eval workflow not scheduled to run at least weekly."
   ],
   "files": [
-    ".github/eval/",
+    "constitution/eval/",
     ".github/workflows/eval-pr-validate-codebase-rules.yml",
     ".github/scripts/build-combined-eval-prompt.sh",
     ".github/scripts/check-combined-eval.sh"

@@ -132,9 +132,9 @@ A test case counts as an eval in Gazelle when it references a specific knowledge
 
 **Evidence:**
 
-- `.github/eval/PR-validator/*/description.md`
-- `.github/eval/PR-validator/*/diff.patch`
-- `.github/eval/PR-validator/*/expected.json`
+- `constitution/eval/PR-validator/*/description.md`
+- `constitution/eval/PR-validator/*/diff.patch`
+- `constitution/eval/PR-validator/*/expected.json`
 
 **Links:**
 
@@ -688,7 +688,7 @@ The knowledge graph must be tested against a fixed eval set at least weekly.
 
 **Files:**
 
-- `.github/eval/`
+- `constitution/eval/`
 - `.github/workflows/eval-pr-validate-codebase-rules.yml`
 - `.github/scripts/build-combined-eval-prompt.sh`
 - `.github/scripts/check-combined-eval.sh`
@@ -1588,9 +1588,9 @@ A landing zone must be reshaped by editing its parameter file and merging a pull
 
 ### validate-codebase-rules
 
-Every pull request must be validated against the knowledge graph rules and checked for functionality the graph doesn't yet name.
+Every pull request must be validated against the knowledge graph rules and checked for functionality the graph doesn't yet name, and a FAIL result must block merge.
 
-**Why:** Without automated validation, rule violations reach the codebase unchallenged and the graph stops describing what the code actually does.
+**Why:** Without automated validation, rule violations reach the codebase unchallenged and the graph stops describing what the code actually does; without blocking merge, a FAIL carries no enforcement and is only a comment a reviewer can ignore.
 
 **Anchor:** no-human-touch
 
@@ -1611,6 +1611,7 @@ Every pull request must be validated against the knowledge graph rules and check
 5. Ask Claude to return JSON: {"result": "PASS"|"FAIL", "summary": {"what": "...", "why": "..."}, "foundations": [...], "constitutive": [...], "regulative": [...], "uncovered": [...]}, where uncovered holds one entry per gap found, each with a description of the new functionality and the evidence (file/line) that introduced it.
 6. Parse the JSON output. Render each layer as a section: failed rules listed with violation and evidence, passed rules collapsed under a details toggle. Render uncovered findings as their own section. result is FAIL if any rule in any layer has status fail or uncovered contains one or more entries, and a FAIL result must fail the workflow job so GitHub Actions visibly reports advisory findings.
 7. Post the formatted findings as a pull request comment, prefixed with the what/why summary and suffixed with model, token count, and cost in EUR.
+8. Configure the check as a required status check on the default branch, with no admin-bypass exemption, so a FAIL cannot be merged past.
 
 **Links:**
 
@@ -1619,7 +1620,6 @@ Every pull request must be validated against the knowledge graph rules and check
 
 **Violations:**
 
-- Validation configured as a required status check, blocking merge on findings.
 - graph.md included in the injected file content.
 
 **Files:**

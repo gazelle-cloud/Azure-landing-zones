@@ -3,8 +3,6 @@ name: pr - validate codebase rules
 on:
   pull_request:
     types: [opened, synchronize]
-    paths-ignore:
-      - 'constitution/graph.md'
 
 permissions:
   contents: read
@@ -115,7 +113,7 @@ jobs:
               body += renderLayer('Regulative', result.regulative);
               body += renderUncovered(result.uncovered);
             } else {
-              body = `### ⚠️ Codebase Rules Validation — advisory findings\n\n> These findings are advisory only and do not block merge.`;
+              body = `### ⚠️ Codebase Rules Validation — findings\n\n> This check must pass before merge.`;
               body += renderSummary(result.summary);
               body += renderLayer('Foundations', result.foundations);
               body += renderLayer('Constitutive', result.constitutive);
@@ -147,5 +145,5 @@ jobs:
             });
 
             if (result && result.result === 'FAIL') {
-              core.setFailed('Codebase rules validation found violations — see the PR comment. This check is advisory and does not block merge.');
+              core.setFailed('Codebase rules validation found violations — see the PR comment.');
             }

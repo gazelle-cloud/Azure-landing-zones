@@ -8,9 +8,9 @@
     "rule": "A test case counts as an eval in Gazelle when it references a specific knowledge graph node and a failure scenario is defined.",
     "anchor": "no-human-touch",
     "evidence": [
-        ".github/eval/PR-validator/*/description.md",
-        ".github/eval/PR-validator/*/diff.patch",
-        ".github/eval/PR-validator/*/expected.json"
+        "constitution/eval/PR-validator/*/description.md",
+        "constitution/eval/PR-validator/*/diff.patch",
+        "constitution/eval/PR-validator/*/expected.json"
     ],
     "links": [
         {

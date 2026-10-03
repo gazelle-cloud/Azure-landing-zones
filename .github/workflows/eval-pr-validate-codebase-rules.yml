@@ -32,7 +32,7 @@ jobs:
           TOTAL_OUTPUT=0
           MODEL=""
 
-          mapfile -t FIXTURE_DIRS < <(find .github/eval -mindepth 2 -maxdepth 2 -type d -exec test -f {}/diff.patch \; -print | sort)
+          mapfile -t FIXTURE_DIRS < <(find constitution/eval -mindepth 2 -maxdepth 2 -type d -exec test -f {}/diff.patch \; -print | sort)
           EXPECTED_FILES=()
           for DIR in "${FIXTURE_DIRS[@]}"; do
             EXPECTED_FILES+=("$DIR/expected.json")
