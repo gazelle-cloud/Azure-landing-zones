@@ -5,7 +5,7 @@
         "type": "entity",
         "term": "platform-member"
     },
-    "rule": "A product team counts as a platform member when a platform-member file declares its application.",
+    "rule": "A product team counts as a platform member when a file matching properties.memberFilePattern, other than properties.excludedFiles, declares its application with each of properties.requiredFields.",
     "anchor": "no-platform-ops",
     "evidence": [
         "platform-members/<AppName>.json"
@@ -22,6 +22,9 @@
     ],
     "properties": {
         "memberFilePattern": "platform-members/<AppName>.json",
+        "excludedFiles": [
+            "platform-members/template.json"
+        ],
         "requiredFields": [
             "applicationName",
             "ownerEmail",

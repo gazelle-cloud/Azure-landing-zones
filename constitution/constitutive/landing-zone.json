@@ -5,32 +5,22 @@
         "type": "entity",
         "term": "landing-zone"
     },
-    "rule": "An Azure subscription counts as a landing zone when a landing-zone parameter file declares it.",
+    "rule": "An Azure subscription counts as a landing zone when a file matching properties.parameterFilePattern declares its subscriptionId.",
     "anchor": "no-human-touch",
     "evidence": [
-        "landing-zones/oases-<env>/oases-<appName>-<env>.bicepparam"
+        "landing-zones/*/oases-*.bicepparam"
     ],
     "links": [
         {
             "target": "platform-member",
             "relation": "depends-on",
             "note": "The run deploys the landing zone in a named member's name, so there is no one to deploy it for until membership exists."
-        },
-        {
-            "target": "oases",
-            "relation": "depends-on",
-            "note": "A landing zone holds its status in the oases register, so there is nowhere for it to hold until the platform establishes oases."
         }
     ],
     "violations": [
         "Subscription hand-built to resemble a landing zone."
     ],
     "properties": {
-        "parameterFilePattern": "landing-zones/oases-<env>/oases-<appName>-<env>.bicepparam",
-        "requiredParameters": [
-            "appName",
-            "environment",
-            "subscriptionId"
-        ]
+        "parameterFilePattern": "landing-zones/*/oases-*.bicepparam"
     }
 }

@@ -106,19 +106,19 @@ A graph node counts as part of the Gazelle constitution when it is a valid JSON 
 - Rule followed that no JSON file in the knowledge graph carries.
 - graph.md edited directly rather than the node it is generated from.
 - Constitutive rule with a links entry that depends on a regulative rule.
-- A constitutive rule defines its counting criterion in terms that an agent cannot validate by reading repository files alone.
+- A constitutive criterion written or judged against anything but repository files.
 
 ### eval
 
 **Subject:** eval (entity)
 
-A test case counts as an eval when expected.json's result and must_fail resolve against properties.
+A test case counts as an eval when its expected.json matches properties.fixturePattern for one of properties.kinds.
 
 **Anchor:** no-human-touch
 
 **Evidence:**
 
-- `constitution/eval/PR-validator/*/expected.json`
+- `constitution/eval/*/*/expected.json`
 
 **Links:**
 
@@ -126,16 +126,12 @@ A test case counts as an eval when expected.json's result and must_fail resolve 
 
 **Violations:**
 
-- must_fail entry naming an id with no matching node in the graph.
+- Expected answer copied from model output.
 
 **Properties:**
 
-- file: expected.json
-- field: result
-- allowedValues: PASS FAIL
-- failRequires: must_fail
-- failRequiresNonEmpty: True
-- mustFailResolvesToGraph: True
+- fixturePattern: constitution/eval/<kind>/<case>/expected.json
+- kinds: PR-validator semantic
 
 ### gazelle
 
@@ -190,18 +186,17 @@ An Azure Policy assignment counts as a guardrail when its declared name is liste
 
 **Subject:** landing-zone (entity)
 
-An Azure subscription counts as a landing zone when a landing-zone parameter file declares it.
+An Azure subscription counts as a landing zone when a file matching properties.parameterFilePattern declares its subscriptionId.
 
 **Anchor:** no-human-touch
 
 **Evidence:**
 
-- `landing-zones/oases-<env>/oases-<appName>-<env>.bicepparam`
+- `landing-zones/*/oases-*.bicepparam`
 
 **Links:**
 
 - depends-on → platform-member — The run deploys the landing zone in a named member's name, so there is no one to deploy it for until membership exists.
-- depends-on → oases — A landing zone holds its status in the oases register, so there is nowhere for it to hold until the platform establishes oases.
 
 **Violations:**
 
@@ -209,8 +204,7 @@ An Azure subscription counts as a landing zone when a landing-zone parameter fil
 
 **Properties:**
 
-- parameterFilePattern: landing-zones/oases-<env>/oases-<appName>-<env>.bicepparam
-- requiredParameters: appName environment subscriptionId
+- parameterFilePattern: landing-zones/*/oases-*.bicepparam
 
 ### oases
 
@@ -242,7 +236,7 @@ A management group counts as oases when properties.file declares it as a child o
 
 **Subject:** platform-member (entity)
 
-A product team counts as a platform member when a platform-member file declares its application.
+A product team counts as a platform member when a file matching properties.memberFilePattern, other than properties.excludedFiles, declares its application with each of properties.requiredFields.
 
 **Anchor:** no-platform-ops
 
@@ -261,6 +255,7 @@ A product team counts as a platform member when a platform-member file declares 
 **Properties:**
 
 - memberFilePattern: platform-members/<AppName>.json
+- excludedFiles: platform-members/template.json
 - requiredFields: applicationName ownerEmail engineerEmail
 
 ### platform-test-environment
@@ -644,6 +639,52 @@ The main diagnostic initiative must define shared defaults; parameter files may 
 - `platform-management/policy/bicep/configDiagnosticSettings.bicep`
 - `platform-management/policy/parameters/diagnosticSettings.bicepparam`
 
+### eval-PR-validator
+
+The PR validator must be tested against a fixed eval set at least weekly.
+
+**Why:** An untested graph change can silently break how a rule is interpreted, and nothing would show that until a PR is wrongly passed or wrongly failed.
+
+**Anchor:** no-human-touch
+
+**Implements:** eval
+
+**Links:**
+
+- depends-on → validate-codebase-rules — The eval fixtures exercise the graph through the exact prompt validate-codebase-rules runs, so there's nothing to grade a verdict against until that process defines what one looks like.
+
+**Violations:**
+
+- Eval workflow not scheduled to run at least weekly.
+- FAIL fixture with an empty must_fail.
+- must_fail entry naming an id with no matching node in the graph.
+
+**Files:**
+
+- `constitution/eval/PR-validator/`
+- `.github/workflows/eval-pr-validate-codebase-rules.yml`
+- `.github/scripts/build-combined-eval-prompt.sh`
+- `.github/scripts/check-combined-eval.sh`
+
+### eval-semantic
+
+A semantic eval must test a constitutive rule against its own fixture files.
+
+**Why:** Without fixed files, the expected count drifts with the repository and a failure stops pointing at the rule.
+
+**Anchor:** no-human-touch
+
+**Implements:** eval
+
+**Violations:**
+
+- Expected count read from the live repository.
+- Semantic eval run with the full graph in context.
+
+**Files:**
+
+- `constitution/eval/semantic/`
+
 ### functionality-named-in-graph
 
 Functionality the codebase carries must be named by a knowledge graph node.
@@ -680,31 +721,6 @@ A constitutive rule's evidence must name the exact file or pattern a check would
 **Files:**
 
 - `constitution/constitutive/*.json`
-
-### graph-tested-against-evals
-
-The knowledge graph must be tested against a fixed eval set at least weekly.
-
-**Why:** An untested graph change can silently break how a rule is interpreted, and nothing would show that until a PR is wrongly passed or wrongly failed.
-
-**Anchor:** no-human-touch
-
-**Implements:** eval
-
-**Links:**
-
-- depends-on → validate-codebase-rules — The eval fixtures exercise the graph through the exact prompt validate-codebase-rules runs, so there's nothing to grade a verdict against until that process defines what one looks like.
-
-**Violations:**
-
-- Eval workflow not scheduled to run at least weekly.
-
-**Files:**
-
-- `constitution/eval/`
-- `.github/workflows/eval-pr-validate-codebase-rules.yml`
-- `.github/scripts/build-combined-eval-prompt.sh`
-- `.github/scripts/check-combined-eval.sh`
 
 ### graph-violations
 

@@ -13,7 +13,7 @@ Gazelle sets the rules and writes down why. Teams build in Azure, ship through G
 | regulative (process) | `constitution/regulative-process/<id>.json` | What has to happen to do something; one carrying `steps` is an operation |
 | github | `.github/workflows/<name>.yml` | GitHub Actions workflows — platform triggers, reusable templates, per-landing-zone generated workflows, and self-service flows |
 | platform members | `platform-members/<AppName>.json` | One file per registered application; binds Entra ID group, GitHub repo, and billing scope |
-| landing zones | `landing-zones/oases-<env>/oases-<appName>-<env>.bicepparam` | Per-landing-zone parameter file; the file an application team edits to manage their landing zone |
+| landing zones | `landing-zones/<managementGroup>/oases-<appName>-<env>.bicepparam` | One file per landing zone; the folder names its management group |
 | platform management | `platform-management/<capability>/parameters/` | Policy definitions and assignments, custom roles, and management group hierarchy |
 | visualization | [`gazelle-cloud.github.io`](https://github.com/gazelle-cloud/gazelle-cloud.github.io) | Interactive force-directed graphs of the knowledge graph, operations, and deployment workflows |
 
