@@ -69,17 +69,13 @@ The allowed list starts empty. A resource type joins the platform only after its
 
 **Subject:** bigbang (entity)
 
-platform-BigBang.yml counts as BigBang when its jobs call each reusable workflow listed in properties.requiredWorkflows via `uses:`.
+platform-BigBang.yml counts as BigBang when its jobs call every workflow in properties.requiredWorkflows.
 
 **Anchor:** no-human-touch
 
 **Evidence:**
 
 - `.github/workflows/platform-BigBang.yml`
-
-**Violations:**
-
-- BigBang succeeds only because existing platform state was left in place from a previous run.
 
 **Properties:**
 
@@ -89,7 +85,7 @@ platform-BigBang.yml counts as BigBang when its jobs call each reusable workflow
 
 **Subject:** constitution (entity)
 
-A graph node counts as part of the Gazelle constitution when it is a valid JSON file under one of the knowledge graph node directories.
+A valid JSON file under a graph node directory counts as constitution.
 
 **Anchor:** no-human-touch
 
@@ -103,9 +99,8 @@ A graph node counts as part of the Gazelle constitution when it is a valid JSON 
 
 **Violations:**
 
-- Rule followed that no JSON file in the knowledge graph carries.
-- graph.md edited directly rather than the node it is generated from.
-- Constitutive rule with a links entry that depends on a regulative rule.
+- graph.md edited by hand.
+- Constitutive rule depending on a regulative one.
 - A constitutive criterion written or judged against anything but repository files.
 
 ### eval
@@ -122,11 +117,7 @@ A test case counts as an eval when its expected.json matches properties.fixtureP
 
 **Links:**
 
-- depends-on → constitution — An eval references a knowledge graph node, so there is nothing to reference until the constitution holds it.
-
-**Violations:**
-
-- Expected answer copied from model output.
+- depends-on → constitution — Each fixture names a node the constitution holds.
 
 **Properties:**
 
@@ -137,7 +128,7 @@ A test case counts as an eval when its expected.json matches properties.fixtureP
 
 **Subject:** gazelle (entity)
 
-An Azure tenant counts as Gazelle when its ID matches the configuration value identified in properties.
+An Azure tenant counts as Gazelle when its ID matches properties.path in properties.file.
 
 **Anchor:** no-human-touch
 
@@ -147,12 +138,8 @@ An Azure tenant counts as Gazelle when its ID matches the configuration value id
 
 **Links:**
 
-- depends-on → bigbang — BigBang supplies the repository-declared workflow for building its platform.
-- depends-on → constitution — The constitution supplies the graph nodes that govern its platform.
-
-**Violations:**
-
-- Azure tenant presented as Gazelle that BigBang did not build.
+- depends-on → bigbang — BigBang builds its platform.
+- depends-on → constitution — The constitution governs it.
 
 **Properties:**
 
@@ -174,10 +161,6 @@ An Azure Policy assignment counts as a guardrail when its declared name is liste
 - `platform-management/policy/bicep/configDiagnosticSettings.bicep`
 - `landing-zones/bicep/modules/azurePolicy.bicep`
 
-**Violations:**
-
-- A landing-zone boundary relies on platform-team review instead of an enforceable Azure Policy control.
-
 **Properties:**
 
 - assignmentNames: allowedResources allowedLocations denyLocalAuthentication denyPublicNetworkAccess denyWeakTLS denyCrossTenantReplication config-diagnosticSettings
@@ -196,11 +179,7 @@ An Azure subscription counts as a landing zone when a file matching properties.p
 
 **Links:**
 
-- depends-on → platform-member — The run deploys the landing zone in a named member's name, so there is no one to deploy it for until membership exists.
-
-**Violations:**
-
-- Subscription hand-built to resemble a landing zone.
+- depends-on → platform-member — Deployed in a member's name.
 
 **Properties:**
 
@@ -220,7 +199,7 @@ A management group counts as oases when properties.file declares it as a child o
 
 **Links:**
 
-- depends-on → platform — The platform is what establishes oases, so there is nothing to establish one until Gazelle names a management group as the platform.
+- depends-on → platform — Oases is a child of the platform management group.
 
 **Violations:**
 
@@ -246,11 +225,7 @@ A product team counts as a platform member when a file matching properties.membe
 
 **Links:**
 
-- depends-on → gazelle — Membership is a status held in Gazelle, so there is nowhere for it to hold until the graph binds a tenant.
-
-**Violations:**
-
-- Product team provisioning a landing zone with no entry in the member register.
+- depends-on → gazelle — Membership is held in Gazelle's tenant.
 
 **Properties:**
 
@@ -262,7 +237,7 @@ A product team counts as a platform member when a file matching properties.membe
 
 **Subject:** platform-test-environment (entity)
 
-A management group counts as the platform-test-environment when Gazelle names it in configuration files.
+A management group counts as the platform-test-environment when its name matches properties.path in properties.file.
 
 **Anchor:** no-human-touch
 
@@ -272,17 +247,22 @@ A management group counts as the platform-test-environment when Gazelle names it
 
 **Links:**
 
-- depends-on → gazelle — The test environment is a status Gazelle confers through repository configuration, so no management group has that status until Gazelle names it.
+- depends-on → gazelle — Gazelle confers the status.
 
 **Violations:**
 
-- Management group treated as the platform-test-environment without being named in Gazelle configuration files.
+- Test change validated against a management group other than the configured one.
+
+**Properties:**
+
+- file: githubVariables.json
+- path: AzurePlatformVariables.environmentVariables.TOP_LEVEL_MANAGEMENT_GROUP_NAME.test
 
 ### platform
 
 **Subject:** platform (entity)
 
-A management group counts as the platform when its name matches the configuration value identified in properties.
+A management group counts as the platform when its name matches properties.path in properties.file.
 
 **Anchor:** no-human-touch
 
@@ -292,7 +272,7 @@ A management group counts as the platform when its name matches the configuratio
 
 **Links:**
 
-- depends-on → gazelle — The authority the platform holds is Gazelle's, so there is nothing for a name to carry until BigBang builds a tenant Gazelle says is one.
+- depends-on → gazelle — The platform carries Gazelle's authority.
 
 **Violations:**
 

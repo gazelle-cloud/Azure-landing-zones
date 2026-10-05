@@ -14,12 +14,10 @@
         {
             "target": "platform-member",
             "relation": "depends-on",
-            "note": "The run deploys the landing zone in a named member's name, so there is no one to deploy it for until membership exists."
+            "note": "Deployed in a member's name."
         }
     ],
-    "violations": [
-        "Subscription hand-built to resemble a landing zone."
-    ],
+    "violations": [],
     "properties": {
         "parameterFilePattern": "landing-zones/*/oases-*.bicepparam"
     }

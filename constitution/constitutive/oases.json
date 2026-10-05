@@ -14,7 +14,7 @@
         {
             "target": "platform",
             "relation": "depends-on",
-            "note": "The platform is what establishes oases, so there is nothing to establish one until Gazelle names a management group as the platform."
+            "note": "Oases is a child of the platform management group."
         }
     ],
     "violations": [

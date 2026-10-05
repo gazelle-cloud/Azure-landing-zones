@@ -5,15 +5,13 @@
         "type": "entity",
         "term": "bigbang"
     },
-    "rule": "platform-BigBang.yml counts as BigBang when its jobs call each reusable workflow listed in properties.requiredWorkflows via `uses:`.",
+    "rule": "platform-BigBang.yml counts as BigBang when its jobs call every workflow in properties.requiredWorkflows.",
     "anchor": "no-human-touch",
     "evidence": [
         ".github/workflows/platform-BigBang.yml"
     ],
     "links": [],
-    "violations": [
-        "BigBang succeeds only because existing platform state was left in place from a previous run."
-    ],
+    "violations": [],
     "properties": {
         "requiredWorkflows": [
             "./.github/workflows/template-GitHub-environment-variables.yml",

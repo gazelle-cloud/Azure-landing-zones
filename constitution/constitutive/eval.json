@@ -14,12 +14,10 @@
         {
             "target": "constitution",
             "relation": "depends-on",
-            "note": "An eval references a knowledge graph node, so there is nothing to reference until the constitution holds it."
+            "note": "Each fixture names a node the constitution holds."
         }
     ],
-    "violations": [
-        "Expected answer copied from model output."
-    ],
+    "violations": [],
     "properties": {
         "fixturePattern": "constitution/eval/<kind>/<case>/expected.json",
         "kinds": [

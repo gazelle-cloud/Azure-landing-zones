@@ -14,9 +14,7 @@
         "landing-zones/bicep/modules/azurePolicy.bicep"
     ],
     "links": [],
-    "violations": [
-        "A landing-zone boundary relies on platform-team review instead of an enforceable Azure Policy control."
-    ],
+    "violations": [],
     "properties": {
         "assignmentNames": [
             "allowedResources",

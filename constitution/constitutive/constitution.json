@@ -5,7 +5,7 @@
         "type": "entity",
         "term": "constitution"
     },
-    "rule": "A graph node counts as part of the Gazelle constitution when it is a valid JSON file under one of the knowledge graph node directories.",
+    "rule": "A valid JSON file under a graph node directory counts as constitution.",
     "anchor": "no-human-touch",
     "evidence": [
         "constitution/foundations/*.json",
@@ -16,9 +16,8 @@
     ],
     "links": [],
     "violations": [
-        "Rule followed that no JSON file in the knowledge graph carries.",
-        "graph.md edited directly rather than the node it is generated from.",
-        "Constitutive rule with a links entry that depends on a regulative rule.",
+        "graph.md edited by hand.",
+        "Constitutive rule depending on a regulative one.",
         "A constitutive criterion written or judged against anything but repository files."
     ],
     "properties": {}

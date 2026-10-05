@@ -14,12 +14,10 @@
         {
             "target": "gazelle",
             "relation": "depends-on",
-            "note": "Membership is a status held in Gazelle, so there is nowhere for it to hold until the graph binds a tenant."
+            "note": "Membership is held in Gazelle's tenant."
         }
     ],
-    "violations": [
-        "Product team provisioning a landing zone with no entry in the member register."
-    ],
+    "violations": [],
     "properties": {
         "memberFilePattern": "platform-members/<AppName>.json",
         "excludedFiles": [

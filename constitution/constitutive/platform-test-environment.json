@@ -5,7 +5,7 @@
     "type": "entity",
     "term": "platform-test-environment"
   },
-  "rule": "A management group counts as the platform-test-environment when Gazelle names it in configuration files.",
+  "rule": "A management group counts as the platform-test-environment when its name matches properties.path in properties.file.",
   "anchor": "no-human-touch",
   "evidence": [
     "githubVariables.json"
@@ -14,11 +14,14 @@
     {
       "target": "gazelle",
       "relation": "depends-on",
-      "note": "The test environment is a status Gazelle confers through repository configuration, so no management group has that status until Gazelle names it."
+      "note": "Gazelle confers the status."
     }
   ],
   "violations": [
-    "Management group treated as the platform-test-environment without being named in Gazelle configuration files."
+    "Test change validated against a management group other than the configured one."
   ],
-  "properties": {}
+  "properties": {
+    "file": "githubVariables.json",
+    "path": "AzurePlatformVariables.environmentVariables.TOP_LEVEL_MANAGEMENT_GROUP_NAME.test"
+  }
 }

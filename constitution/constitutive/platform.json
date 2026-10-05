@@ -5,7 +5,7 @@
         "type": "entity",
         "term": "platform"
     },
-    "rule": "A management group counts as the platform when its name matches the configuration value identified in properties.",
+    "rule": "A management group counts as the platform when its name matches properties.path in properties.file.",
     "anchor": "no-human-touch",
     "evidence": [
         "githubVariables.json"
@@ -14,7 +14,7 @@
         {
             "target": "gazelle",
             "relation": "depends-on",
-            "note": "The authority the platform holds is Gazelle's, so there is nothing for a name to carry until BigBang builds a tenant Gazelle says is one."
+            "note": "The platform carries Gazelle's authority."
         }
     ],
     "violations": [
