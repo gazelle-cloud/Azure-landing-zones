@@ -5,11 +5,9 @@
         "type": "entity",
         "term": "eval"
     },
-    "rule": "A test case counts as an eval in Gazelle when it references a specific knowledge graph node and a failure scenario is defined.",
+    "rule": "A test case counts as an eval when expected.json's result and must_fail resolve against properties.",
     "anchor": "no-human-touch",
     "evidence": [
-        "constitution/eval/PR-validator/*/description.md",
-        "constitution/eval/PR-validator/*/diff.patch",
         "constitution/eval/PR-validator/*/expected.json"
     ],
     "links": [
@@ -20,7 +18,17 @@
         }
     ],
     "violations": [
-        "Eval fixture references a rule but its diff.patch does not exercise a breach of that rule."
+        "must_fail entry naming an id with no matching node in the graph."
     ],
-    "properties": {}
+    "properties": {
+        "file": "expected.json",
+        "field": "result",
+        "allowedValues": [
+            "PASS",
+            "FAIL"
+        ],
+        "failRequires": "must_fail",
+        "failRequiresNonEmpty": true,
+        "mustFailResolvesToGraph": true
+    }
 }

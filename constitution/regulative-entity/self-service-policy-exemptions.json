@@ -7,7 +7,7 @@
   "decision": "An exemption must be granted through a merged pull request against the landing zone's parameter file.",
   "why": "A deny policy without an exemption path gets worked around rather than enforced, as teams find other routes when blocked.",
   "anchor": "no-unapproved-resources",
-  "implements": "allowed-resources",
+  "implements": "guardrail",
   "links": [],
   "violations": [
     "Exemption applied in the portal rather than through a merged pull request.",

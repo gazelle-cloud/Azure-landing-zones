@@ -5,7 +5,7 @@
         "type": "entity",
         "term": "platform-member"
     },
-    "rule": "A product team counts as a platform member in Gazelle when the member register names it.",
+    "rule": "A product team counts as a platform member when a platform-member file declares its application.",
     "anchor": "no-platform-ops",
     "evidence": [
         "platform-members/<AppName>.json"
@@ -20,5 +20,12 @@
     "violations": [
         "Product team provisioning a landing zone with no entry in the member register."
     ],
-    "properties": {}
+    "properties": {
+        "memberFilePattern": "platform-members/<AppName>.json",
+        "requiredFields": [
+            "applicationName",
+            "ownerEmail",
+            "engineerEmail"
+        ]
+    }
 }

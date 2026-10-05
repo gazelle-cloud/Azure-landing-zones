@@ -5,21 +5,28 @@
         "type": "entity",
         "term": "gazelle"
     },
-    "rule": "An Azure tenant counts as Gazelle when githubVariables.json names it and BigBang is declared as its bootstrap workflow.",
+    "rule": "An Azure tenant counts as Gazelle when its ID matches the configuration value identified in properties.",
     "anchor": "no-human-touch",
     "evidence": [
-        ".github/workflows/platform-BigBang.yml",
         "githubVariables.json"
     ],
     "links": [
         {
             "target": "bigbang",
             "relation": "depends-on",
-            "note": "Gazelle status relies on a deployment pipeline that can reproduce the tenant from the repository alone, so an Azure tenant cannot count as Gazelle until BigBang exists."
+            "note": "BigBang supplies the repository-declared workflow for building its platform."
+        },
+        {
+            "target": "constitution",
+            "relation": "depends-on",
+            "note": "The constitution supplies the graph nodes that govern its platform."
         }
     ],
     "violations": [
         "Azure tenant presented as Gazelle that BigBang did not build."
     ],
-    "properties": {}
+    "properties": {
+        "file": "githubVariables.json",
+        "path": "AzurePlatformVariables.repositoryVariables.AZURE_TENANT_ID"
+    }
 }

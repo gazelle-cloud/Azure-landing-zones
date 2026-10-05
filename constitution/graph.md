@@ -12,14 +12,12 @@
 | constitution |
 | platform |
 | platform-test-environment |
-| platform-azure-identity |
-| platform-github-identity |
 | oases |
-| approved |
 | landing-zone |
 | platform-member |
 | eval |
 | bigbang |
+| guardrail |
 
 ### Relations
 
@@ -67,27 +65,11 @@ The allowed list starts empty. A resource type joins the platform only after its
 
 ## Constitutive
 
-### allowed-resources
-
-**Subject:** approved (entity)
-
-An Azure resource counts as approved in Gazelle when the allowed-resources list names it.
-
-**Anchor:** no-unapproved-resources
-
-**Evidence:**
-
-- `platform-management/policy/parameters/oases/allowedResources.json`
-
-**Violations:**
-
-- Resource type added to the allowed-resources list for proof-of-concept use only.
-
 ### bigbang
 
 **Subject:** bigbang (entity)
 
-A GitHub Actions workflow counts as BigBang when Gazelle names its workflow definition.
+platform-BigBang.yml counts as BigBang when its jobs call each reusable workflow listed in properties.requiredWorkflows via `uses:`.
 
 **Anchor:** no-human-touch
 
@@ -98,6 +80,10 @@ A GitHub Actions workflow counts as BigBang when Gazelle names its workflow defi
 **Violations:**
 
 - BigBang succeeds only because existing platform state was left in place from a previous run.
+
+**Properties:**
+
+- requiredWorkflows: ./.github/workflows/template-GitHub-environment-variables.yml ./.github/workflows/template-Management-Groups.yml ./.github/workflows/template-access-control.yml ./.github/workflows/template-Azure-Policy.yml ./.github/workflows/template-push-Docker-images.yml ./.github/workflows/template-trigger-landingzone-workflows.yml
 
 ### constitution
 
@@ -126,14 +112,12 @@ A graph node counts as part of the Gazelle constitution when it is a valid JSON 
 
 **Subject:** eval (entity)
 
-A test case counts as an eval in Gazelle when it references a specific knowledge graph node and a failure scenario is defined.
+A test case counts as an eval when expected.json's result and must_fail resolve against properties.
 
 **Anchor:** no-human-touch
 
 **Evidence:**
 
-- `constitution/eval/PR-validator/*/description.md`
-- `constitution/eval/PR-validator/*/diff.patch`
 - `constitution/eval/PR-validator/*/expected.json`
 
 **Links:**
@@ -142,34 +126,71 @@ A test case counts as an eval in Gazelle when it references a specific knowledge
 
 **Violations:**
 
-- Eval fixture references a rule but its diff.patch does not exercise a breach of that rule.
+- must_fail entry naming an id with no matching node in the graph.
+
+**Properties:**
+
+- file: expected.json
+- field: result
+- allowedValues: PASS FAIL
+- failRequires: must_fail
+- failRequiresNonEmpty: True
+- mustFailResolvesToGraph: True
 
 ### gazelle
 
 **Subject:** gazelle (entity)
 
-An Azure tenant counts as Gazelle when githubVariables.json names it and BigBang is declared as its bootstrap workflow.
+An Azure tenant counts as Gazelle when its ID matches the configuration value identified in properties.
 
 **Anchor:** no-human-touch
 
 **Evidence:**
 
-- `.github/workflows/platform-BigBang.yml`
 - `githubVariables.json`
 
 **Links:**
 
-- depends-on → bigbang — Gazelle status relies on a deployment pipeline that can reproduce the tenant from the repository alone, so an Azure tenant cannot count as Gazelle until BigBang exists.
+- depends-on → bigbang — BigBang supplies the repository-declared workflow for building its platform.
+- depends-on → constitution — The constitution supplies the graph nodes that govern its platform.
 
 **Violations:**
 
 - Azure tenant presented as Gazelle that BigBang did not build.
 
+**Properties:**
+
+- file: githubVariables.json
+- path: AzurePlatformVariables.repositoryVariables.AZURE_TENANT_ID
+
+### guardrail
+
+**Subject:** guardrail (entity)
+
+An Azure Policy assignment counts as a guardrail when its declared name is listed in properties.assignmentNames.
+
+**Anchor:** no-unapproved-resources
+
+**Evidence:**
+
+- `platform-management/policy/bicep/oases.bicep`
+- `platform-management/policy/bicep/customPolicyDefinitions.bicep`
+- `platform-management/policy/bicep/configDiagnosticSettings.bicep`
+- `landing-zones/bicep/modules/azurePolicy.bicep`
+
+**Violations:**
+
+- A landing-zone boundary relies on platform-team review instead of an enforceable Azure Policy control.
+
+**Properties:**
+
+- assignmentNames: allowedResources allowedLocations denyLocalAuthentication denyPublicNetworkAccess denyWeakTLS denyCrossTenantReplication config-diagnosticSettings
+
 ### landing-zone
 
 **Subject:** landing-zone (entity)
 
-An Azure subscription counts as a landing zone when the oases register names it.
+An Azure subscription counts as a landing zone when a landing-zone parameter file declares it.
 
 **Anchor:** no-human-touch
 
@@ -186,11 +207,16 @@ An Azure subscription counts as a landing zone when the oases register names it.
 
 - Subscription hand-built to resemble a landing zone.
 
+**Properties:**
+
+- parameterFilePattern: landing-zones/oases-<env>/oases-<appName>-<env>.bicepparam
+- requiredParameters: appName environment subscriptionId
+
 ### oases
 
 **Subject:** oases (entity)
 
-A management group counts as oases when the management-group template declares it under the platform hierarchy.
+A management group counts as oases when properties.file declares it as a child of properties.parentParameter, named properties.childManagementGroupName.
 
 **Anchor:** no-platform-ops
 
@@ -206,52 +232,17 @@ A management group counts as oases when the management-group template declares i
 
 - Test landing zones assumed to belong to the test management group hierarchy.
 
-### platform-azure-identity
+**Properties:**
 
-**Subject:** platform-azure-identity (entity)
-
-An Entra ID app registration counts as the platform Azure identity when Gazelle names it in configuration files.
-
-**Anchor:** no-human-touch
-
-**Evidence:**
-
-- `githubVariables.json`
-
-**Links:**
-
-- depends-on → gazelle — The app registration exists inside the Gazelle tenant, so no Entra ID app registration can carry platform Azure identity status until Gazelle exists.
-
-**Violations:**
-
-- Platform deployment authenticates through a managed identity.
-- Platform Azure identity is shared with non-platform workloads.
-
-### platform-github-identity
-
-**Subject:** platform-github-identity (entity)
-
-A GitHub App counts as the platform GitHub identity when Gazelle names it in configuration files.
-
-**Anchor:** no-human-touch
-
-**Evidence:**
-
-- `githubVariables.json`
-
-**Links:**
-
-- depends-on → gazelle — The GitHub App carries platform authority for Gazelle repositories, so no GitHub App can carry platform GitHub identity status until Gazelle exists.
-
-**Violations:**
-
-- Platform automation authenticates to GitHub with a personal access token.
+- file: platform-management/management-groups/bicep/managementGroups.bicep
+- parentParameter: topLevelManagementGroupName
+- childManagementGroupName: oases-${environment}
 
 ### platform-member
 
 **Subject:** platform-member (entity)
 
-A product team counts as a platform member in Gazelle when the member register names it.
+A product team counts as a platform member when a platform-member file declares its application.
 
 **Anchor:** no-platform-ops
 
@@ -266,6 +257,11 @@ A product team counts as a platform member in Gazelle when the member register n
 **Violations:**
 
 - Product team provisioning a landing zone with no entry in the member register.
+
+**Properties:**
+
+- memberFilePattern: platform-members/<AppName>.json
+- requiredFields: applicationName ownerEmail engineerEmail
 
 ### platform-test-environment
 
@@ -291,27 +287,26 @@ A management group counts as the platform-test-environment when Gazelle names it
 
 **Subject:** platform (entity)
 
-A management group counts as the platform when Gazelle names it.
+A management group counts as the platform when its name matches the configuration value identified in properties.
 
 **Anchor:** no-human-touch
 
 **Evidence:**
 
 - `githubVariables.json`
-- `.github/workflows/template-Management-Groups.yml`
-- `platform-management/management-groups/bicep/managementGroups.bicep`
 
 **Links:**
 
 - depends-on → gazelle — The authority the platform holds is Gazelle's, so there is nothing for a name to carry until BigBang builds a tenant Gazelle says is one.
-- depends-on → platform-azure-identity — The platform is deployed through the platform Azure identity, so Gazelle cannot name a management group as the platform without an identity able to deploy it.
-- depends-on → platform-github-identity — The platform configures Gazelle repositories and environments through the platform GitHub identity, so no platform can be reproduced from the repository without an identity able to configure GitHub.
 
 **Violations:**
 
 - Platform capability hosted in a subscription rather than assigned at a management group.
-- Dedicated platform hierarchy or connectivity subscription introduced to hold a capability enterprise-scale would put there.
-- Management group presented as the platform that BigBang cannot rebuild from the repository.
+
+**Properties:**
+
+- file: githubVariables.json
+- path: AzurePlatformVariables.environmentVariables.TOP_LEVEL_MANAGEMENT_GROUP_NAME.prod
 
 ## Regulative - entity
 
@@ -344,7 +339,7 @@ Only a service reachable through Azure Resource Manager may be adopted.
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Violations:**
 
@@ -362,7 +357,7 @@ Azure Policy must allow only the approved location.
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Links:**
 
@@ -378,6 +373,24 @@ Azure Policy must allow only the approved location.
 - `.github/workflows/template-Azure-Policy.yml`
 - `platform-management/policy/bicep/oases.bicep`
 
+### azure-policy-allowed-resources
+
+Azure Policy must allow only the approved resource types.
+
+**Why:** Without an allow list, the platform cannot distinguish intended resource capabilities from accidental drift before guardrails deny or exempt them.
+
+**Anchor:** no-unapproved-resources
+
+**Implements:** guardrail
+
+**Violations:**
+
+- Resource type added to the allowed-resources list for proof-of-concept use only.
+
+**Files:**
+
+- `platform-management/policy/parameters/oases/allowedResources.json`
+
 ### azure-policy-config-diagnostic-settings
 
 Azure Policy must configure diagnostic settings for every allowed resource.
@@ -386,7 +399,7 @@ Azure Policy must configure diagnostic settings for every allowed resource.
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Violations:**
 
@@ -405,7 +418,7 @@ An Azure Policy gap must be closed by a custom definition when built-in policies
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Links:**
 
@@ -429,7 +442,7 @@ Azure Policy must deny cross-tenant data replication.
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Violations:**
 
@@ -448,7 +461,7 @@ Azure Policy must deny local authentication methods such as SAS tokens, access k
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Violations:**
 
@@ -467,7 +480,7 @@ Azure Policy must deny public network access for every allowed resource.
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Links:**
 
@@ -491,7 +504,7 @@ An approved resource must refuse clients connecting below TLS 1.2.
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Violations:**
 
@@ -511,7 +524,7 @@ An Azure Policy must declare exactly one effect: deny, config, or allowed.
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Violations:**
 
@@ -530,7 +543,7 @@ An exemption must resolve its assignment ID through the platform-generated refer
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Links:**
 
@@ -618,7 +631,7 @@ The main diagnostic initiative must define shared defaults; parameter files may 
 
 **Anchor:** no-human-touch
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Violations:**
 
@@ -993,7 +1006,7 @@ Each landing zone must have its own parameter file and its own trigger workflow.
 **Links:**
 
 - depends-on → deployment-logic-reusable-workflow — Per landing zone triggers share centralized deployment logic through the reusable workflow.
-- depends-on → platform-azure-identity — The platform Azure identity's credentials are what let the template deploy landing zone resources.
+- depends-on → platform-identity-azure — The platform Azure identity's credentials are what let the template deploy landing zone resources.
 
 **Violations:**
 
@@ -1118,6 +1131,21 @@ Platform automation Docker images must be hosted outside the landing zones.
 - `landing-zones/bicep/modules/landingzone-automation.bicep`
 - `landing-zones/bicep/modules/base/jobs-cron.bicep`
 
+### platform-identity-azure
+
+Platform must use an Entra ID app registration as its identity
+
+**Why:** A managed identity needs an existing Azure resource to attach to, but BigBang's first run has none — so there is nothing to authenticate as.
+
+**Anchor:** no-human-touch
+
+**Implements:** platform
+
+**Violations:**
+
+- Platform deployment authenticates through a managed identity.
+- Platform Azure identity is shared with non-platform workloads.
+
 ### platform-identity-claude
 
 Agentic workflows must authenticate with the Claude Pro OAuth token.
@@ -1140,7 +1168,7 @@ Platform and landing zone workflows must authenticate to GitHub through the plat
 
 **Anchor:** no-human-touch
 
-**Implements:** platform-github-identity
+**Implements:** platform
 
 **Violations:**
 
@@ -1183,7 +1211,7 @@ Defender for Cloud recommendations with no free remediation path must be pre-exe
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Violations:**
 
@@ -1202,7 +1230,7 @@ An exemption must be granted through a merged pull request against the landing z
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Violations:**
 
@@ -1268,7 +1296,7 @@ A resource type must clear deny coverage, diagnostic settings, and job-function 
 
 **Anchor:** no-unapproved-resources
 
-**Implements:** allowed-resources
+**Implements:** guardrail
 
 **Trigger:**
 

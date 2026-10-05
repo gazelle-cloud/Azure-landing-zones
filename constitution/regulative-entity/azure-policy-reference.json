@@ -7,7 +7,7 @@
   "decision": "An exemption must resolve its assignment ID through the platform-generated reference file.",
   "why": "A hardcoded assignment ID silently breaks every exemption when the platform redeploys.",
   "anchor": "no-unapproved-resources",
-  "implements": "allowed-resources",
+  "implements": "guardrail",
   "links": [
     {
       "target": "azure-policy-effect-declaration",

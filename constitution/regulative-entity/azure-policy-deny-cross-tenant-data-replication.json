@@ -7,7 +7,7 @@
     "decision": "Azure Policy must deny cross-tenant data replication.",
     "why": "Without this, data can leave the tenant over Microsoft's backbone without crossing a network boundary the platform can observe.",
     "anchor": "no-unapproved-resources",
-    "implements": "allowed-resources",
+    "implements": "guardrail",
     "links": [],
     "violations": [
         "A data replication capability is approved before the platform can prove replicated data remains inside the Gazelle tenant."

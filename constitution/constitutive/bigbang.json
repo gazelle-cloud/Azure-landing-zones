@@ -5,7 +5,7 @@
         "type": "entity",
         "term": "bigbang"
     },
-    "rule": "A GitHub Actions workflow counts as BigBang when Gazelle names its workflow definition.",
+    "rule": "platform-BigBang.yml counts as BigBang when its jobs call each reusable workflow listed in properties.requiredWorkflows via `uses:`.",
     "anchor": "no-human-touch",
     "evidence": [
         ".github/workflows/platform-BigBang.yml"
@@ -14,5 +14,14 @@
     "violations": [
         "BigBang succeeds only because existing platform state was left in place from a previous run."
     ],
-    "properties": {}
+    "properties": {
+        "requiredWorkflows": [
+            "./.github/workflows/template-GitHub-environment-variables.yml",
+            "./.github/workflows/template-Management-Groups.yml",
+            "./.github/workflows/template-access-control.yml",
+            "./.github/workflows/template-Azure-Policy.yml",
+            "./.github/workflows/template-push-Docker-images.yml",
+            "./.github/workflows/template-trigger-landingzone-workflows.yml"
+        ]
+    }
 }

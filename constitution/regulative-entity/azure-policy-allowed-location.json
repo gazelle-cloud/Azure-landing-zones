@@ -7,7 +7,7 @@
     "decision": "Azure Policy must allow only the approved location.",
     "why": "Without this, the platform cannot prove that landing-zone resources stay in the single region.",
     "anchor": "no-unapproved-resources",
-    "implements": "allowed-resources",
+    "implements": "guardrail",
     "links": [
         {
             "target": "deployment-config-in-repo",

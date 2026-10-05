@@ -7,7 +7,7 @@
   "decision": "A resource type must clear deny coverage, diagnostic settings, and job-function role review before it joins the allowed list.",
   "why": "A type listed ahead of its controls is available to every landing zone with nothing enforcing how it is configured.",
   "anchor": "no-unapproved-resources",
-  "implements": "allowed-resources",
+  "implements": "guardrail",
   "trigger": [
     "allow resource type",
     "approve resource type",

@@ -7,7 +7,7 @@
     "decision": "Azure Policy must deny public network access for every allowed resource.",
     "why": "Without this, the platform can't guarantee that data plane access stays inside the landing zone network boundary.",
     "anchor": "no-unapproved-resources",
-    "implements": "allowed-resources",
+    "implements": "guardrail",
     "links": [
         {
             "target": "landing-zone-github-runners",

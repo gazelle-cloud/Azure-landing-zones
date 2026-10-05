@@ -7,7 +7,7 @@
     "decision": "An approved resource must refuse clients connecting below TLS 1.2.",
     "why": "Without it, traffic to approved resources can fall back to protocol versions with known breaks, exposing data in transit.",
     "anchor": "no-unapproved-resources",
-    "implements": "allowed-resources",
+    "implements": "guardrail",
     "links": [],
     "violations": [
         "An approved resource permits non-HTTPS transport.",
