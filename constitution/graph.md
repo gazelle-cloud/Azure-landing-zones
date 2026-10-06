@@ -150,15 +150,13 @@ An Azure tenant counts as Gazelle when its ID matches properties.path in propert
 
 **Subject:** guardrail (entity)
 
-An Azure Policy assignment counts as a guardrail when its declared name is listed in properties.assignmentNames.
+An Azure Policy assignment counts as a guardrail when its module's params.policyName or params.name value is listed in properties.assignmentNames.
 
 **Anchor:** no-unapproved-resources
 
 **Evidence:**
 
 - `platform-management/policy/bicep/oases.bicep`
-- `platform-management/policy/bicep/customPolicyDefinitions.bicep`
-- `platform-management/policy/bicep/configDiagnosticSettings.bicep`
 - `landing-zones/bicep/modules/azurePolicy.bicep`
 
 **Properties:**

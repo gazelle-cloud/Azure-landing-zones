@@ -5,12 +5,10 @@
         "type": "entity",
         "term": "guardrail"
     },
-    "rule": "An Azure Policy assignment counts as a guardrail when its declared name is listed in properties.assignmentNames.",
+    "rule": "An Azure Policy assignment counts as a guardrail when its module's params.policyName or params.name value is listed in properties.assignmentNames.",
     "anchor": "no-unapproved-resources",
     "evidence": [
         "platform-management/policy/bicep/oases.bicep",
-        "platform-management/policy/bicep/customPolicyDefinitions.bicep",
-        "platform-management/policy/bicep/configDiagnosticSettings.bicep",
         "landing-zones/bicep/modules/azurePolicy.bicep"
     ],
     "links": [],
