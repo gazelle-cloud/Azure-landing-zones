@@ -15,11 +15,12 @@
     "add azure subscription"
   ],
   "steps": [
-    "Confirm the application file exists under platform-members/. If not, register-platform-member completes first.",
-    "Collect from the user: application name, environment (test or prod), management group name (oases-prod or oases-test), and budget (optional, default 100).",
-    "Auto-select the subscription ID: az account management-group subscription show-sub-under-mg --name subscription-bank --query \"[0].name\" -o tsv",
-    "Confirm the values with the user, including the auto-selected subscription ID, then trigger the workflow, which raises a pull request.",
-    "A platform engineer reviews and approves the pull request, and that approval triggers the automation to complete provisioning."
+    "Collect the application name, environment (test or prod), management group (oases-prod or oases-test), and budget (default 100).",
+    "Verify the application file exists under platform-members/. If absent, complete register-platform-member before continuing.",
+    "Select a subscription from the bank with az account management-group subscription show-sub-under-mg --name subscription-bank --query \"[0].name\" -o tsv. Stop if none is returned.",
+    "Present all values, including the selected subscription ID, and wait for confirmation.",
+    "Dispatch requestNew-Landing-Zone, which opens a PR containing the parameter file and landing-zone workflow.",
+    "A platform engineer reviews the PR. Merge triggers the landing-zone workflow to provision the environment."
   ],
   "workflow": "requestNew-Landing-Zone",
   "links": [

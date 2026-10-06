@@ -12,16 +12,16 @@
     {
       "target": "deployment-logic-reusable-workflow",
       "relation": "depends-on",
-      "note": "Per landing zone triggers share centralized deployment logic through the reusable workflow."
+      "note": "Landing zone triggers call the shared deployment workflow."
     },
     {
       "target": "platform-identity-azure",
       "relation": "depends-on",
-      "note": "The platform Azure identity's credentials are what let the template deploy landing zone resources."
+      "note": "Template deployments authenticate as the platform Azure identity."
     }
   ],
   "violations": [
-    "Generated workflow name not matching the lz-* prefix, which breaks fan-out discovery.",
+    "Generated workflow name lacks the lz-* prefix.",
     "One parameter file covering more than one landing zone."
   ],
   "files": [

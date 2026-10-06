@@ -4,14 +4,12 @@
   "subject": {
     "type": "entity"
   },
-  "decision": "Only a service reachable through Azure Resource Manager may be adopted.",
-  "why": "If a service isn't manageable through ARM, the platform cannot guarantee service integrity.",
+  "decision": "Only services manageable through Azure Resource Manager may be adopted.",
+  "why": "Without an ARM resource representation, a service falls outside the platform's Policy, RBAC, and diagnostic controls.",
   "anchor": "no-unapproved-resources",
   "implements": "guardrail",
   "links": [],
-  "violations": [
-    "Service adopted with no ARM resource representation, leaving it invisible to Policy, RBAC, and diagnostics."
-  ],
+  "violations": [],
   "files": [
     "platform-management/policy/parameters/oases/allowedResources.json"
   ],

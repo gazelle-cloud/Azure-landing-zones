@@ -12,7 +12,7 @@
     {
       "target": "azure-native-services-only",
       "relation": "constrains",
-      "note": "GitHub Container Registry sits outside ARM, so it is a dependency the platform consumes rather than a service it adopts."
+      "note": "GitHub Container Registry is consumed outside ARM, not adopted as a platform service."
     }
   ],
   "violations": [

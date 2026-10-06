@@ -9,9 +9,7 @@
     "anchor": "no-unapproved-resources",
     "implements": "guardrail",
     "links": [],
-    "violations": [
-        "A data replication capability is approved before the platform can prove replicated data remains inside the Gazelle tenant."
-    ],
+    "violations": [],
     "files": [
         "platform-management/policy/bicep/oases.bicep",
         "platform-management/policy/parameters/oases/denyCrossTenantReplication.json"

@@ -12,7 +12,7 @@
     {
       "target": "validate-codebase-rules",
       "relation": "depends-on",
-      "note": "The eval fixtures exercise the graph through the exact prompt validate-codebase-rules runs, so there's nothing to grade a verdict against until that process defines what one looks like."
+      "note": "Evals use the validator's exact prompt and verdict format."
     }
   ],
   "violations": [

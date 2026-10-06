@@ -4,8 +4,8 @@
   "subject": {
     "type": "process"
   },
-  "decision": "Every pull request must be validated against the knowledge graph rules and checked for functionality the graph doesn't yet name, and a FAIL result must block merge.",
-  "why": "Without automated validation, rule violations reach the codebase unchallenged and the graph stops describing what the code actually does; without blocking merge, a FAIL carries no enforcement and is only a comment a reviewer can ignore.",
+  "decision": "Every PR must be checked for rule violations and functionality absent from the graph; either finding must block merge.",
+  "why": "Without a blocking check, rule violations and unnamed functionality can reach the default branch.",
   "anchor": "no-human-touch",
   "implements": "constitution",
   "trigger": [
@@ -14,14 +14,15 @@
     "constitution validation"
   ],
   "steps": [
-    "On pull_request opened or synchronize, check out the repo at the PR head with full history.",
-    "Collect the full diff (git diff origin/<base>...HEAD) and the full content of every non-deleted changed file. Cap total injected content at 50 KB; truncate with a note beyond that.",
-    "Run claude -p with the diff and file contents from the repo root so CLAUDE.md context loads automatically. Ask Claude to check every rule in all three layers - foundations, constitutive, regulative - and return a verdict for every single one, including rules that do not apply.",
-    "Ask Claude to separately identify any functionality, capability, or resource type the diff introduces that no vocabulary, constitutive, or regulative node names - regardless of whether it violates an existing rule.",
-    "Ask Claude to return JSON: {\"result\": \"PASS\"|\"FAIL\", \"summary\": {\"what\": \"...\", \"why\": \"...\"}, \"foundations\": [...], \"constitutive\": [...], \"regulative\": [...], \"uncovered\": [...]}, where uncovered holds one entry per gap found, each with a description of the new functionality and the evidence (file/line) that introduced it.",
-    "Parse the JSON output. Render each layer as a section: failed rules listed with violation and evidence, passed rules collapsed under a details toggle. Render uncovered findings as their own section. result is FAIL if any rule in any layer has status fail or uncovered contains one or more entries, and a FAIL result must fail the workflow job so GitHub Actions visibly reports advisory findings.",
-    "Post the formatted findings as a pull request comment, prefixed with the what/why summary and suffixed with model, token count, and cost in EUR.",
-    "Configure the check as a required status check on the default branch, with no admin-bypass exemption, so a FAIL cannot be merged past."
+    "Prerequisite: configure the check as required on the default branch, with no admin bypass.",
+    "On pull_request opened or synchronize, check out the PR head with full history.",
+    "Collect git diff origin/<base>...HEAD and the full content of non-deleted changed files. Exclude graph.md from injected content; cap injected content at 50 KB and mark truncation.",
+    "Run claude -p from the repository root so CLAUDE.md loads. Request a verdict for every foundation, constitutive rule, and regulative rule, including rules that do not apply.",
+    "Separately identify introduced functionality, capabilities, or resource types that no vocabulary, constitutive, or regulative node names.",
+    "Require JSON with result, summary: {what, why}, foundations, constitutive, regulative, and uncovered. Each uncovered entry must describe the gap and cite its introducing file and line.",
+    "Set the result to FAIL if any rule fails or uncovered is nonempty. A FAIL must fail the workflow job.",
+    "Render failures with violations and evidence, collapse passed rules by layer, and list uncovered findings separately.",
+    "Post the PR comment with the what/why summary, findings, model, token count, and cost in EUR."
   ],
   "links": [
     {

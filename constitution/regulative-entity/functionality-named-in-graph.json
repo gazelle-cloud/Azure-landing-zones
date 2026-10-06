@@ -12,7 +12,7 @@
     {
       "target": "update-knowledge-base",
       "relation": "depends-on",
-      "note": "An uncovered-functionality finding has no closure path until update-knowledge-base exists to add the missing entry."
+      "note": "Closing uncovered-functionality findings requires adding the missing graph entries."
     }
   ],
   "violations": [

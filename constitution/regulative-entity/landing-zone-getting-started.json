@@ -11,7 +11,7 @@
   "links": [],
   "violations": [
     "Module template customized for a specific application instead of generic.",
-    "Repo created without pipelines, leaving the team no deployment path."
+    "Application repo created without deployment pipelines."
   ],
   "files": [
     ".github/workflows/template-new-platform-members.yml"

@@ -4,7 +4,7 @@
   "subject": {
     "type": "entity"
   },
-  "decision": "A role must be scoped to a job function and assigned to the application's Entra ID group, never to an individual or a resource type.",
+  "decision": "A role must define permissions by job function, not resource type, and be assigned to the application's Entra ID group, not an individual.",
   "why": "Without job-function scoping, every new allowed resource type forces team re-onboarding.",
   "anchor": "no-platform-ops",
   "implements": "platform-member",

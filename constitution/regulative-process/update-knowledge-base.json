@@ -18,13 +18,13 @@
     "update knowledge graph"
   ],
   "steps": [
-    "Identify whether this is a new entry or an update to an existing one. For an update, read the existing file first.",
-    "Determine the type: vocabulary, constitutive, or regulative. Constitutive states what counts as something; regulative states what has to happen inside that.",
-    "Draft the entry. The id matches the filename, the subject names a vocabulary term, the anchor names a foundation, and the why states the consequence of ignoring the rule rather than restating it.",
-    "For links: add one where the source is incomplete without the target, and let the note say which source behaviour relies on which target constraint, fact, or output. Drop it if the relationship is obvious from context alone.",
-    "For a regulative rule, name the constitutive rule it upholds in implements. Omit implements where the rule serves its foundation directly.",
-    "Present the complete draft before writing any file.",
-    "Write the file.",
+    "Identify whether the entry is new or existing. Read the existing file before drafting an update.",
+    "Choose the node type and follow its schema. Constitutive rules define what counts; regulative rules state requirements for entities or processes.",
+    "For individual rule files, match the ID to the filename and anchor the rule to a foundation. Constitutive subjects name vocabulary terms; regulative subjects specify entity or process.",
+    "For regulative rules, explain what fails without the requirement. Name the constitutive rules upheld in implements, or omit it when serving the foundation directly.",
+    "Add dependency links only where the source needs the target. Name the required constraint, fact, or output in the note; omit obvious relationships.",
+    "Present the complete draft and wait for permission to write.",
+    "Write the approved entry and regenerate constitution/graph.md with .github/scripts/write-knowledge-graph.ps1.",
     "Open a pull request."
   ],
   "links": [],
@@ -37,7 +37,8 @@
   "files": [
     "constitution/vocabulary/",
     "constitution/constitutive/",
-    "constitution/regulative/"
+    "constitution/regulative-entity/",
+    "constitution/regulative-process/"
   ],
   "properties": {}
 }

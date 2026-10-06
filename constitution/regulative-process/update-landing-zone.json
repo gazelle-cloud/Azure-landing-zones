@@ -4,8 +4,8 @@
   "subject": {
     "type": "process"
   },
-  "decision": "A landing zone must be reshaped by editing its parameter file and merging a pull request, which redeploys the stack.",
-  "why": "An out-of-band edit is removed on the next deployment, because the stack deletes what the code no longer declares.",
+  "decision": "Landing zone changes must use a merged parameter-file PR, except eight-hour exemptions granted through lz-flow-create-policy-exemption.",
+  "why": "Changes outside the parameter file or temporary-exemption workflow leave the landing zone's configuration untracked.",
   "anchor": "no-platform-ops",
   "implements": "landing-zone",
   "trigger": [
@@ -15,14 +15,16 @@
     "cost alert"
   ],
   "steps": [
-    "Read the rules this process is governed by, to understand the constraints on tags, budget, and exemptions.",
-    "Verify the landing zone exists: the bicepparam file and the lz-oasis-{appName}-{env} workflow. If either is missing this is a create-landing-zone task.",
-    "Collect from the user the app and environment to manage, and which concern to change: cost, tags, or exemptions.",
-    "Cost: edit the single budget value. The budget drives one forecasted alert, so additional thresholds are out of scope.",
-    "Tags: edit subscriptionLevelTags and resourceLevelTags keys and placement. Keep ownerEmail and engineerEmail as readEnvironmentVariable references, and keep ownerEmail at subscription level.",
-    "Exemptions: ask whether the exemption is temporary or long-lived. Temporary triggers lz-flow-create-policy-exemption with an 8-hour expiry. Long-lived adds an entry to the exemptions array referencing a policy-assignment-reference.json key.",
-    "Present a complete draft of the bicepparam change before implementing.",
-    "Open a pull request. The merge redeploys the landing zone stack with deleteAll."
+    "Read the governing rules.",
+    "Collect the application, environment, and requested change: cost, tags, or exemptions.",
+    "Locate the parameter file and its deployment workflow. If either is missing, stop the update and resolve provisioning through create-landing-zone.",
+    "For exemptions, ask whether the request is temporary or long-lived.",
+    "For a temporary exemption, collect the policy selection and subscription ID, present the eight-hour scope, and wait for confirmation. Dispatch lz-flow-create-policy-exemption and end this branch; no parameter-file edit or PR is required.",
+    "For cost, draft a change to the single budget value; additional alert thresholds are out of scope.",
+    "For tags, draft changes to subscriptionLevelTags and resourceLevelTags. Preserve ownerEmail and engineerEmail as readEnvironmentVariable references, with ownerEmail at subscription level.",
+    "For a long-lived exemption, draft an exemptions entry referencing a policy-assignment-reference.json key.",
+    "For parameter-file changes, present the complete draft and wait for permission to implement.",
+    "Apply the approved changes and open a PR. Merge redeploys the landing-zone stack with deleteAll."
   ],
   "workflow": "lz-oasis-{appName}-{env}",
   "links": [
@@ -42,10 +44,13 @@
     {
       "target": "deployment-declarative-lifecycle",
       "relation": "governed-by"
+    },
+    {
+      "target": "self-service-policy-exemptions",
+      "relation": "governed-by"
     }
   ],
   "violations": [
-    "Budget, tag, or exemption changed in the portal instead of the parameter file.",
     "Exemption entry naming a literal ARM assignment ID."
   ],
   "files": [

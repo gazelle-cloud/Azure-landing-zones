@@ -9,10 +9,7 @@
   "anchor": "no-human-touch",
   "implements": "bigbang",
   "links": [],
-  "violations": [
-    "Deployment Stack configured with detachAll, leaving removed resources with no cleanup path.",
-    "Resource created outside the stack treated as temporary because the next pipeline run is expected to delete it."
-  ],
+  "violations": [],
   "files": [
     ".github/workflows/template-landing-zones.yml",
     ".github/workflows/template-access-control.yml",

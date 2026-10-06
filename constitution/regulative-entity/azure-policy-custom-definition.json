@@ -12,7 +12,7 @@
         {
             "target": "azure-policy-effect-declaration",
             "relation": "depends-on",
-            "note": "The effect a custom definition carries determines the effect its Azure Policy control must declare."
+            "note": "The custom definition's effect determines its policy control's name prefix."
         }
     ],
     "violations": [

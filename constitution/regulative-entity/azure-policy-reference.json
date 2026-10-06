@@ -15,10 +15,7 @@
       "note": "The reference file is indexed by assignment name, so the name stays stable across redeployments."
     }
   ],
-  "violations": [
-    "Manually editing policy-assignment-reference.json.",
-    "Exemption naming an assignment with a literal string instead of resolving it through the loaded reference."
-  ],
+  "violations": [],
   "files": [
     ".github/workflows/lz-flow-create-policy-exemption.yml",
     "landing-zones/*/policy-assignment-reference.json",

@@ -12,7 +12,7 @@
         {
             "target": "azure-policy-config-diagnostic-settings",
             "relation": "depends-on",
-            "note": "The landing zone receives telemetry through platform-defined Azure Policy."
+            "note": "Azure Policy configures diagnostic settings that route telemetry to the landing-zone workspace."
         }
     ],
     "violations": [

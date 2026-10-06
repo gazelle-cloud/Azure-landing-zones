@@ -5,7 +5,7 @@
     "type": "entity"
   },
   "decision": "Resources the landing zone template declares must live in a single dedicated resource group.",
-  "why": "Without a dedicated group, resources the template declares mix with resources it does not, and a team cannot tell which of them it owns.",
+  "why": "Mixing template-managed and application-managed resources obscures which resources the landing zone template controls.",
   "anchor": "no-platform-ops",
   "implements": "landing-zone",
   "links": [],

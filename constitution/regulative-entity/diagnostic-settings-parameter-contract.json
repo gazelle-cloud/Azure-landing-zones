@@ -10,8 +10,7 @@
   "implements": "guardrail",
   "violations": [
     "A shared diagnostic default is hardcoded in a parameter file instead of the main initiative.",
-    "A parameter file passes an outer-initiative parameter that the child policy does not declare.",
-    "A policy-specific value is omitted or overridden without review."
+    "A parameter file passes an outer-initiative parameter that the child policy does not declare."
   ],
   "files": [
     "platform-management/policy/bicep/configDiagnosticSettings.bicep",

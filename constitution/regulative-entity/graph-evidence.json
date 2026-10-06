@@ -5,7 +5,7 @@
         "type": "entity"
     },
     "decision": "A constitutive rule's evidence must name the exact file or pattern a check would read to test it.",
-    "why": "Without this a violation can sit unnoticed indefinitely.",
+    "why": "Without a file or pattern to inspect, a checker cannot locate the evidence needed to test the rule.",
     "anchor": "no-human-touch",
     "implements": "constitution",
     "links": [],

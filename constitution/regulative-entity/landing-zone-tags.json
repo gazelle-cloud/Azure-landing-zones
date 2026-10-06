@@ -12,7 +12,7 @@
     {
       "target": "landing-zone-automation",
       "relation": "depends-on",
-      "note": "Tag remediation has no runtime without the automation capability."
+      "note": "Landing zone automation runs tag remediation."
     }
   ],
   "violations": [

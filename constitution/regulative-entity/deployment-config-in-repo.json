@@ -10,7 +10,6 @@
   "implements": "bigbang",
   "links": [],
   "violations": [
-    "GitHub variable created in the UI.",
     "Bicep parameter with a hardcoded tenant ID or location instead of readEnvironmentVariable()."
   ],
   "files": [

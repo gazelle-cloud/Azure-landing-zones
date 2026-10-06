@@ -306,17 +306,13 @@ A subscription must bill to the owning application's invoice section.
 
 ### azure-native-services-only
 
-Only a service reachable through Azure Resource Manager may be adopted.
+Only services manageable through Azure Resource Manager may be adopted.
 
-**Why:** If a service isn't manageable through ARM, the platform cannot guarantee service integrity.
+**Why:** Without an ARM resource representation, a service falls outside the platform's Policy, RBAC, and diagnostic controls.
 
 **Anchor:** no-unapproved-resources
 
 **Implements:** guardrail
-
-**Violations:**
-
-- Service adopted with no ARM resource representation, leaving it invisible to Policy, RBAC, and diagnostics.
 
 **Files:**
 
@@ -334,7 +330,7 @@ Azure Policy must allow only the approved location.
 
 **Links:**
 
-- depends-on → deployment-config-in-repo — The approved location is a platform boundary because the repository names it in githubVariables.json.
+- depends-on → deployment-config-in-repo — The allowed location comes from githubVariables.json.
 
 **Violations:**
 
@@ -350,7 +346,7 @@ Azure Policy must allow only the approved location.
 
 Azure Policy must allow only the approved resource types.
 
-**Why:** Without an allow list, the platform cannot distinguish intended resource capabilities from accidental drift before guardrails deny or exempt them.
+**Why:** Without an allow list, the platform cannot tell whether a misconfiguration was accidental or a deliberate choice.
 
 **Anchor:** no-unapproved-resources
 
@@ -395,7 +391,7 @@ An Azure Policy gap must be closed by a custom definition when built-in policies
 
 **Links:**
 
-- depends-on → azure-policy-effect-declaration — The effect a custom definition carries determines the effect its Azure Policy control must declare.
+- depends-on → azure-policy-effect-declaration — The custom definition's effect determines its policy control's name prefix.
 
 **Violations:**
 
@@ -416,10 +412,6 @@ Azure Policy must deny cross-tenant data replication.
 **Anchor:** no-unapproved-resources
 
 **Implements:** guardrail
-
-**Violations:**
-
-- A data replication capability is approved before the platform can prove replicated data remains inside the Gazelle tenant.
 
 **Files:**
 
@@ -457,7 +449,7 @@ Azure Policy must deny public network access for every allowed resource.
 
 **Links:**
 
-- depends-on → landing-zone-github-runners — Denying public network access relies on landing zones having private GitHub runners inside the VNet for data-plane access.
+- depends-on → landing-zone-github-runners — Runners inside the landing zone VNet provide data-plane access when public access is denied.
 
 **Violations:**
 
@@ -491,17 +483,13 @@ An approved resource must refuse clients connecting below TLS 1.2.
 
 ### azure-policy-effect-declaration
 
-An Azure Policy must declare exactly one effect: deny, config, or allowed.
+An Azure Policy's name must use exactly one platform prefix: deny, config, or allowed.
 
 **Why:** Without this, landing-zone users cannot tell whether a policy modifies resources on their behalf, weakening code as the source of truth.
 
 **Anchor:** no-unapproved-resources
 
 **Implements:** guardrail
-
-**Violations:**
-
-- Azure Policy name prefix does not contain approved verb.
 
 **Files:**
 
@@ -522,11 +510,6 @@ An exemption must resolve its assignment ID through the platform-generated refer
 
 - depends-on → azure-policy-effect-declaration — The reference file is indexed by assignment name, so the name stays stable across redeployments.
 
-**Violations:**
-
-- Manually editing policy-assignment-reference.json.
-- Exemption naming an assignment with a literal string instead of resolving it through the loaded reference.
-
 **Files:**
 
 - `.github/workflows/lz-flow-create-policy-exemption.yml`
@@ -545,7 +528,6 @@ Platform configuration must be defined in the repository, never set outside it.
 
 **Violations:**
 
-- GitHub variable created in the UI.
 - Bicep parameter with a hardcoded tenant ID or location instead of readEnvironmentVariable().
 
 **Files:**
@@ -561,11 +543,6 @@ A deployment stack must be configured with deleteAll, so what its code stops dec
 **Anchor:** no-human-touch
 
 **Implements:** bigbang
-
-**Violations:**
-
-- Deployment Stack configured with detachAll, leaving removed resources with no cleanup path.
-- Resource created outside the stack treated as temporary because the next pipeline run is expected to delete it.
 
 **Files:**
 
@@ -610,7 +587,6 @@ The main diagnostic initiative must define shared defaults; parameter files may 
 
 - A shared diagnostic default is hardcoded in a parameter file instead of the main initiative.
 - A parameter file passes an outer-initiative parameter that the child policy does not declare.
-- A policy-specific value is omitted or overridden without review.
 
 **Files:**
 
@@ -629,7 +605,7 @@ The PR validator must be tested against a fixed eval set at least weekly.
 
 **Links:**
 
-- depends-on → validate-codebase-rules — The eval fixtures exercise the graph through the exact prompt validate-codebase-rules runs, so there's nothing to grade a verdict against until that process defines what one looks like.
+- depends-on → validate-codebase-rules — Evals use the validator's exact prompt and verdict format.
 
 **Violations:**
 
@@ -675,7 +651,7 @@ Functionality the codebase carries must be named by a knowledge graph node.
 
 **Links:**
 
-- depends-on → update-knowledge-base — An uncovered-functionality finding has no closure path until update-knowledge-base exists to add the missing entry.
+- depends-on → update-knowledge-base — Closing uncovered-functionality findings requires adding the missing graph entries.
 
 **Violations:**
 
@@ -685,7 +661,7 @@ Functionality the codebase carries must be named by a knowledge graph node.
 
 A constitutive rule's evidence must name the exact file or pattern a check would read to test it.
 
-**Why:** Without this a violation can sit unnoticed indefinitely.
+**Why:** Without a file or pattern to inspect, a checker cannot locate the evidence needed to test the rule.
 
 **Anchor:** no-human-touch
 
@@ -745,7 +721,7 @@ A regulative rule's why must name the consequence of the rule's absence, not res
 
 ### job-function-scoped-roles
 
-A role must be scoped to a job function and assigned to the application's Entra ID group, never to an individual or a resource type.
+A role must define permissions by job function, not resource type, and be assigned to the application's Entra ID group, not an individual.
 
 **Why:** Without job-function scoping, every new allowed resource type forces team re-onboarding.
 
@@ -765,7 +741,7 @@ A role must be scoped to a job function and assigned to the application's Entra 
 
 ### landing-zone-action-group
 
-Alerts must route through the landing zone's action group, addressed from the platform member profile rather than to a person.
+Alerts must route through the landing zone's action group, with recipients sourced from the platform member profile.
 
 **Why:** Hardcoded contacts go stale, so alerts fire to former members and incidents go unanswered.
 
@@ -819,7 +795,7 @@ Automation jobs must run inside the landing zone's own subscription.
 
 **Links:**
 
-- depends-on → platform-identity-graph — Jobs query Entra ID, so the Graph read permissions are what make that call possible.
+- depends-on → platform-identity-graph — Jobs querying Entra ID require the landing zone identity's Graph read permissions.
 
 **Violations:**
 
@@ -844,7 +820,7 @@ An application repo must be seeded with deployable pipelines and modules from th
 **Violations:**
 
 - Module template customized for a specific application instead of generic.
-- Repo created without pipelines, leaving the team no deployment path.
+- Application repo created without deployment pipelines.
 
 **Files:**
 
@@ -862,7 +838,7 @@ A landing zone's pipelines must reach its data plane from inside the landing zon
 
 **Links:**
 
-- depends-on → platform-identity-github — Runner registration needs the GitHub App, as no other identity can register runners to a repo.
+- depends-on → platform-identity-github — Runner registration authenticates through the platform GitHub App.
 
 **Violations:**
 
@@ -913,7 +889,7 @@ Telemetry a landing zone produces must be stored, queried, and billed within tha
 
 **Links:**
 
-- depends-on → azure-policy-config-diagnostic-settings — The landing zone receives telemetry through platform-defined Azure Policy.
+- depends-on → azure-policy-config-diagnostic-settings — Azure Policy configures diagnostic settings that route telemetry to the landing-zone workspace.
 
 **Violations:**
 
@@ -949,7 +925,7 @@ Every landing zone must be deployed and configured from its application's reposi
 
 Resources the landing zone template declares must live in a single dedicated resource group.
 
-**Why:** Without a dedicated group, resources the template declares mix with resources it does not, and a team cannot tell which of them it owns.
+**Why:** Mixing template-managed and application-managed resources obscures which resources the landing zone template controls.
 
 **Anchor:** no-platform-ops
 
@@ -975,7 +951,7 @@ Tag values on a landing zone must be sourced from the platform member profile.
 
 **Links:**
 
-- depends-on → landing-zone-automation — Tag remediation has no runtime without the automation capability.
+- depends-on → landing-zone-automation — Landing zone automation runs tag remediation.
 
 **Violations:**
 
@@ -999,12 +975,12 @@ Each landing zone must have its own parameter file and its own trigger workflow.
 
 **Links:**
 
-- depends-on → deployment-logic-reusable-workflow — Per landing zone triggers share centralized deployment logic through the reusable workflow.
-- depends-on → platform-identity-azure — The platform Azure identity's credentials are what let the template deploy landing zone resources.
+- depends-on → deployment-logic-reusable-workflow — Landing zone triggers call the shared deployment workflow.
+- depends-on → platform-identity-azure — Template deployments authenticate as the platform Azure identity.
 
 **Violations:**
 
-- Generated workflow name not matching the lz-* prefix, which breaks fan-out discovery.
+- Generated workflow name lacks the lz-* prefix.
 - One parameter file covering more than one landing zone.
 
 **Files:**
@@ -1017,7 +993,7 @@ Each landing zone must have its own parameter file and its own trigger workflow.
 
 VNet address spaces must be allocated by querying live Azure, not by reading an assignment registry.
 
-**Why:** Without querying live state, address allocations drift and VNets cannot peer.
+**Why:** Stale address allocations can produce overlapping VNet ranges that prevent peering.
 
 **Anchor:** no-platform-ops
 
@@ -1050,7 +1026,6 @@ A landing zone must draw its subscription from the Subscription Bank, and must r
 
 **Violations:**
 
-- New subscription created while the bank held an available empty one.
 - Sunset subscription cancelled rather than returned to the bank.
 
 **Files:**
@@ -1063,15 +1038,11 @@ A landing zone must draw its subscription from the Subscription Bank, and must r
 
 The platform must not restrict landing zone placement to the production environment.
 
-**Why:** Without it, early adopters cannot test new platform features.
+**Why:** Restricting landing zones to production prevents early adopters from testing features in the platform's test environment.
 
 **Anchor:** no-platform-ops
 
 **Implements:** oases
-
-**Violations:**
-
-- Placement restricted to the production management group hierarchy.
 
 **Files:**
 
@@ -1089,11 +1060,7 @@ Break-glass must be used only where automation cannot execute the change.
 
 **Links:**
 
-- depends-on → deployment-declarative-lifecycle — Stack deny assignments override role actions, so break-glass reaches platform resources by being excluded from them.
-
-**Violations:**
-
-- Break-glass used for a change a pull request could have made.
+- depends-on → deployment-declarative-lifecycle — Break-glass access requires exclusion from stack deny assignments, which override role permissions.
 
 **Files:**
 
@@ -1113,7 +1080,7 @@ Platform automation Docker images must be hosted outside the landing zones.
 
 **Links:**
 
-- constrains → azure-native-services-only — GitHub Container Registry sits outside ARM, so it is a dependency the platform consumes rather than a service it adopts.
+- constrains → azure-native-services-only — GitHub Container Registry is consumed outside ARM, not adopted as a platform service.
 
 **Violations:**
 
@@ -1129,7 +1096,7 @@ Platform automation Docker images must be hosted outside the landing zones.
 
 Platform must use an Entra ID app registration as its identity
 
-**Why:** A managed identity needs an existing Azure resource to attach to, but BigBang's first run has none — so there is nothing to authenticate as.
+**Why:** BigBang must authenticate before it creates platform resources, so its identity cannot depend on those resources.
 
 **Anchor:** no-human-touch
 
@@ -1177,7 +1144,7 @@ Platform and landing zone workflows must authenticate to GitHub through the plat
 
 A landing zone identity must hold granular Microsoft Graph read permissions and no broad directory access.
 
-**Why:** Without them, applications cannot resolve tenant identities, so user lookup and group-based authorization fail.
+**Why:** Missing Graph read permissions break identity lookup; broad directory permissions expose more tenant data than applications need.
 
 **Anchor:** no-platform-ops
 
@@ -1185,7 +1152,7 @@ A landing zone identity must hold granular Microsoft Graph read permissions and 
 
 **Links:**
 
-- depends-on → landing-zone-identity — One shared identity per landing zone is what makes a single permission grant cover every workload in it.
+- depends-on → landing-zone-identity — Granting Graph permissions to the shared identity covers every landing zone workload.
 
 **Violations:**
 
@@ -1218,9 +1185,9 @@ Defender for Cloud recommendations with no free remediation path must be pre-exe
 
 ### self-service-policy-exemptions
 
-An exemption must be granted through a merged pull request against the landing zone's parameter file.
+An exemption must be granted through a merged parameter-file PR or, for eight hours, through lz-flow-create-policy-exemption.
 
-**Why:** A deny policy without an exemption path gets worked around rather than enforced, as teams find other routes when blocked.
+**Why:** Without a governed exemption path, blocked teams can bypass deny policies through untracked exceptions.
 
 **Anchor:** no-unapproved-resources
 
@@ -1228,7 +1195,6 @@ An exemption must be granted through a merged pull request against the landing z
 
 **Violations:**
 
-- Exemption applied in the portal rather than through a merged pull request.
 - Exemption description that does not name the reason for the exemption.
 
 **Files:**
@@ -1259,12 +1225,13 @@ A new automation job must run as the landing zone identity, against the ARM API,
 
 **Steps:**
 
-1. Read the rules this process is governed by, to understand access, identity, and image constraints before writing any code.
-2. Implement the job logic under landing-zones/automation/, using the ARM API alone with no data-plane or VNet-dependent calls.
-3. Add a Dockerfile whose base image is pullable from a public registry without authentication.
-4. Register the job in landing-zones/bicep/modules/landingzone-automation.bicep, following the existing job definition pattern.
-5. Verify the job authenticates as the landing zone identity, with no separate identity or secret.
-6. Present a complete draft of all changes before implementing.
+1. Read the governing rules.
+2. Draft the job under landing-zones/automation/, using only ARM calls and no data-plane or VNet-dependent calls.
+3. Draft a Dockerfile with a base image pullable without authentication.
+4. Draft registration in landing-zones/bicep/modules/landingzone-automation.bicep, following the existing job pattern.
+5. Present all proposed changes and wait for permission to implement.
+6. Apply the approved changes.
+7. Verify the job uses the landing zone identity without a separate identity or secret.
 
 **Links:**
 
@@ -1302,14 +1269,14 @@ A resource type must clear deny coverage, diagnostic settings, and job-function 
 
 **Steps:**
 
-1. Read the rules this process is governed by.
-2. Add the resource type to allowedResources.json.
-3. Find the built-in diagnostic settings policy and add it to diagnosticSettings.bicepparam.
-4. For each file in oases/, find built-in policies with the required effect and add matching entries.
-5. For each gap where no built-in provides the required effect, author a custom definition and register it in policyDefinitions.bicepparam.
-6. Check defenderForCloudExemptions.jsonc for paid-SKU recommendations specific to this resource type.
-7. Check accessControl.bicepparam for custom role actions needed by this resource type.
-8. Present a complete draft of all changes before implementing.
+1. Read the governing rules.
+2. Identify the built-in diagnostic-settings policy and draft its entry in diagnosticSettings.bicepparam.
+3. Review each control in oases/ for built-in coverage with the required effect.
+4. Draft custom definitions for uncovered controls and register them in policyDefinitions.bicepparam.
+5. Review defenderForCloudExemptions.jsonc for resource-specific paid-SKU recommendations and accessControl.bicepparam for required job-function actions.
+6. Once coverage and role review are complete, draft the allowedResources.json entry alongside all required control changes.
+7. Present the complete draft and wait for permission to implement.
+8. Apply the approved changes together.
 
 **Links:**
 
@@ -1355,11 +1322,12 @@ A landing zone must be provisioned through requestNew-Landing-Zone workflow.
 
 **Steps:**
 
-1. Confirm the application file exists under platform-members/. If not, register-platform-member completes first.
-2. Collect from the user: application name, environment (test or prod), management group name (oases-prod or oases-test), and budget (optional, default 100).
-3. Auto-select the subscription ID: az account management-group subscription show-sub-under-mg --name subscription-bank --query "[0].name" -o tsv
-4. Confirm the values with the user, including the auto-selected subscription ID, then trigger the workflow, which raises a pull request.
-5. A platform engineer reviews and approves the pull request, and that approval triggers the automation to complete provisioning.
+1. Collect the application name, environment (test or prod), management group (oases-prod or oases-test), and budget (default 100).
+2. Verify the application file exists under platform-members/. If absent, complete register-platform-member before continuing.
+3. Select a subscription from the bank with az account management-group subscription show-sub-under-mg --name subscription-bank --query "[0].name" -o tsv. Stop if none is returned.
+4. Present all values, including the selected subscription ID, and wait for confirmation.
+5. Dispatch requestNew-Landing-Zone, which opens a PR containing the parameter file and landing-zone workflow.
+6. A platform engineer reviews the PR. Merge triggers the landing-zone workflow to provision the environment.
 
 **Links:**
 
@@ -1410,7 +1378,7 @@ A platform change must pass the test environment before it reaches production.
 
 A landing zone must be decommissioned through lz-flow-destroy-landing-zone, which returns its subscription to the bank.
 
-**Why:** Deleting resources by hand cancels the subscription instead of returning it, and the quota is not released.
+**Why:** Manual resource deletion does not return the subscription to the bank for reuse.
 
 **Anchor:** no-platform-ops
 
@@ -1426,11 +1394,11 @@ A landing zone must be decommissioned through lz-flow-destroy-landing-zone, whic
 
 **Steps:**
 
-1. Read the rules this process is governed by, to understand what is being destroyed and what constraints apply.
-2. Collect from the user: subscription ID of the landing zone to decommission.
-3. Verify the bicepparam file and the lz-oasis-{appName}-{env} workflow both exist. Stop if either is missing.
-4. Present what will be permanently destroyed: deployment stack, resource groups, role assignments, budget, Defender settings. Confirm the subscription returns to the bank. Wait for explicit confirmation.
-5. Trigger lz-flow-destroy-landing-zone via workflow_dispatch with the subscription ID. Leave the file deletions to the workflow.
+1. Read the governing rules.
+2. Collect the subscription ID and locate its parameter file and landing-zone workflow. Stop if either is missing.
+3. Present what decommissioning permanently removes: deployment stack, resource groups, role assignments, budget, and Defender settings. State that the subscription returns to the bank.
+4. Wait for explicit confirmation, then dispatch lz-flow-destroy-landing-zone with the subscription ID.
+5. Leave file deletion to the workflow, which opens a cleanup PR. A platform engineer reviews the PR; merge initiates Azure cleanup and returns the subscription to the bank.
 
 **Links:**
 
@@ -1503,9 +1471,10 @@ An application must be registered through requestNew-Platform-Members before any
 
 **Steps:**
 
-1. Collect from the user: application name, owner email, and engineer email.
-2. Confirm the values with the user, then trigger the workflow, which raises a pull request creating platform-members/{AppName}.json.
-3. A platform engineer reviews and approves the pull request, and that approval provisions the application repo, Entra group, billing scope, and repository variables.
+1. Collect the application name, owner email, and engineer email.
+2. Present the values and wait for confirmation.
+3. Dispatch requestNew-Platform-Members, which opens a PR creating platform-members/{AppName}.json.
+4. A platform engineer reviews the PR. After merge, template-new-platform-members provisions the application repo, Entra group, billing scope, and repository variables.
 
 **Violations:**
 
@@ -1538,13 +1507,13 @@ A knowledge graph entry must be drafted and presented before any file is written
 
 **Steps:**
 
-1. Identify whether this is a new entry or an update to an existing one. For an update, read the existing file first.
-2. Determine the type: vocabulary, constitutive, or regulative. Constitutive states what counts as something; regulative states what has to happen inside that.
-3. Draft the entry. The id matches the filename, the subject names a vocabulary term, the anchor names a foundation, and the why states the consequence of ignoring the rule rather than restating it.
-4. For links: add one where the source is incomplete without the target, and let the note say which source behaviour relies on which target constraint, fact, or output. Drop it if the relationship is obvious from context alone.
-5. For a regulative rule, name the constitutive rule it upholds in implements. Omit implements where the rule serves its foundation directly.
-6. Present the complete draft before writing any file.
-7. Write the file.
+1. Identify whether the entry is new or existing. Read the existing file before drafting an update.
+2. Choose the node type and follow its schema. Constitutive rules define what counts; regulative rules state requirements for entities or processes.
+3. For individual rule files, match the ID to the filename and anchor the rule to a foundation. Constitutive subjects name vocabulary terms; regulative subjects specify entity or process.
+4. For regulative rules, explain what fails without the requirement. Name the constitutive rules upheld in implements, or omit it when serving the foundation directly.
+5. Add dependency links only where the source needs the target. Name the required constraint, fact, or output in the note; omit obvious relationships.
+6. Present the complete draft and wait for permission to write.
+7. Write the approved entry and regenerate constitution/graph.md with .github/scripts/write-knowledge-graph.ps1.
 8. Open a pull request.
 
 **Violations:**
@@ -1558,13 +1527,14 @@ A knowledge graph entry must be drafted and presented before any file is written
 
 - `constitution/vocabulary/`
 - `constitution/constitutive/`
-- `constitution/regulative/`
+- `constitution/regulative-entity/`
+- `constitution/regulative-process/`
 
 ### update-landing-zone
 
-A landing zone must be reshaped by editing its parameter file and merging a pull request, which redeploys the stack.
+Landing zone changes must use a merged parameter-file PR, except eight-hour exemptions granted through lz-flow-create-policy-exemption.
 
-**Why:** An out-of-band edit is removed on the next deployment, because the stack deletes what the code no longer declares.
+**Why:** Changes outside the parameter file or temporary-exemption workflow leave the landing zone's configuration untracked.
 
 **Anchor:** no-platform-ops
 
@@ -1581,14 +1551,16 @@ A landing zone must be reshaped by editing its parameter file and merging a pull
 
 **Steps:**
 
-1. Read the rules this process is governed by, to understand the constraints on tags, budget, and exemptions.
-2. Verify the landing zone exists: the bicepparam file and the lz-oasis-{appName}-{env} workflow. If either is missing this is a create-landing-zone task.
-3. Collect from the user the app and environment to manage, and which concern to change: cost, tags, or exemptions.
-4. Cost: edit the single budget value. The budget drives one forecasted alert, so additional thresholds are out of scope.
-5. Tags: edit subscriptionLevelTags and resourceLevelTags keys and placement. Keep ownerEmail and engineerEmail as readEnvironmentVariable references, and keep ownerEmail at subscription level.
-6. Exemptions: ask whether the exemption is temporary or long-lived. Temporary triggers lz-flow-create-policy-exemption with an 8-hour expiry. Long-lived adds an entry to the exemptions array referencing a policy-assignment-reference.json key.
-7. Present a complete draft of the bicepparam change before implementing.
-8. Open a pull request. The merge redeploys the landing zone stack with deleteAll.
+1. Read the governing rules.
+2. Collect the application, environment, and requested change: cost, tags, or exemptions.
+3. Locate the parameter file and its deployment workflow. If either is missing, stop the update and resolve provisioning through create-landing-zone.
+4. For exemptions, ask whether the request is temporary or long-lived.
+5. For a temporary exemption, collect the policy selection and subscription ID, present the eight-hour scope, and wait for confirmation. Dispatch lz-flow-create-policy-exemption and end this branch; no parameter-file edit or PR is required.
+6. For cost, draft a change to the single budget value; additional alert thresholds are out of scope.
+7. For tags, draft changes to subscriptionLevelTags and resourceLevelTags. Preserve ownerEmail and engineerEmail as readEnvironmentVariable references, with ownerEmail at subscription level.
+8. For a long-lived exemption, draft an exemptions entry referencing a policy-assignment-reference.json key.
+9. For parameter-file changes, present the complete draft and wait for permission to implement.
+10. Apply the approved changes and open a PR. Merge redeploys the landing-zone stack with deleteAll.
 
 **Links:**
 
@@ -1596,10 +1568,10 @@ A landing zone must be reshaped by editing its parameter file and merging a pull
 - governed-by → azure-policy-reference
 - governed-by → landing-zone-tags
 - governed-by → deployment-declarative-lifecycle
+- governed-by → self-service-policy-exemptions
 
 **Violations:**
 
-- Budget, tag, or exemption changed in the portal instead of the parameter file.
 - Exemption entry naming a literal ARM assignment ID.
 
 **Files:**
@@ -1610,9 +1582,9 @@ A landing zone must be reshaped by editing its parameter file and merging a pull
 
 ### validate-codebase-rules
 
-Every pull request must be validated against the knowledge graph rules and checked for functionality the graph doesn't yet name, and a FAIL result must block merge.
+Every PR must be checked for rule violations and functionality absent from the graph; either finding must block merge.
 
-**Why:** Without automated validation, rule violations reach the codebase unchallenged and the graph stops describing what the code actually does; without blocking merge, a FAIL carries no enforcement and is only a comment a reviewer can ignore.
+**Why:** Without a blocking check, rule violations and unnamed functionality can reach the default branch.
 
 **Anchor:** no-human-touch
 
@@ -1626,14 +1598,15 @@ Every pull request must be validated against the knowledge graph rules and check
 
 **Steps:**
 
-1. On pull_request opened or synchronize, check out the repo at the PR head with full history.
-2. Collect the full diff (git diff origin/<base>...HEAD) and the full content of every non-deleted changed file. Cap total injected content at 50 KB; truncate with a note beyond that.
-3. Run claude -p with the diff and file contents from the repo root so CLAUDE.md context loads automatically. Ask Claude to check every rule in all three layers - foundations, constitutive, regulative - and return a verdict for every single one, including rules that do not apply.
-4. Ask Claude to separately identify any functionality, capability, or resource type the diff introduces that no vocabulary, constitutive, or regulative node names - regardless of whether it violates an existing rule.
-5. Ask Claude to return JSON: {"result": "PASS"|"FAIL", "summary": {"what": "...", "why": "..."}, "foundations": [...], "constitutive": [...], "regulative": [...], "uncovered": [...]}, where uncovered holds one entry per gap found, each with a description of the new functionality and the evidence (file/line) that introduced it.
-6. Parse the JSON output. Render each layer as a section: failed rules listed with violation and evidence, passed rules collapsed under a details toggle. Render uncovered findings as their own section. result is FAIL if any rule in any layer has status fail or uncovered contains one or more entries, and a FAIL result must fail the workflow job so GitHub Actions visibly reports advisory findings.
-7. Post the formatted findings as a pull request comment, prefixed with the what/why summary and suffixed with model, token count, and cost in EUR.
-8. Configure the check as a required status check on the default branch, with no admin-bypass exemption, so a FAIL cannot be merged past.
+1. Prerequisite: configure the check as required on the default branch, with no admin bypass.
+2. On pull_request opened or synchronize, check out the PR head with full history.
+3. Collect git diff origin/<base>...HEAD and the full content of non-deleted changed files. Exclude graph.md from injected content; cap injected content at 50 KB and mark truncation.
+4. Run claude -p from the repository root so CLAUDE.md loads. Request a verdict for every foundation, constitutive rule, and regulative rule, including rules that do not apply.
+5. Separately identify introduced functionality, capabilities, or resource types that no vocabulary, constitutive, or regulative node names.
+6. Require JSON with result, summary: {what, why}, foundations, constitutive, regulative, and uncovered. Each uncovered entry must describe the gap and cite its introducing file and line.
+7. Set the result to FAIL if any rule fails or uncovered is nonempty. A FAIL must fail the workflow job.
+8. Render failures with violations and evidence, collapse passed rules by layer, and list uncovered findings separately.
+9. Post the PR comment with the what/why summary, findings, model, token count, and cost in EUR.
 
 **Links:**
 

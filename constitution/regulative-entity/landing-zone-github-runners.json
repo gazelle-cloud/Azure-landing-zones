@@ -12,7 +12,7 @@
     {
       "target": "platform-identity-github",
       "relation": "depends-on",
-      "note": "Runner registration needs the GitHub App, as no other identity can register runners to a repo."
+      "note": "Runner registration authenticates through the platform GitHub App."
     }
   ],
   "violations": [

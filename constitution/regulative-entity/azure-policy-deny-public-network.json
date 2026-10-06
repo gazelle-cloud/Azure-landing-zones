@@ -12,7 +12,7 @@
         {
             "target": "landing-zone-github-runners",
             "relation": "depends-on",
-            "note": "Denying public network access relies on landing zones having private GitHub runners inside the VNet for data-plane access."
+            "note": "Runners inside the landing zone VNet provide data-plane access when public access is denied."
         }
     ],
     "violations": [

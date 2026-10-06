@@ -5,13 +5,11 @@
     "type": "entity"
   },
   "decision": "The platform must not restrict landing zone placement to the production environment.",
-  "why": "Without it, early adopters cannot test new platform features.",
+  "why": "Restricting landing zones to production prevents early adopters from testing features in the platform's test environment.",
   "anchor": "no-platform-ops",
   "implements": "oases",
   "links": [],
-  "violations": [
-    "Placement restricted to the production management group hierarchy."
-  ],
+  "violations": [],
   "files": [
     ".github/workflows/requestNew-Landing-Zone.yml"
   ],

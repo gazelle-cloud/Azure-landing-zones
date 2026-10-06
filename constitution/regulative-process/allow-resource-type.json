@@ -14,14 +14,14 @@
     "add resource to allowed list"
   ],
   "steps": [
-    "Read the rules this process is governed by.",
-    "Add the resource type to allowedResources.json.",
-    "Find the built-in diagnostic settings policy and add it to diagnosticSettings.bicepparam.",
-    "For each file in oases/, find built-in policies with the required effect and add matching entries.",
-    "For each gap where no built-in provides the required effect, author a custom definition and register it in policyDefinitions.bicepparam.",
-    "Check defenderForCloudExemptions.jsonc for paid-SKU recommendations specific to this resource type.",
-    "Check accessControl.bicepparam for custom role actions needed by this resource type.",
-    "Present a complete draft of all changes before implementing."
+    "Read the governing rules.",
+    "Identify the built-in diagnostic-settings policy and draft its entry in diagnosticSettings.bicepparam.",
+    "Review each control in oases/ for built-in coverage with the required effect.",
+    "Draft custom definitions for uncovered controls and register them in policyDefinitions.bicepparam.",
+    "Review defenderForCloudExemptions.jsonc for resource-specific paid-SKU recommendations and accessControl.bicepparam for required job-function actions.",
+    "Once coverage and role review are complete, draft the allowedResources.json entry alongside all required control changes.",
+    "Present the complete draft and wait for permission to implement.",
+    "Apply the approved changes together."
   ],
   "workflow": "platform-Azure-Policy",
   "links": [

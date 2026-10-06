@@ -5,14 +5,14 @@
     "type": "entity"
   },
   "decision": "A landing zone identity must hold granular Microsoft Graph read permissions and no broad directory access.",
-  "why": "Without them, applications cannot resolve tenant identities, so user lookup and group-based authorization fail.",
+  "why": "Missing Graph read permissions break identity lookup; broad directory permissions expose more tenant data than applications need.",
   "anchor": "no-platform-ops",
   "implements": "platform",
   "links": [
     {
       "target": "landing-zone-identity",
       "relation": "depends-on",
-      "note": "One shared identity per landing zone is what makes a single permission grant cover every workload in it."
+      "note": "Granting Graph permissions to the shared identity covers every landing zone workload."
     }
   ],
   "violations": [

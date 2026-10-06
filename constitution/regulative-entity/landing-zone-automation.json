@@ -12,7 +12,7 @@
     {
       "target": "platform-identity-graph",
       "relation": "depends-on",
-      "note": "Jobs query Entra ID, so the Graph read permissions are what make that call possible."
+      "note": "Jobs querying Entra ID require the landing zone identity's Graph read permissions."
     }
   ],
   "violations": [

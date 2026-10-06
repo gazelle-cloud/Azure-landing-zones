@@ -14,12 +14,13 @@
     "automate remediation"
   ],
   "steps": [
-    "Read the rules this process is governed by, to understand access, identity, and image constraints before writing any code.",
-    "Implement the job logic under landing-zones/automation/, using the ARM API alone with no data-plane or VNet-dependent calls.",
-    "Add a Dockerfile whose base image is pullable from a public registry without authentication.",
-    "Register the job in landing-zones/bicep/modules/landingzone-automation.bicep, following the existing job definition pattern.",
-    "Verify the job authenticates as the landing zone identity, with no separate identity or secret.",
-    "Present a complete draft of all changes before implementing."
+    "Read the governing rules.",
+    "Draft the job under landing-zones/automation/, using only ARM calls and no data-plane or VNet-dependent calls.",
+    "Draft a Dockerfile with a base image pullable without authentication.",
+    "Draft registration in landing-zones/bicep/modules/landingzone-automation.bicep, following the existing job pattern.",
+    "Present all proposed changes and wait for permission to implement.",
+    "Apply the approved changes.",
+    "Verify the job uses the landing zone identity without a separate identity or secret."
   ],
   "workflow": "platform-automation",
   "links": [

@@ -18,9 +18,10 @@
     "join the platform"
   ],
   "steps": [
-    "Collect from the user: application name, owner email, and engineer email.",
-    "Confirm the values with the user, then trigger the workflow, which raises a pull request creating platform-members/{AppName}.json.",
-    "A platform engineer reviews and approves the pull request, and that approval provisions the application repo, Entra group, billing scope, and repository variables."
+    "Collect the application name, owner email, and engineer email.",
+    "Present the values and wait for confirmation.",
+    "Dispatch requestNew-Platform-Members, which opens a PR creating platform-members/{AppName}.json.",
+    "A platform engineer reviews the PR. After merge, template-new-platform-members provisions the application repo, Entra group, billing scope, and repository variables."
   ],
   "workflow": "requestNew-Platform-Members",
   "links": [],

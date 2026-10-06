@@ -16,7 +16,6 @@
     }
   ],
   "violations": [
-    "New subscription created while the bank held an available empty one.",
     "Sunset subscription cancelled rather than returned to the bank."
   ],
   "files": [

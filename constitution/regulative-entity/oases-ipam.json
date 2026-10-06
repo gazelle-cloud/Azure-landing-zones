@@ -5,7 +5,7 @@
     "type": "entity"
   },
   "decision": "VNet address spaces must be allocated by querying live Azure, not by reading an assignment registry.",
-  "why": "Without querying live state, address allocations drift and VNets cannot peer.",
+  "why": "Stale address allocations can produce overlapping VNet ranges that prevent peering.",
   "anchor": "no-platform-ops",
   "implements": "oases",
   "links": [],

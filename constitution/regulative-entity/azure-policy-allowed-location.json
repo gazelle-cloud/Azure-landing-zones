@@ -12,7 +12,7 @@
         {
             "target": "deployment-config-in-repo",
             "relation": "depends-on",
-            "note": "The approved location is a platform boundary because the repository names it in githubVariables.json."
+            "note": "The allowed location comes from githubVariables.json."
         }
     ],
     "violations": [
